@@ -52,8 +52,10 @@ epochInfo = rbind(epochInfo,epochInfo)
 allData <- cbind(epochInfo, scalpData)
 allData <- gather(allData, "sample", "voltage", gathercols, factor_key = TRUE)
 
-allData$sample <- as.integer(substring(allData$sample,2))
+subtractedData <- lHemData
 
+#Tidy variable names etc. and create any necessary variables
+allData$sample <- as.integer(substring(allData$sample,2))
 allData <- allData %>% mutate(Contra = as.factor(ifelse(Hemifield==Hem, "Ipsilateral", "Contralateral")))
 allData <- allData %>% mutate(Stimulus = paste(LatStim," (",MidStim," mid)"))
 
@@ -62,6 +64,22 @@ rm(epochInfo,lHemData,rHemData,scalpData, gathercols)
 #####
 library(ggplot2)
 baseline = 200
+#Categorization ERPs
+allData %>%
+  filter(Event == "Learn" & Reject == 0) %>%
+  mutate(sample = sample-baseline) %>%
+  group_by(LatStim,sample,Contra,Group) %>%
+  summarise(mean = mean(voltage)) %>%
+  ggplot(., aes(sample, mean)) +
+  geom_line(aes(colour = Contra),size=1) +
+  scale_x_continuous(name ="Latency (ms)", expand = c(0, 0)) +
+  scale_y_reverse(name =expression(paste("Amplitude (",mu,"v)")), expand = c(0, 0)) +
+  facet_grid(LatStim~Group) +
+  geom_vline(xintercept = 0,linetype = "dashed" )+
+  geom_hline(yintercept = 0,linetype = "dashed") +
+  theme_minimal()
+
+#Search ERPs
 allData %>%
   filter(Event == "Search" & LatStim != "None" & Reject == 0) %>%
   mutate(sample = sample-baseline) %>%

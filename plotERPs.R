@@ -1,9 +1,9 @@
-dPath = 'F:/CSL Choice/Data/EEG (raw data)/Visuals/'
+dPath = 'CSL_Visuals/'
 fPrefix = 'N2pc'
 
 #Load group data
-groupdata = read.csv(file="F:/CSL Choice/Scripts/SophiaGroupAssignment_provisional.csv")
-groupdata = groupdata %>% mutate(Group = as.factor(ifelse(Group == 1, "Colour", "Shape")))
+groupdata = read.csv(file="CSL_Visuals/SophiaGroupAssignment_provisional.csv")
+groupdata = groupdata %>% mutate(Group = ifelse(Group == 1, "Colour", "Shape"))
 groupdata$Reject = as.factor(groupdata$Reject)
 
 #####
@@ -55,17 +55,23 @@ allData <- gather(allData, "sample", "voltage", gathercols, factor_key = TRUE)
 allData$sample <- as.integer(substring(allData$sample,2))
 
 allData <- allData %>% mutate(Contra = as.factor(ifelse(Hemifield==Hem, "Ipsilateral", "Contralateral")))
-allData <- recode(allData, )
+allData <- allData %>% mutate(Stimulus = paste(LatStim," (",MidStim," mid)"))
+
 #clear stuff that I don't need
 rm(epochInfo,lHemData,rHemData,scalpData, gathercols)
 #####
 library(ggplot2)
+baseline = 200
 allData %>%
   filter(Event == "Search" & LatStim != "None" & Reject == 0) %>%
-  group_by(LatStim,sample,Contra,Group) %>%
+  mutate(sample = sample-baseline) %>%
+  group_by(Stimulus,sample,Contra,Group) %>%
   summarise(mean = mean(voltage)) %>%
   ggplot(., aes(sample, mean)) +
-    geom_line(aes(linetype = Contra)) +
-    facet_grid(Group~LatStim) +
-    scale_y_reverse()
-  
+    geom_line(aes(colour = Contra),size=1) +
+    scale_x_continuous(name ="Latency (ms)", expand = c(0, 0)) +
+    scale_y_reverse(name =expression(paste("Amplitude (",mu,"v)")), expand = c(0, 0)) +
+    facet_grid(Stimulus~Group) +
+    geom_vline(xintercept = 0,linetype = "dashed" )+
+    geom_hline(yintercept = 0,linetype = "dashed") +
+    theme_minimal()

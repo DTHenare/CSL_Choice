@@ -1,3 +1,7 @@
+library(tidyr)
+library(dplyr)
+library(ggplot2)
+
 dPath = 'CSL_Visuals/'
 fPrefix = 'N2pc'
 
@@ -36,13 +40,16 @@ for (subj in 2:length(eFileList)) {
   rHemData = rbind(rHemData, curRHemData)
 }
 epochInfo$Subject = as.factor(epochInfo$Subject)
+epochInfo$Group = as.factor(epochInfo$Group)
+epochInfo$VarName8 = NULL
+epochInfo$VarName9 = NULL
+epochInfo$VarName10 = NULL
+epochInfo$VarName11 = NULL
 
 #clear stuff that I don't need
 rm(curEpochInfo,curLHemData,curRHemData, fPrefix, eFileList, eFilePattern, lFileList, lFilePattern, rFileList, rFilePattern, subj, groupdata)
 #####
 #combine all the data together into one long table
-library(tidyr)
-library(dplyr)
 gathercols = colnames(lHemData)
 lHemData$Hem = "Left"
 rHemData$Hem = "Right"
@@ -60,8 +67,9 @@ allData <- allData %>% mutate(Stimulus = paste(LatStim," (",MidStim," mid)"))
 #clear stuff that I don't need
 rm(epochInfo,lHemData,rHemData,scalpData, gathercols)
 #####
-library(ggplot2)
 baseline = 200
+plotWidth = 6
+plotHeight = 2.25
 #Categorization ERPs
 allData %>%
   filter(Event == "Learn" & Reject == 0) %>%
@@ -78,6 +86,7 @@ allData %>%
     geom_hline(yintercept = 0,linetype = "dashed") +
     theme_minimal() +
     theme(panel.spacing.y = unit(2, "lines"))
+ggsave("LearnERPs.pdf",width = plotWidth, height = plotHeight*2)
 #Subtracted
 allData %>%
   filter(Event == "Learn" & Reject == 0) %>%
@@ -96,6 +105,7 @@ allData %>%
     geom_hline(yintercept = 0,linetype = "dashed") +
     theme_minimal() +
     theme(panel.spacing.y = unit(2, "lines"))
+ggsave("LearnLRPs.pdf",width = plotWidth, height = plotHeight*2)
 
 #Search ERPs
 allData %>%
@@ -113,6 +123,7 @@ allData %>%
     geom_hline(yintercept = 0,linetype = "dashed") +
     theme_minimal() +
     theme(panel.spacing.y = unit(2, "lines"))
+ggsave("SearchERPs.pdf",width = plotWidth, height = plotHeight*3)
 #Subtracted
 allData %>%
   filter(Event == "Search" & LatStim != "None" & Reject == 0) %>%
@@ -131,3 +142,4 @@ allData %>%
     geom_hline(yintercept = 0,linetype = "dashed") +
     theme_minimal() +
     theme(panel.spacing.y = unit(2, "lines"))
+ggsave("SearchLRPs.pdf",width = plotWidth, height = plotHeight*3)

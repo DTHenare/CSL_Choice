@@ -39,6 +39,7 @@ for (subj in 2:length(eFileList)) {
   lHemData = rbind(lHemData, curLHemData)
   rHemData = rbind(rHemData, curRHemData)
 }
+#Tidy the variables, remove unnecessary and convert to factors
 epochInfo$Subject = as.factor(epochInfo$Subject)
 epochInfo$Group = as.factor(epochInfo$Group)
 epochInfo$VarName8 = NULL
@@ -77,7 +78,7 @@ allData %>%
   group_by(LatStim,sample,Contra,Group) %>%
   summarise(mean = mean(voltage)) %>%
   ggplot(., aes(sample, mean)) +
-    geom_line(aes(colour = Contra),size=1) +
+    geom_line(aes(colour = Contra),size=0.5) +
     scale_color_manual(values=c("#000000", "#CC0000")) +
     scale_x_continuous(name ="Latency (ms)", expand = c(0, 0)) +
     scale_y_reverse(name =expression(paste("Amplitude (",mu,"v)")), expand = c(0, 0)) +
@@ -114,7 +115,7 @@ allData %>%
   group_by(Stimulus,sample,Contra,Group) %>%
   summarise(mean = mean(voltage)) %>%
   ggplot(., aes(sample, mean)) +
-    geom_line(aes(colour = Contra),size=1) +
+    geom_line(aes(colour = Contra),size=0.5) +
     scale_color_manual(values=c("#000000", "#CC0000")) +
     scale_x_continuous(name ="Latency (ms)", expand = c(0, 0)) +
     scale_y_reverse(name =expression(paste("Amplitude (",mu,"v)")), expand = c(0, 0)) +

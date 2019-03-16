@@ -70,12 +70,14 @@ allData %>%
   summarise(mean = mean(voltage)) %>%
   ggplot(., aes(sample, mean)) +
     geom_line(aes(colour = Contra),size=1) +
+    scale_color_manual(values=c("#000000", "#CC0000")) +
     scale_x_continuous(name ="Latency (ms)", expand = c(0, 0)) +
     scale_y_reverse(name =expression(paste("Amplitude (",mu,"v)")), expand = c(0, 0)) +
     facet_grid(LatStim~Group) +
     geom_vline(xintercept = 0,linetype = "dashed" )+
     geom_hline(yintercept = 0,linetype = "dashed") +
-    theme_minimal()
+    theme_minimal() +
+    theme(panel.spacing.y = unit(2, "lines"))
 #Subtracted
 allData %>%
   filter(Event == "Learn" & Reject == 0) %>%
@@ -86,12 +88,14 @@ allData %>%
   mutate(diff = Contralateral - Ipsilateral) %>%
   ggplot(., aes(sample,diff)) +
     geom_line(aes(colour = Group),size=1) +
+    scale_colour_brewer(palette = "Set1") +
     scale_x_continuous(name ="Latency (ms)", expand = c(0, 0)) +
     scale_y_reverse(name =expression(paste("Amplitude (",mu,"v)")), expand = c(0, 0)) +
     facet_grid(LatStim~.) +
     geom_vline(xintercept = 0,linetype = "dashed" )+
     geom_hline(yintercept = 0,linetype = "dashed") +
-    theme_minimal()
+    theme_minimal() +
+    theme(panel.spacing.y = unit(2, "lines"))
 
 #Search ERPs
 allData %>%
@@ -101,12 +105,14 @@ allData %>%
   summarise(mean = mean(voltage)) %>%
   ggplot(., aes(sample, mean)) +
     geom_line(aes(colour = Contra),size=1) +
+    scale_color_manual(values=c("#000000", "#CC0000")) +
     scale_x_continuous(name ="Latency (ms)", expand = c(0, 0)) +
     scale_y_reverse(name =expression(paste("Amplitude (",mu,"v)")), expand = c(0, 0)) +
     facet_grid(Stimulus~Group) +
     geom_vline(xintercept = 0,linetype = "dashed" )+
     geom_hline(yintercept = 0,linetype = "dashed") +
-    theme_minimal()
+    theme_minimal() +
+    theme(panel.spacing.y = unit(2, "lines"))
 #Subtracted
 allData %>%
   filter(Event == "Search" & LatStim != "None" & Reject == 0) %>%
@@ -117,10 +123,11 @@ allData %>%
   mutate(diff = Contralateral - Ipsilateral) %>%
   ggplot(., aes(sample,diff)) +
     geom_line(aes(colour = Group),size=1) +
+    scale_colour_brewer(palette = "Set1") +
     scale_x_continuous(name ="Latency (ms)", expand = c(0, 0)) +
     scale_y_reverse(name =expression(paste("Amplitude (",mu,"v)")), expand = c(0, 0)) +
     facet_grid(Stimulus~.) +
     geom_vline(xintercept = 0,linetype = "dashed" )+
     geom_hline(yintercept = 0,linetype = "dashed") +
-    theme_minimal()
-  
+    theme_minimal() +
+    theme(panel.spacing.y = unit(2, "lines"))

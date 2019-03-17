@@ -64,6 +64,8 @@ allData <- gather(allData, "sample", "voltage", gathercols, factor_key = TRUE)
 allData$sample <- as.integer(substring(allData$sample,2))
 allData <- allData %>% mutate(Contra = ifelse(Hemifield==Hem, "Ipsilateral", "Contralateral"))
 allData <- allData %>% mutate(Stimulus = paste(LatStim," (",MidStim," mid)"))
+allData <- allData %>% mutate(Object = as.factor(paste(Group,LatStim, sep="")))
+allData$Object <- recode(allData$Object, ShapePredictor = "Shape", ColourPredictor="Colour", ShapeNonPred = "Colour", ColourNonPred = "Shape")
 
 #clear stuff that I don't need
 rm(epochInfo,lHemData,rHemData,scalpData, gathercols)
@@ -86,7 +88,8 @@ allData %>%
     geom_vline(xintercept = 0,linetype = "dashed" )+
     geom_hline(yintercept = 0,linetype = "dashed") +
     theme_minimal() +
-    theme(panel.spacing.y = unit(2, "lines"))
+    theme(panel.spacing.y = unit(2, "lines")) +
+    coord_fixed(ratio = 10)
 ggsave("LearnERPs.pdf",width = plotWidth, height = plotHeight*2)
 #Subtracted
 allData %>%
@@ -107,6 +110,23 @@ allData %>%
     theme_minimal() +
     theme(panel.spacing.y = unit(2, "lines"))
 ggsave("LearnLRPs.pdf",width = plotWidth, height = plotHeight*2)
+allData %>%
+  filter(Event == "Learn" & Reject == 0) %>%
+  mutate(sample = sample-baseline) %>%
+  group_by(Object,sample,Contra,Group) %>%
+  summarise(mean = mean(voltage)) %>%
+  spread(Contra, mean) %>% 
+  mutate(diff = Contralateral - Ipsilateral) %>%
+  ggplot(., aes(sample,diff)) +
+  geom_line(aes(colour = Group),size=1) +
+  scale_colour_brewer(palette = "Set1") +
+  scale_x_continuous(name ="Latency (ms)", expand = c(0, 0)) +
+  scale_y_reverse(name =expression(paste("Amplitude (",mu,"v)")), expand = c(0, 0)) +
+  facet_grid(Object~.) +
+  geom_vline(xintercept = 0,linetype = "dashed" )+
+  geom_hline(yintercept = 0,linetype = "dashed") +
+  theme_minimal() +
+  theme(panel.spacing.y = unit(2, "lines"))
 
 #Search ERPs
 allData %>%

@@ -109,7 +109,7 @@ allData %>%
     geom_hline(yintercept = 0,linetype = "dashed") +
     theme_minimal() +
     theme(panel.spacing.y = unit(2, "lines"))
-ggsave("LearnLRPs.pdf",width = plotWidth, height = plotHeight*2)
+ggsave("LearnLERPs.pdf",width = plotWidth, height = plotHeight*2)
 allData %>%
   filter(Event == "Learn" & Reject == 0) %>%
   mutate(sample = sample-baseline) %>%
@@ -163,4 +163,4 @@ allData %>%
     geom_hline(yintercept = 0,linetype = "dashed") +
     theme_minimal() +
     theme(panel.spacing.y = unit(2, "lines"))
-ggsave("SearchLRPs.pdf",width = plotWidth, height = plotHeight*3)
+ggsave("SearchLERPs.pdf",width = plotWidth, height = plotHeight*3)

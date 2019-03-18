@@ -46,6 +46,10 @@ epochInfo$VarName8 = NULL
 epochInfo$VarName9 = NULL
 epochInfo$VarName10 = NULL
 epochInfo$VarName11 = NULL
+allData$LatStim=NULL
+allData$MidStim=NULL
+allData$TrialType=NULL
+allData$Timepoint=NULL
 
 #clear stuff that I don't need
 rm(curEpochInfo,curLHemData,curRHemData, fPrefix, eFileList, eFilePattern, lFileList, lFilePattern, rFileList, rFilePattern, subj, groupdata)
@@ -87,4 +91,25 @@ allData %>%
   geom_hline(yintercept = 0,linetype = "dashed") +
   theme_minimal() +
   theme(panel.spacing.y = unit(2, "lines"))
-ggsave("LRPs.pdf",width = plotWidth, height = plotHeight*3)
+ggsave("LRPsUnsub.pdf",width = plotWidth, height = plotHeight*3)
+
+allData %>%
+  mutate(sample = sample-baseline) %>%
+  group_by(Event, sample, Contra, Group) %>%
+  summarise(mean = mean(voltage)) %>%
+  spread(Contra, mean) %>% 
+  mutate(diff = Contralateral - Ipsilateral) %>%
+  ggplot(., aes(sample, diff)) +
+  geom_line(aes(colour = Group),size=0.5) +
+  scale_colour_brewer(palette = "Set1") +
+  scale_x_continuous(name ="Latency (ms)", expand = c(0, 0)) +
+  scale_y_reverse(name =expression(paste("Amplitude (",mu,"v)")), expand = c(0, 0)) +
+  facet_grid(Event~.) +
+  geom_vline(xintercept = -800,linetype = "dashed" )+
+  geom_hline(yintercept = 0,linetype = "dashed") +
+  theme_minimal() +
+  theme(panel.spacing.y = unit(2, "lines"))
+ggsave("LRPsSub.pdf",width = plotWidth, height = plotHeight*3)
+
+#Physio appontments
+#friday 9; tuesday 8:55; thursday 4:55, tuesday 2:40, thursday 2:15, Monday 12:10

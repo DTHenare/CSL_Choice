@@ -111,6 +111,3 @@ allData %>%
   theme_minimal() +
   theme(panel.spacing.y = unit(2, "lines"))
 ggsave("LRPsSub.pdf",width = plotWidth, height = plotHeight*3)
-
-#Physio appontments
-#friday 9; tuesday 8:55; thursday 4:55, tuesday 2:40, thursday 2:15, Monday 12:10

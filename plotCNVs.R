@@ -55,6 +55,7 @@ epochInfo$LatStim=NULL
 epochInfo$MidStim=NULL
 epochInfo$TrialType=NULL
 epochInfo$Timepoint=NULL
+epochInfo$Hemifield=NULL
 
 #clear stuff that I don't need
 rm(curEpochInfo,curFzData,curCzData,curPzData, fPrefix, eFileList, eFilePattern, fFileList, fFilePattern, cFileList, cFilePattern, pFileList, pFilePattern, subj, groupdata)
@@ -68,19 +69,21 @@ scalpData = rbind(FzData,CzData,PzData)
 epochInfo = rbind(epochInfo,epochInfo,epochInfo)
 
 allData <- cbind(epochInfo, scalpData)
-rm(epochInfo,FzData,CzData,PzData)
+rm(epochInfo,FzData,CzData,PzData,scalpData)
 gc()
 allData <- gather(allData, "sample", "voltage", gathercols, factor_key = TRUE)
 
-#Tidy variable names etc. and create any necessary variables - could use unite
+#Tidy variable names etc. and create any necessary variables
 allData$sample <- as.integer(substring(allData$sample,2))
-allData <- allData %>% mutate(Hemifield = ifelse(substring(Event,1,5)=="Learn", "Left", "Right"))
-allData <- allData %>% mutate(Contra = ifelse(Hemifield==Hem, "Ipsilateral", "Contralateral"))
-allData <- allData %>% mutate(Run = substring(allData$Event,15))
-allData <- allData %>% mutate(Run = ifelse((Run == "p" | Run == "ep"),"Repetition","Switch"))
+allData <- allData %>% mutate(RepSwitch = substring(allData$Event,15))
+allData <- allData %>% mutate(RepSwitch = ifelse((RepSwitch == "p" | RepSwitch == "ep"),"Repetition","Switch"))
+allData <- allData %>% mutate(TaskChoice = substring(Event,1,5)) %>% mutate(TaskChoice = ifelse(TaskChoice=="Searc","Search","Learn"))
 
 #clear stuff that I don't need
-rm(epochInfo,lHemData,rHemData,scalpData, gathercols)
+rm(gathercols)
+allData$StimTrig = NULL
+allData$Event = NULL
+gc()
 #####
 baseline = 1000
 plotWidth = 6
@@ -88,34 +91,15 @@ plotHeight = 2.25
 
 allData %>%
   mutate(sample = sample-baseline) %>%
-  group_by(Run, sample, Contra, Group) %>%
+  group_by(RepSwitch, sample, Chan, Group) %>%
   summarise(mean = mean(voltage)) %>%
   ggplot(., aes(sample, mean)) +
-  geom_line(aes(colour = Contra),size=0.5) +
+  geom_line(aes(colour = RepSwitch),size=0.5) +
   scale_color_manual(values=c("#000000", "#CC0000")) +
   scale_x_continuous(name ="Latency (ms)", expand = c(0, 0)) +
   scale_y_reverse(name =expression(paste("Amplitude (",mu,"v)")), expand = c(0, 0)) +
-  facet_grid(Run~Group) +
+  facet_grid(Chan~Group) +
   geom_vline(xintercept = -800,linetype = "dashed" )+
   geom_hline(yintercept = 0,linetype = "dashed") +
   theme_minimal() +
   theme(panel.spacing.y = unit(2, "lines"))
-ggsave("LRPsUnsub.pdf",width = plotWidth, height = plotHeight*3)
-
-allData %>%
-  mutate(sample = sample-baseline) %>%
-  group_by(Run, sample, Contra, Group) %>%
-  summarise(mean = mean(voltage)) %>%
-  spread(Contra, mean) %>% 
-  mutate(diff = Contralateral - Ipsilateral) %>%
-  ggplot(., aes(sample, diff)) +
-  geom_line(aes(colour = Group),size=0.5) +
-  scale_colour_brewer(palette = "Set1") +
-  scale_x_continuous(name ="Latency (ms)", expand = c(0, 0)) +
-  scale_y_reverse(name =expression(paste("Amplitude (",mu,"v)")), expand = c(0, 0)) +
-  facet_grid(Run~.) +
-  geom_vline(xintercept = -800,linetype = "dashed" )+
-  geom_hline(yintercept = 0,linetype = "dashed") +
-  theme_minimal() +
-  theme(panel.spacing.y = unit(2, "lines"))
-ggsave("LRPsSub.pdf",width = plotWidth, height = plotHeight*3)

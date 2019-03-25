@@ -167,21 +167,36 @@ allData %>%
 ggsave("SearchLERPs.pdf",width = plotWidth, height = plotHeight*3)
 #####
 #Running stats
-allData %>%
+learnData <- allData %>%
   mutate(sample = sample-baseline) %>%
-  filter(Event == "Learn" & Reject == 0 & (sample>200 | sample < 300) %>%
-  group_by(LatStim,sample,Contra,Group) %>%
-  summarise(mean = mean(voltage)) %>%
-  spread(Contra, mean) %>% 
-  mutate(diff = Contralateral - Ipsilateral) %>%
+  filter(Event == "Learn" & Reject == 0 & (sample>200 | sample < 300)) %>%
+  group_by(LatStim,Subject,Contra,Group) %>%
+  summarise(mV = mean(voltage))
+searchData <- allData %>%
+  mutate(sample = sample-baseline) %>%
+  filter(Event == "Search" & LatStim != "None" & Reject == 0 & (sample>200 | sample < 300)) %>%
+  group_by(Stimulus,Subject,Contra,Group) %>%
+  summarise(mV = mean(voltage))
 
-output.aov <- aov_ez(
-  data = allData,
-  dv = "value",
-  id = "PID", 
-  within = c("Load", "Component")
+learn.aov <- aov_ez(
+  data = learnData,
+  dv = "mV",
+  id = "Subject", 
+  within = c("Contra", "LatStim"),
+  between = "Group"
 )
-dist.load.emmeans <- emmeans(dist.aov, ~ Load)
+
+search.aov <- aov_ez(
+  data = searchData,
+  dv = "mV",
+  id = "Subject", 
+  within = c("Contra", "Stimulus"),
+  between = "Group"
+)
+
+
+
+dist.load.emmeans <- emmeans(output.aov, ~ Contra)
 dist.component.emmeans <- emmeans(dist.aov, ~ Component)
 dist.interaction.load.emmeans <- emmeans(dist.aov, ~Load|Component)
 dist.load.posthoc <- pairs(dist.load.emmeans)

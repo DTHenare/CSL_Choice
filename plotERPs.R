@@ -1,6 +1,7 @@
 library(tidyr)
 library(dplyr)
 library(ggplot2)
+library(afex)
 
 dPath = 'CSL_Visuals/'
 fPrefix = 'N2pc'
@@ -164,3 +165,25 @@ allData %>%
     theme_minimal() +
     theme(panel.spacing.y = unit(2, "lines"))
 ggsave("SearchLERPs.pdf",width = plotWidth, height = plotHeight*3)
+#####
+#Running stats
+allData %>%
+  mutate(sample = sample-baseline) %>%
+  filter(Event == "Learn" & Reject == 0 & (sample>200 | sample < 300) %>%
+  group_by(LatStim,sample,Contra,Group) %>%
+  summarise(mean = mean(voltage)) %>%
+  spread(Contra, mean) %>% 
+  mutate(diff = Contralateral - Ipsilateral) %>%
+
+output.aov <- aov_ez(
+  data = allData,
+  dv = "value",
+  id = "PID", 
+  within = c("Load", "Component")
+)
+dist.load.emmeans <- emmeans(dist.aov, ~ Load)
+dist.component.emmeans <- emmeans(dist.aov, ~ Component)
+dist.interaction.load.emmeans <- emmeans(dist.aov, ~Load|Component)
+dist.load.posthoc <- pairs(dist.load.emmeans)
+dist.component.posthoc <- pairs(dist.component.emmeans)
+dist.interaction.load.posthoc <- pairs(dist.interaction.load.emmeans)

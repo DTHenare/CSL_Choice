@@ -169,12 +169,12 @@ ggsave("SearchLERPs.pdf",width = plotWidth, height = plotHeight*3)
 #Running stats
 learnData <- allData %>%
   mutate(sample = sample-baseline) %>%
-  filter(Event == "Learn" & Reject == 0 & (sample>200 | sample < 300)) %>%
+  filter(Event == "Learn" & Reject == 0 & (sample>250 | sample < 350)) %>%
   group_by(LatStim,Subject,Contra,Group) %>%
   summarise(mV = mean(voltage))
 searchData <- allData %>%
   mutate(sample = sample-baseline) %>%
-  filter(Event == "Search" & LatStim != "None" & Reject == 0 & (sample>200 | sample < 300)) %>%
+  filter(Event == "Search" & LatStim != "None" & Reject == 0 & (sample>250 | sample < 350)) %>%
   group_by(Stimulus,Subject,Contra,Group) %>%
   summarise(mV = mean(voltage))
 

@@ -72,8 +72,8 @@ allData$Object <- recode(allData$Object, ShapePredictor = "Shape", ColourPredict
 rm(epochInfo,lHemData,rHemData,scalpData, gathercols)
 #####
 baseline = 200
-plotWidth = 6
-plotHeight = 2.25
+plotWidth = 24
+plotHeight = 9
 #Categorization ERPs
 allData %>%
   filter(Event == "Learn" & Reject == 0) %>%
@@ -81,16 +81,15 @@ allData %>%
   group_by(LatStim,sample,Contra,Group) %>%
   summarise(mean = mean(voltage)) %>%
   ggplot(., aes(sample, mean)) +
-    geom_line(aes(colour = Contra),size=0.5) +
+    geom_line(aes(colour = Contra),size=0.25) +
     scale_color_manual(values=c("#000000", "#CC0000")) +
     scale_x_continuous(name ="Latency (ms)", expand = c(0, 0)) +
-    scale_y_reverse(name =expression(paste("Amplitude (",mu,"v)")), expand = c(0, 0)) +
+    scale_y_reverse(name =expression(paste("Amplitude (",mu,"v)")), expand = c(0, 0), limits=c(0,15)) +
     facet_grid(LatStim~Group) +
     geom_vline(xintercept = 0,linetype = "dashed" )+
     geom_hline(yintercept = 0,linetype = "dashed") +
     theme_minimal() +
-    theme(panel.spacing.y = unit(2, "lines")) +
-    coord_fixed(ratio = 10)
+    theme(panel.spacing.y = unit(2, "lines"))
 ggsave("LearnERPs.pdf",width = plotWidth, height = plotHeight*2)
 #Subtracted
 allData %>%
@@ -119,7 +118,7 @@ allData %>%
   spread(Contra, mean) %>% 
   mutate(diff = Contralateral - Ipsilateral) %>%
   ggplot(., aes(sample,diff)) +
-  geom_line(aes(colour = Group),size=1) +
+  geom_line(aes(colour = Group),size=5) +
   scale_colour_brewer(palette = "Set1") +
   scale_x_continuous(name ="Latency (ms)", expand = c(0, 0)) +
   scale_y_reverse(name =expression(paste("Amplitude (",mu,"v)")), expand = c(0, 0)) +
@@ -127,8 +126,8 @@ allData %>%
   geom_vline(xintercept = 0,linetype = "dashed" )+
   geom_hline(yintercept = 0,linetype = "dashed") +
   theme_minimal() +
-  theme(panel.spacing.y = unit(2, "lines"))
-
+  theme(panel.spacing.y = unit(2, "lines"), text= element_text(size=60))
+ggsave("LearnLERPs.pdf",width = plotWidth, height = plotHeight*2)
 #Search ERPs
 allData %>%
   filter(Event == "Search" & LatStim != "None" & Reject == 0) %>%
@@ -155,7 +154,7 @@ allData %>%
   spread(Contra, mean) %>% 
   mutate(diff = Contralateral - Ipsilateral) %>%
   ggplot(., aes(sample,diff)) +
-    geom_line(aes(colour = Group),size=1) +
+    geom_line(aes(colour = Group),size=5) +
     scale_colour_brewer(palette = "Set1") +
     scale_x_continuous(name ="Latency (ms)", expand = c(0, 0)) +
     scale_y_reverse(name =expression(paste("Amplitude (",mu,"v)")), expand = c(0, 0)) +
@@ -163,20 +162,22 @@ allData %>%
     geom_vline(xintercept = 0,linetype = "dashed" )+
     geom_hline(yintercept = 0,linetype = "dashed") +
     theme_minimal() +
-    theme(panel.spacing.y = unit(2, "lines"))
+    theme(panel.spacing.y = unit(2, "lines"),text= element_text(size=60))
 ggsave("SearchLERPs.pdf",width = plotWidth, height = plotHeight*3)
 #####
 #Running stats
 learnData <- allData %>%
   mutate(sample = sample-baseline) %>%
-  filter(Event == "Learn" & Reject == 0 & (sample>250 | sample < 350)) %>%
+  filter(Event == "Learn" & Reject == 0 & sample>250 & sample < 350) %>%
   group_by(LatStim,Subject,Contra,Group) %>%
   summarise(mV = mean(voltage))
 searchData <- allData %>%
   mutate(sample = sample-baseline) %>%
-  filter(Event == "Search" & LatStim != "None" & Reject == 0 & (sample>250 | sample < 350)) %>%
+  filter(Event == "Search" & LatStim != "None" & Reject == 0 & sample>250 & sample < 350) %>%
   group_by(Stimulus,Subject,Contra,Group) %>%
   summarise(mV = mean(voltage))
+searchData %>%
+  spread(mV, c("Stimulus", "Contra"))
 
 learn.aov <- aov_ez(
   data = learnData,

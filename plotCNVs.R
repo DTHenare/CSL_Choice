@@ -86,8 +86,8 @@ allData$Event = NULL
 gc()
 #####
 baseline = 1000
-plotWidth = 6
-plotHeight = 2.25
+plotWidth = 24
+plotHeight = 9
 
 allData %>%
   mutate(sample = sample-baseline) %>%
@@ -102,4 +102,4 @@ allData %>%
   geom_vline(xintercept = -800,linetype = "dashed" )+
   geom_hline(yintercept = 0,linetype = "dashed") +
   theme_minimal() +
-  theme(panel.spacing.y = unit(2, "lines"))
+  theme(panel.spacing.y = unit(2, "lines"),text= element_text(size=60))

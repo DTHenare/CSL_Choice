@@ -86,20 +86,21 @@ allData$Event = NULL
 gc()
 #####
 baseline = 1000
-plotWidth = 6
-plotHeight = 2.25
+plotWidth = 24
+plotHeight = 9
 
 allData %>%
   mutate(sample = sample-baseline) %>%
   group_by(RepSwitch, sample, Chan, Group) %>%
   summarise(mean = mean(voltage)) %>%
   ggplot(., aes(sample, mean)) +
-  geom_line(aes(colour = RepSwitch),size=0.5) +
+  geom_line(aes(colour = RepSwitch),size=3) +
   scale_color_manual(values=c("#000000", "#CC0000")) +
   scale_x_continuous(name ="Latency (ms)", expand = c(0, 0)) +
   scale_y_reverse(name =expression(paste("Amplitude (",mu,"v)")), expand = c(0, 0)) +
-  facet_grid(Chan~Group) +
+  facet_grid(Chan~Group,scales = "free_y") +
   geom_vline(xintercept = -800,linetype = "dashed" )+
   geom_hline(yintercept = 0,linetype = "dashed") +
   theme_minimal() +
-  theme(panel.spacing.y = unit(2, "lines"))
+  theme(panel.spacing.y = unit(2, "lines"),text= element_text(size=60))
+ggsave("CNVERPs.pdf",width = plotWidth, height = plotHeight*2)

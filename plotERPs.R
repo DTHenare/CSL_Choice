@@ -135,7 +135,7 @@ allData %>%
   group_by(Stimulus,sample,Contra,Group) %>%
   summarise(mean = mean(voltage)) %>%
   ggplot(., aes(sample, mean)) +
-    geom_line(aes(colour = Contra),size=0.5) +
+    geom_line(aes(colour = Contra),size=2) +
     scale_color_manual(values=c("#000000", "#CC0000")) +
     scale_x_continuous(name ="Latency (ms)", expand = c(0, 0)) +
     scale_y_reverse(name =expression(paste("Amplitude (",mu,"v)")), expand = c(0, 0)) +
@@ -143,8 +143,8 @@ allData %>%
     geom_vline(xintercept = 0,linetype = "dashed" )+
     geom_hline(yintercept = 0,linetype = "dashed") +
     theme_minimal() +
-    theme(panel.spacing.y = unit(2, "lines"))
-ggsave("SearchERPs.pdf",width = plotWidth, height = plotHeight*3)
+    theme(panel.spacing.y = unit(2, "lines"),text= element_text(size=30))
+ggsave("SearchERPs.pdf",width = plotWidth, height = plotHeight)
 #Subtracted
 allData %>%
   filter(Event == "Search" & LatStim != "None" & Reject == 0) %>%
@@ -195,11 +195,11 @@ search.aov <- aov_ez(
   between = "Group"
 )
 
-
+library(emmeans)
 
 dist.load.emmeans <- emmeans(output.aov, ~ Contra)
 dist.component.emmeans <- emmeans(dist.aov, ~ Component)
-dist.interaction.load.emmeans <- emmeans(dist.aov, ~Load|Component)
+dist.interaction.load.emmeans <- emmeans(search.aov, ~Contra|Stimulus)
 dist.load.posthoc <- pairs(dist.load.emmeans)
 dist.component.posthoc <- pairs(dist.component.emmeans)
 dist.interaction.load.posthoc <- pairs(dist.interaction.load.emmeans)

@@ -168,9 +168,45 @@ ggsave("SearchLERPs.pdf",width = plotWidth, height = plotHeight*3)
 #Running stats
 learnData <- allData %>%
   mutate(sample = sample-baseline) %>%
-  filter(Event == "Learn" & Reject == 0 & sample>250 & sample < 350) %>%
-  group_by(LatStim,Subject,Contra,Group) %>%
+  filter(Event == "Learn" & Reject == 0 & sample>200 & sample < 300 & Object == "Shape") %>%
+  group_by(Object,Subject,Contra,Group) %>%
   summarise(mV = mean(voltage))
+learn.aov <- aov_ez(
+  data = learnData,
+  dv = "mV",
+  id = "Subject", 
+  within = c("Contra"),
+  between = "Group"
+)
+learnData <- allData %>%
+  mutate(sample = sample-baseline) %>%
+  filter(Event == "Learn" & Reject == 0 & sample>200 & sample < 300 & Object == "Shape") %>%
+  group_by(Object,Subject,Contra,Group) %>%
+  summarise(mV = mean(voltage))%>% 
+  spread(Contra, mV) %>% 
+  mutate(diff = Contralateral - Ipsilateral)
+ggplot(learnData, aes(Group, diff, fill=Group)) +
+  geom_flat_violin(position = position_nudge(x = .25, y = 0),adjust =2)+
+  geom_point(position = position_jitter(width = .15), size = 2)+
+  #note that here we need to set the x-variable to a numeric variable and bump it to get the boxplots to line up with the rainclouds. 
+  geom_boxplot(aes(x = as.numeric(Group)+0.25, y = diff),outlier.shape = NA, alpha = 0.3, width = .1, colour = "BLACK") + 
+  ylab('mV diff')+xlab('Group')+theme_cowplot()+guides(fill = FALSE, colour = FALSE)
+learnData <- allData %>%
+  mutate(sample = sample-baseline) %>%
+  filter(Event == "Learn" & Reject == 0 & sample>200 & sample < 300) %>%
+  group_by(Object,Subject,Contra,Group) %>%
+  summarise(mV = mean(voltage))%>% 
+  spread(Contra, mV) %>% 
+  mutate(diff = Contralateral - Ipsilateral)
+ggplot(learnData, aes(x = Object, y = diff, fill = Group)) +
+  geom_flat_violin(aes(fill = Group),position = position_nudge(x = .1, y = 0), adjust = 1.5, trim = FALSE, alpha = .5, colour = NA)+
+  geom_point(aes(x = Object, y = diff, colour = Group),position = position_jitter(width = .05), size = 1, shape = 20)+
+  geom_boxplot(aes(x = Object, y = diff, fill = Group),outlier.shape = NA, alpha = .5, width = .1, colour = "black")+
+  scale_colour_brewer(palette = "Dark2")+
+  scale_fill_brewer(palette = "Dark2")+
+  ggtitle("Figure R10: Repeated Measures Factorial Rainclouds")
+ggsave('10repanvplot.png', width = w, height = h)
+
 searchData <- allData %>%
   mutate(sample = sample-baseline) %>%
   filter(Event == "Search" & LatStim != "None" & Reject == 0 & sample>250 & sample < 350) %>%
@@ -178,15 +214,6 @@ searchData <- allData %>%
   summarise(mV = mean(voltage))
 searchData %>%
   spread(mV, c("Stimulus", "Contra"))
-
-learn.aov <- aov_ez(
-  data = learnData,
-  dv = "mV",
-  id = "Subject", 
-  within = c("Contra", "LatStim"),
-  between = "Group"
-)
-
 search.aov <- aov_ez(
   data = searchData,
   dv = "mV",

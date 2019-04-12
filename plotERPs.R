@@ -2,6 +2,7 @@ library(tidyr)
 library(dplyr)
 library(ggplot2)
 library(afex)
+library(cowplot)
 
 dPath = 'CSL_Visuals/'
 fPrefix = 'N2pc'
@@ -193,34 +194,50 @@ ggplot(learnData, aes(Group, diff, fill=Group)) +
   ylab('mV diff')+xlab('Group')+theme_cowplot()+guides(fill = FALSE, colour = FALSE)
 learnData <- allData %>%
   mutate(sample = sample-baseline) %>%
-  filter(Event == "Learn" & Reject == 0 & sample>200 & sample < 300) %>%
+  filter(Event == "Learn" & Reject == 0 & sample>200 & sample < 300 & Object == "Colour") %>%
   group_by(Object,Subject,Contra,Group) %>%
   summarise(mV = mean(voltage))%>% 
   spread(Contra, mV) %>% 
   mutate(diff = Contralateral - Ipsilateral)
 ggplot(learnData, aes(x = Object, y = diff, fill = Group)) +
   geom_flat_violin(aes(fill = Group),position = position_nudge(x = .1, y = 0), adjust = 1.5, trim = FALSE, alpha = .5, colour = NA)+
-  geom_point(aes(x = Object, y = diff, colour = Group),position = position_jitter(width = .05), size = 1, shape = 20)+
+  geom_point(aes(x = as.numeric(Object)-3.20, y = diff, colour = Group),position = position_jitter(width = .05), size = 4, shape = 20)+
   geom_boxplot(aes(x = Object, y = diff, fill = Group),outlier.shape = NA, alpha = .5, width = .1, colour = "black")+
-  scale_colour_brewer(palette = "Dark2")+
-  scale_fill_brewer(palette = "Dark2")+
-  ggtitle("Figure R10: Repeated Measures Factorial Rainclouds")
-ggsave('10repanvplot.png', width = w, height = h)
+  scale_colour_brewer(palette = "Set1")+
+  scale_fill_brewer(palette = "Set1")+
+  scale_y_continuous(limits = c(-2,2))
+#  ggtitle("Figure R10: Repeated Measures Factorial Rainclouds")
+ggsave('test.pdf', width = plotWidth/3, height = plotHeight)
+
+searchData <- allData %>%
+  mutate(sample = sample-baseline) %>%
+  filter(Event == "Search" & LatStim != "None" & Reject == 0 & sample>250 & sample < 350 & Stimulus == "Target  ( None  mid)") %>%
+  group_by(Stimulus,Subject,Contra,Group) %>%
+  summarise(mV = mean(voltage))
+search.aov <- aov_ez(
+  data = searchData,
+  dv = "mV",
+  id = "Subject", 
+  within = c("Contra"),
+  between = "Group"
+)
+search.aov
 
 searchData <- allData %>%
   mutate(sample = sample-baseline) %>%
   filter(Event == "Search" & LatStim != "None" & Reject == 0 & sample>250 & sample < 350) %>%
   group_by(Stimulus,Subject,Contra,Group) %>%
-  summarise(mV = mean(voltage))
-searchData %>%
-  spread(mV, c("Stimulus", "Contra"))
-search.aov <- aov_ez(
-  data = searchData,
-  dv = "mV",
-  id = "Subject", 
-  within = c("Contra", "Stimulus"),
-  between = "Group"
-)
+  summarise(mV = mean(voltage)) %>%
+  spread(Contra, mV) %>% 
+  mutate(diff = Contralateral - Ipsilateral)
+ggplot(searchData, aes(x = Stimulus, y = diff, fill = Group)) +
+  geom_flat_violin(aes(fill = Group),position = position_nudge(x = .1, y = 0), adjust = 1.5, trim = FALSE, alpha = .5, colour = NA)+
+  geom_point(aes(x = as.numeric(Stimulus), y = diff, colour = Group),position = position_jitter(width = .05), size = 4, shape = 20)+
+  geom_boxplot(aes(x = Stimulus, y = diff, fill = Group),outlier.shape = NA, alpha = .5, width = .1, colour = "black")+
+  scale_colour_brewer(palette = "Set1")+
+  scale_fill_brewer(palette = "Set1")+
+  scale_y_continuous(limits = c(-2,2)) + 
+  facet_grid(Stimulus~.)
 
 library(emmeans)
 

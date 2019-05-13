@@ -85,7 +85,7 @@ allData %>%
     geom_line(aes(colour = Contra),size=0.25) +
     scale_color_manual(values=c("#000000", "#CC0000")) +
     scale_x_continuous(name ="Latency (ms)", expand = c(0, 0)) +
-    scale_y_reverse(name =expression(paste("Amplitude (",mu,"v)")), expand = c(0, 0), limits=c(0,15)) +
+    scale_y_reverse(name =expression(paste("Amplitude (",mu,"v)")), expand = c(0, 0)) +
     facet_grid(LatStim~Group) +
     geom_vline(xintercept = 0,linetype = "dashed" )+
     geom_hline(yintercept = 0,linetype = "dashed") +
@@ -124,7 +124,7 @@ allData %>%
   scale_x_continuous(name ="Latency (ms)", expand = c(0, 0)) +
   scale_y_reverse(name =expression(paste("Amplitude (",mu,"v)")), expand = c(0, 0)) +
   facet_grid(Object~.) +
-  geom_vline(xintercept = 0,linetype = "dashed" )+
+  geom_vline(xintercept = 0,linetype = "dashed" ) +
   geom_hline(yintercept = 0,linetype = "dashed") +
   theme_minimal() +
   theme(panel.spacing.y = unit(2, "lines"), text= element_text(size=60))
@@ -232,11 +232,14 @@ searchData <- allData %>%
   mutate(diff = Contralateral - Ipsilateral)
 ggplot(searchData, aes(x = Stimulus, y = diff, fill = Group)) +
   geom_flat_violin(aes(fill = Group),position = position_nudge(x = .1, y = 0), adjust = 1.5, trim = FALSE, alpha = .5, colour = NA)+
-  geom_point(aes(x = as.numeric(Stimulus), y = diff, colour = Group),position = position_jitter(width = .05), size = 4, shape = 20)+
+  geom_point(aes(x = as.numeric(Stimulus), y = diff, colour = Gr`oup),position = position_jitter(width = .05), size = 4, shape = 20)+
   geom_boxplot(aes(x = Stimulus, y = diff, fill = Group),outlier.shape = NA, alpha = .5, width = .1, colour = "black")+
   scale_colour_brewer(palette = "Set1")+
   scale_fill_brewer(palette = "Set1")+
   scale_y_continuous(limits = c(-2,2)) + 
+  facet_grid(Stimulus~.)
+ggplot(searchData, aes(x = Event, y = diff, fill = Group)) +
+  geom_flat_violin(aes(fill = Group),position = position_nudge(x = .1, y = 0), adjust = 1.5, trim = FALSE, alpha = .5, colour = NA) +
   facet_grid(Stimulus~.)
 
 library(emmeans)

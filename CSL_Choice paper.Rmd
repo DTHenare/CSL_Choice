@@ -183,26 +183,52 @@ allData %>%
 ```
 
 ```{r learnStats}
-learnNt <- allData %>%
+learnNtShape <- allData %>%
   mutate(sample = sample-baseline) %>%
   filter(Event == "Learn" & Reject == 0 & sample>185 & sample < 250 & Object == "Shape") %>%
   group_by(Object,Subject,Contra,Group) %>%
   summarise(mV = mean(voltage))
-learn.Nt.aov <- aov_ez(
-  data = learnNt,
+learn.NtShape.aov <- aov_ez(
+  data = learnNtShape,
   dv = "mV",
   id = "Subject", 
   within = c("Contra"),
   between = "Group"
 )
 
-learnPd <- allData %>%
+learnNtCol <- allData %>%
+  mutate(sample = sample-baseline) %>%
+  filter(Event == "Learn" & Reject == 0 & sample>185 & sample < 250 & Object == "Colour") %>%
+  group_by(Object,Subject,Contra,Group) %>%
+  summarise(mV = mean(voltage))
+learn.NtCol.aov <- aov_ez(
+  data = learnNtCol,
+  dv = "mV",
+  id = "Subject", 
+  within = c("Contra"),
+  between = "Group"
+)
+
+learnPdShape <- allData %>%
   mutate(sample = sample-baseline) %>%
   filter(Event == "Learn" & Reject == 0 & sample>200 & sample < 300 & Object == "Shape") %>%
   group_by(Object,Subject,Contra,Group) %>%
   summarise(mV = mean(voltage))
-learn.Pd.aov <- aov_ez(
-  data = learnPd,
+learn.PdShape.aov <- aov_ez(
+  data = learnPdShape,
+  dv = "mV",
+  id = "Subject", 
+  within = c("Contra"),
+  between = "Group"
+)
+
+learnPdCol <- allData %>%
+  mutate(sample = sample-baseline) %>%
+  filter(Event == "Learn" & Reject == 0 & sample>200 & sample < 300 & Object == "Colour") %>%
+  group_by(Object,Subject,Contra,Group) %>%
+  summarise(mV = mean(voltage))
+learn.PdCol.aov <- aov_ez(
+  data = learnPdCol,
   dv = "mV",
   id = "Subject", 
   within = c("Contra"),

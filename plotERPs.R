@@ -169,7 +169,7 @@ ggsave("SearchLERPs.pdf",width = plotWidth, height = plotHeight*3)
 #Running stats
 learnData <- allData %>%
   mutate(sample = sample-baseline) %>%
-  filter(Event == "Learn" & Reject == 0 & sample>200 & sample < 300 & Object == "Shape") %>%
+  filter(Event == "Learn" & Reject == 0 & sample>185 & sample < 250 & Object == "Shape") %>%
   group_by(Object,Subject,Contra,Group) %>%
   summarise(mV = mean(voltage))
 learn.aov <- aov_ez(
@@ -211,7 +211,7 @@ ggsave('test.pdf', width = plotWidth/3, height = plotHeight)
 
 searchData <- allData %>%
   mutate(sample = sample-baseline) %>%
-  filter(Event == "Search" & LatStim != "None" & Reject == 0 & sample>250 & sample < 350 & Stimulus == "Target  ( None  mid)") %>%
+  filter(Event == "Search" & LatStim != "None" & Reject == 0 & sample>250 & sample < 350 & Stimulus == "Distractor  ( Target  mid)") %>%
   group_by(Stimulus,Subject,Contra,Group) %>%
   summarise(mV = mean(voltage))
 search.aov <- aov_ez(
@@ -225,28 +225,26 @@ search.aov
 
 searchData <- allData %>%
   mutate(sample = sample-baseline) %>%
-  filter(Event == "Search" & LatStim != "None" & Reject == 0 & sample>250 & sample < 350) %>%
+  filter(Event == "Search" & LatStim != "None" & Reject == 0 & sample>185 & sample < 250) %>%
   group_by(Stimulus,Subject,Contra,Group) %>%
   summarise(mV = mean(voltage)) %>%
   spread(Contra, mV) %>% 
   mutate(diff = Contralateral - Ipsilateral)
 ggplot(searchData, aes(x = Stimulus, y = diff, fill = Group)) +
   geom_flat_violin(aes(fill = Group),position = position_nudge(x = .1, y = 0), adjust = 1.5, trim = FALSE, alpha = .5, colour = NA)+
-  geom_point(aes(x = as.numeric(Stimulus), y = diff, colour = Gr`oup),position = position_jitter(width = .05), size = 4, shape = 20)+
+  geom_point(aes(x = as.numeric(Stimulus), y = diff, colour = Group),position = position_jitter(width = .05), size = 4, shape = 20)+
   geom_boxplot(aes(x = Stimulus, y = diff, fill = Group),outlier.shape = NA, alpha = .5, width = .1, colour = "black")+
   scale_colour_brewer(palette = "Set1")+
   scale_fill_brewer(palette = "Set1")+
-  scale_y_continuous(limits = c(-2,2)) + 
-  facet_grid(Stimulus~.)
-ggplot(searchData, aes(x = Event, y = diff, fill = Group)) +
-  geom_flat_violin(aes(fill = Group),position = position_nudge(x = .1, y = 0), adjust = 1.5, trim = FALSE, alpha = .5, colour = NA) +
-  facet_grid(Stimulus~.)
+  scale_y_continuous()
+ggplot(searchData, aes(x = Stimulus, y = diff, fill = Group)) +
+  geom_flat_violin(aes(fill = Group),position = position_nudge(x = .1, y = 0), adjust = 1.5, trim = FALSE, alpha = .5, colour = NA)
 
 library(emmeans)
 
-dist.load.emmeans <- emmeans(output.aov, ~ Contra)
-dist.component.emmeans <- emmeans(dist.aov, ~ Component)
-dist.interaction.load.emmeans <- emmeans(search.aov, ~Contra|Stimulus)
+learn.contra.emmeans <- emmeans(learn.aov, ~ Contra)
+dist.component.emmeans <- emmeans(learn.aov, ~ Component)
+dist.interaction.load.emmeans <- emmeans(learn.aov, ~Contra|Group)
 dist.load.posthoc <- pairs(dist.load.emmeans)
 dist.component.posthoc <- pairs(dist.component.emmeans)
 dist.interaction.load.posthoc <- pairs(dist.interaction.load.emmeans)

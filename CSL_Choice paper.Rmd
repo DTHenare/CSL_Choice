@@ -52,7 +52,7 @@ output            : papaja::apa6_pdf
 \raggedbottom
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(echo = TRUE)
 library(tidyr)
 library(dplyr)
 library(ggplot2)
@@ -65,7 +65,7 @@ library(cowplot)
 # Methods
 
 # Results
-```{r organiseData}
+```{r organiseData, echo=FALSE}
 dPath = 'CSL_Visuals/'
 fPrefix = 'N2pc'
 
@@ -135,13 +135,13 @@ allData$Object <- recode(allData$Object, ShapePredictor = "Shape", ColourPredict
 rm(epochInfo,lHemData,rHemData,scalpData, gathercols)
 ```
 
-```{r plotParams}
+```{r plotParams, echo=FALSE}
 baseline = 200
 plotWidth = 24
 plotHeight = 9
 ```
 
-```{r makeLearnPlots}
+```{r makeLearnPlots, echo=FALSE}
 #Subtracted
 allData %>%
   filter(Event == "Learn" & Reject == 0) %>%
@@ -151,18 +151,18 @@ allData %>%
   spread(Contra, mean) %>% 
   mutate(diff = Contralateral - Ipsilateral) %>%
   ggplot(., aes(sample,diff)) +
-  geom_line(aes(colour = Group),size=0.5) +
-  scale_colour_brewer(palette = "Set1") +
-  scale_x_continuous(name ="Latency (ms)", expand = c(0, 0)) +
-  scale_y_reverse(name =expression(paste("Amplitude (",mu,"v)")), expand = c(0, 0)) +
-  facet_grid(Object~.) +
-  geom_vline(xintercept = 0,linetype = "dashed" ) +
-  geom_hline(yintercept = 0,linetype = "dashed") +
-  theme_minimal() +
-  theme(panel.spacing.y = unit(2, "lines"), text= element_text(size=14))
+    geom_line(aes(colour = Group),size=0.5) +
+    scale_colour_brewer(palette = "Set1") +
+    scale_x_continuous(name ="Latency (ms)", expand = c(0, 0)) +
+    scale_y_reverse(name =expression(paste("Amplitude (",mu,"v)")), expand = c(0, 0)) +
+    facet_grid(Object~.) +
+    geom_vline(xintercept = 0,linetype = "dashed" ) +
+    geom_hline(yintercept = 0,linetype = "dashed") +
+    theme_minimal() +
+    theme(panel.spacing.y = unit(2, "lines"), text= element_text(size=14))
 ```
 
-```{r makeSearchPlots}
+```{r makeSearchPlots, echo=FALSE}
 allData %>%
   filter(Event == "Search" & LatStim != "None" & Reject == 0) %>%
   mutate(sample = sample-baseline) %>%
@@ -182,7 +182,7 @@ allData %>%
     theme(panel.spacing.y = unit(2, "lines"),text= element_text(size=14))
 ```
 
-```{r learnStats}
+```{r learnStats, echo=FALSE}
 learnNtShape <- allData %>%
   mutate(sample = sample-baseline) %>%
   filter(Event == "Learn" & Reject == 0 & sample>185 & sample < 250 & Object == "Shape") %>%
@@ -235,6 +235,99 @@ learn.PdCol.aov <- aov_ez(
   between = "Group"
 )
 ```
+
+Stats results (`r papaja::apa_print.afex_aov(learn.NtShape.aov)$full_result`) and then also 
+(`r papaja::apa_print.afex_aov(learn.NtCol.aov)$full_result`) and then also 
+(`r papaja::apa_print.afex_aov(learn.PdShape.aov)$full_result`) and then also 
+(`r papaja::apa_print.afex_aov(learn.PdCol.aov)$full_result`) and then also 
+
+```{r searchStats}
+searchNtTO <- allData %>%
+  mutate(sample = sample-baseline) %>%
+  filter(Event == "Search" & LatStim != "None" & Reject == 0 & sample>185 & sample < 250 & Stimulus == "Target  ( None  mid)") %>%
+  group_by(Stimulus,Subject,Contra,Group) %>%
+  summarise(mV = mean(voltage))
+search.NtTO.aov <- aov_ez(
+  data = searchNtTO,
+  dv = "mV",
+  id = "Subject", 
+  within = c("Contra"),
+  between = "Group"
+)
+
+searchNtTD <- allData %>%
+  mutate(sample = sample-baseline) %>%
+  filter(Event == "Search" & LatStim != "None" & Reject == 0 & sample>185 & sample < 250 & Stimulus == "Target  ( Distractor  mid)") %>%
+  group_by(Stimulus,Subject,Contra,Group) %>%
+  summarise(mV = mean(voltage))
+search.NtTD.aov <- aov_ez(
+  data = searchNtTD,
+  dv = "mV",
+  id = "Subject", 
+  within = c("Contra"),
+  between = "Group"
+)
+
+searchNtDT <- allData %>%
+  mutate(sample = sample-baseline) %>%
+  filter(Event == "Search" & LatStim != "None" & Reject == 0 & sample>185 & sample < 250 & Stimulus == "Distractor  ( Target  mid)") %>%
+  group_by(Stimulus,Subject,Contra,Group) %>%
+  summarise(mV = mean(voltage))
+search.NtDT.aov <- aov_ez(
+  data = searchNtDT,
+  dv = "mV",
+  id = "Subject", 
+  within = c("Contra"),
+  between = "Group"
+)
+
+searchPdTO <- allData %>%
+  mutate(sample = sample-baseline) %>%
+  filter(Event == "Search" & LatStim != "None" & Reject == 0 & sample>200 & sample < 300 & Stimulus == "Target  ( None  mid)") %>%
+  group_by(Stimulus,Subject,Contra,Group) %>%
+  summarise(mV = mean(voltage))
+search.PdTO.aov <- aov_ez(
+  data = searchPdTO,
+  dv = "mV",
+  id = "Subject", 
+  within = c("Contra"),
+  between = "Group"
+)
+
+searchPdTD <- allData %>%
+  mutate(sample = sample-baseline) %>%
+  filter(Event == "Search" & LatStim != "None" & Reject == 0 & sample>200 & sample < 300 & Stimulus == "Target  ( Distractor  mid)") %>%
+  group_by(Stimulus,Subject,Contra,Group) %>%
+  summarise(mV = mean(voltage))
+search.PdTD.aov <- aov_ez(
+  data = searchPdTD,
+  dv = "mV",
+  id = "Subject", 
+  within = c("Contra"),
+  between = "Group"
+)
+
+searchPdDT <- allData %>%
+  mutate(sample = sample-baseline) %>%
+  filter(Event == "Search" & LatStim != "None" & Reject == 0 & sample>200 & sample < 300 & Stimulus == "Distractor  ( Target  mid)") %>%
+  group_by(Stimulus,Subject,Contra,Group) %>%
+  summarise(mV = mean(voltage))
+search.PdDT.aov <- aov_ez(
+  data = searchPdDT,
+  dv = "mV",
+  id = "Subject", 
+  within = c("Contra"),
+  between = "Group"
+)
+```
+
+`r papaja::apa_print.afex_aov(search.NtTO.aov)$full_result`
+`r papaja::apa_print.afex_aov(search.NtTD.aov)$full_result`
+`r papaja::apa_print.afex_aov(search.NtDT.aov)$full_result`
+`r papaja::apa_print.afex_aov(search.PdTO.aov)$full_result`
+`r papaja::apa_print.afex_aov(search.PdTD.aov)$full_result`
+`r papaja::apa_print.afex_aov(search.PdDT.aov)$full_result`
+
 # Discussion
 
 

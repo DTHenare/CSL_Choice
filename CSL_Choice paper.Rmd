@@ -62,6 +62,7 @@ library(ggplot2)
 library(afex)
 library(cowplot)
 library(papaja)
+#colour, grey, center, categorisation, lateralisation, distractor
 ```
 
 ```{r helperfunctions}
@@ -211,6 +212,24 @@ An open question remains as to whether increased top-down control can be used to
 In the present study, we adapted the design of Feldmann-Wüstefeld, Uengoer, and Schubö (2015) to a voluntary task switching paradigm in order to investigate the relationship between top-down control and selection history. By allowing participants to determine whether they would perform search or learning on the next trial, participants would be able to proactively engage the task set for the upcoming trial and exercise greater top-down control. We also recorded EEG during their performance of the task and leveraged the procedure of Hickey, DiLollo, and McDonald (2009) to allow for the isolation of target and distractor activity. This approach provides specific measures of target selection and disengagement, as well as distractor selection and suppression during the task, and therefore provides a fine grained understanding of how increased top-down control interacts with selection history during attentional orienting. We expected to see… specific hypotheses.
 
 # Methods
+
+## Participants
+
+## Experimental procedure
+
+Participants came in for two separate sessions and performed two different tasks, a learning task, and a search task. In seession one, the learning and search trials were separated by block whereas in session two, the participants chose whether an upcoming trial would be a learning or search trial. This procedure followed the logic of Feldmann-Wustefeld (XXXX) where selection history is measured as the effect of the learning task on search performance. The addition of voluntary task selection allowed for us to investigate the influence that top-down control may have on the role of selection history.
+
+### Learning trials
+
+Learning trials began with a XXXX-XXXX ms fixation cross in the center of the screen. Eight stimuli are then presented simultaneously in a circular arrangement for XXXX ms, six of these are unfilled grey circles, one is an unfilled coloured circle (either blue or green randomly selected on each trial), and one is an unfilled grey shape singleton (either pentagon or triangle selected randomly on each trial). Participants have two response keys for the learning task and after selecting one of these keys, they are given feedback informing them whether they have selected the correct response. At the beginning of the task, participants are not told the correct stimulus reponse pairing and must instead learn which key is correct for a given display. For half of the participants (the colour-trained group) the correct response is based on the colour singleton (eg. key 1 when blue is shown, key 2 when green is shown). For the other half of participants (the shape-trained group) the correct response is based on the shape singleton (eg. key 1 when a pentagon is shown, key 2 when a triangle is shown). Participants have XXXX ms to respond on each trial.
+
+### Search trials
+
+Search trials began with a XXXX-XXXX ms fixation cross in the center of the screen. Eight stimuli are then presented simultaneously in a circular arrangement for XXXX ms, six of these are always unfilled grey circles, and one is the target, an unfilled grey diamond. The final stimulus is either another unfilled grey circle (in the target only condition) or an unfilled red circle (in the distractor present condition). Each of these stimuli contained a straight line of varying orientations and participants were required to indicate whether the line contained by the target diamond was oriented horizontally or vertically. Participants have XXXX ms to respond on each trial.
+
+### Task selection
+
+In session two, every trial began with a task selection screen where participants had to indicate using either their left or right thumbs, whetehr they would like to perform a learn or search trial. This screen stayed on until the participant response. Participants were asked to try to ensure that they distributed their choices evenly between the two options, and to try and make their choice random and unpredictable. Participants were required to perform XXXX of each trial type and after every block of XXXX trials, participants were shown a pictoral display (an exmaple is shown in figXXXX) indicating how many of each trial type was left for them to perform.
 
 # Results
 

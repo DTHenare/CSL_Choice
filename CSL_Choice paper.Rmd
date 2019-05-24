@@ -52,20 +52,203 @@ output            : papaja::apa6_pdf
 \raggedbottom
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+set.seed(4609948)
+library(knitr)
+opts_chunk$set(echo = FALSE)
+
 library(tidyr)
 library(dplyr)
 library(ggplot2)
 library(afex)
 library(cowplot)
+library(papaja)
+```
+
+```{r helperfunctions}
+#Function for making split violin option in ggplot
+GeomSplitViolin <- ggproto("GeomSplitViolin", GeomViolin, 
+                           draw_group = function(self, data, ..., draw_quantiles = NULL) {
+                             data <- transform(data, xminv = x - violinwidth * (x - xmin), xmaxv = x + violinwidth * (xmax - x))
+                             grp <- data[1, "group"]
+                             newdata <- plyr::arrange(transform(data, x = if (grp %% 2 == 1) xminv else xmaxv), if (grp %% 2 == 1) y else -y)
+                             newdata <- rbind(newdata[1, ], newdata, newdata[nrow(newdata), ], newdata[1, ])
+                             newdata[c(1, nrow(newdata) - 1, nrow(newdata)), "x"] <- round(newdata[1, "x"])
+                             
+                             if (length(draw_quantiles) > 0 & !scales::zero_range(range(data$y))) {
+                               stopifnot(all(draw_quantiles >= 0), all(draw_quantiles <=
+                                                                         1))
+                               quantiles <- ggplot2:::create_quantile_segment_frame(data, draw_quantiles)
+                               aesthetics <- data[rep(1, nrow(quantiles)), setdiff(names(data), c("x", "y")), drop = FALSE]
+                               aesthetics$alpha <- rep(1, nrow(quantiles))
+                               both <- cbind(quantiles, aesthetics)
+                               quantile_grob <- GeomPath$draw_panel(both, ...)
+                               ggplot2:::ggname("geom_split_violin", grid::grobTree(GeomPolygon$draw_panel(newdata, ...), quantile_grob))
+                             }
+                             else {
+                               ggplot2:::ggname("geom_split_violin", GeomPolygon$draw_panel(newdata, ...))
+                             }
+                           })
+
+geom_split_violin <- function(mapping = NULL, data = NULL, stat = "ydensity", position = "identity", ..., 
+                              draw_quantiles = NULL, trim = TRUE, scale = "area", na.rm = FALSE, 
+                              show.legend = NA, inherit.aes = TRUE) {
+  layer(data = data, mapping = mapping, stat = stat, geom = GeomSplitViolin, 
+        position = position, show.legend = show.legend, inherit.aes = inherit.aes, 
+        params = list(trim = trim, scale = scale, draw_quantiles = draw_quantiles, na.rm = na.rm, ...))
+}
+
+### This script creates an R function to generate raincloud plots, then simulates
+### data for plots. If using for your own data, you only need lines 1-80.
+### It relies largely on code previously written by David Robinson
+### (https://gist.github.com/dgrtwo/eb7750e74997891d7c20)
+### and the package ggplot2 by Hadley Wickham
+
+# Check if required packages are installed ----
+packages <- c("cowplot", "readr", "ggplot2", "dplyr", "lavaan", "smooth", "Hmisc")
+if (length(setdiff(packages, rownames(installed.packages()))) > 0) {
+  install.packages(setdiff(packages, rownames(installed.packages())))
+}
+
+# Load packages ----
+library(ggplot2)
+
+# Defining the geom_flat_violin function ----
+# Note: the below code modifies the
+# existing github page by removing a parenthesis in line 50
+
+"%||%" <- function(a, b) {
+  if (!is.null(a)) a else b
+}
+
+geom_flat_violin <- function(mapping = NULL, data = NULL, stat = "ydensity",
+                             position = "dodge", trim = TRUE, scale = "area",
+                             show.legend = NA, inherit.aes = TRUE, ...) {
+  layer(
+    data = data,
+    mapping = mapping,
+    stat = stat,
+    geom = GeomFlatViolin,
+    position = position,
+    show.legend = show.legend,
+    inherit.aes = inherit.aes,
+    params = list(
+      trim = trim,
+      scale = scale,
+      ...
+    )
+  )
+}
+
+#' @rdname ggplot2-ggproto
+#' @format NULL
+#' @usage NULL
+#' @export
+GeomFlatViolin <-
+  ggproto("GeomFlatViolin", Geom,
+          setup_data = function(data, params) {
+            data$width <- data$width %||%
+              params$width %||% (resolution(data$x, FALSE) * 0.9)
+            
+            # ymin, ymax, xmin, and xmax define the bounding rectangle for each group
+            data %>%
+              group_by(group) %>%
+              mutate(
+                ymin = min(y),
+                ymax = max(y),
+                xmin = x,
+                xmax = x + width / 2
+              )
+          },
+          
+          draw_group = function(data, panel_scales, coord) {
+            # Find the points for the line to go all the way around
+            data <- transform(data,
+                              xminv = x,
+                              xmaxv = x + violinwidth * (xmax - x)
+            )
+            
+            # Make sure it's sorted properly to draw the outline
+            newdata <- rbind(
+              plyr::arrange(transform(data, x = xminv), y),
+              plyr::arrange(transform(data, x = xmaxv), -y)
+            )
+            
+            # Close the polygon: set first and last point the same
+            # Needed for coord_polar and such
+            newdata <- rbind(newdata, newdata[1, ])
+            
+            ggplot2:::ggname("geom_flat_violin", GeomPolygon$draw_panel(newdata, panel_scales, coord))
+          },
+          
+          draw_key = draw_key_polygon,
+          
+          default_aes = aes(
+            weight = 1, colour = "grey20", fill = "white", size = 0.5,
+            alpha = NA, linetype = "solid"
+          ),
+          
+          required_aes = c("x", "y")
+  )
 ```
 
 # Introduction
 
+Everyday visual scenes contain far more information than the human visual system can process at a given point in time. Effective functioning in spite of this limitation requires a system which can flexibly focus its processing on the most relevant parts of a scene. Historically, models of this process have posited that selection is driven by the interaction between bottom-up and top-down influences. Bottom-up processes are based on the physical properties of a stimulus, biasing selection toward things like bright, flashing lights and loud, sudden noises. Top-down processes on the other hand are based on the internal goals of the individual, biasing selection toward, for example, the red and white hat worn by a friend that you’ve lost in a crowd. More recently, Awh, Belopolsky, and Theeuwes (2004) suggested that a third factor, selection history, is integrated with both top-down and bottom-up information in order to direct attention in a visual scene.
+
+Selection history refers to an individual’s previous experience of encountering and responding to a stimulus in a given context, and evidence for its impact on attention has come from a range of observations. One such example of how selection history impacts on the deployment of attention is demonstrated by intertrial priming. In visual search tasks where target features vary from trial to trial, intertrial priming refers to the observation that participants respond significantly faster to the current target when it matches the features of the target from the preceding trial (Fecteau, 2007; Nakayama, Maljkovic, & Kristjansson, 2004; Maljkovic & Nakayama, 1994; Thomson & Milliken, 2010, Wolfe, Butcher, Lee, & Hyle, 2003). Notably, features associated with a previous trial’s target are primed even in cases where they contradict the current top-down goals of the participant (Maljkovic and Nakayama 1994). Similarly, associating a stimulus with reward has been shown to produce increased attentional capture by that stimulus long after the reward has stopped (Anderson, Laurent, & Yantis, 2011; Hickey, Chelazzi, & Theeuwes, 2010; Hickey & van Zoest, 2013; Kiss, Driver, & Eimer, 2009). Intertrial priming and reward association both demonstrate the critical role that selection history plays alongside bottom-up and top-down influences on attentional control.
+
+The impact that selection history has on the allocation of attention has also been shown to persist even when participants are performing a different task. Feldmann-Wüstefeld, Uengoer, and Schubö (2015) demonstrated this using a dual task paradigm in which participants performed either a learning task or a search task on each trial. During the learning task participants learned to categorise stimuli based on either colour or shape, while in the search task they searched for a shape singleton and responded to the rotated line that it contained. Their results showed that when colour singletons were present in the search displays, these distractors caused greater interference on the search task for participants who had performed color categorization in the learning task. This implies that colour became more salient as a result of selection history, and follow-up experiments showed that these effects persist when the tasks are performed in separate blocks, and on separate days.
+
+Additional insight into the effect of learning history on attention has been provided through the measurement of neural indices of attention processing recorded by EEG. One of the predominant components used to study attention is an enhanced negativity recorded at posterior electrode sites contralateral to an attended stimulus, occurring approximately 200ms after stimulus onset. Referred to as N2pc, this component is generally considered to reflect the deployment of spatially selective attention to the stimulus (Ansorge, Kiss, Worschech, & Eimer, 2011; Eimer & Kiss, 2007; Luck & Hillyard, 1994a, 1994b), and has been used as an index of attentional capture by relevant stimuli (Kiss et
+al., 2008a) and pop-out objects (Eimer & Kiss, 2007; Holguín et al., 2009). In their dual task investigation into the effects of learning history on attention, Feldmann-Wüstefeld, Uengoer, and Schubö (2015) showed that during search trials, participants that had performed colour categorisation in the learning task produced an N2pc to the colour distractor whereas participants who performed shape categorisation did not. These data support the suggestion that selection history results in the automatic allocation of attention to stimuli even when they are currently task irrelevant.
+
+Recently, methodological developments have allowed for even more specific measures of attention processing using EEG. Efficient attentional orienting depends not only on efficient mechanisms for identifying and orienting to targets, but also the identification and suppression of possible distractors. Distinguishing between these processes using only behavioural measures has proven difficult, however, recent research has identified a set of lateralized event-related potentials that can provide dissociable measures of object selection and suppression. Central to the calculation of the N2pc is the subtraction of any neural activity that is represented equally in both hemispheres. Hickey, DiLollo, and McDonald (2009) took advantage of this fact in order to dissociate target and distracter processing. Participants in their task performed a visual search task in which both a target and distractor were present, but only one of these objects were lateralized on a given trial. When a target is lateralized and the distractor is on the midline, calculation of lateralized ERPs results in subtraction of all distractor activity and isolation of lateralized target processing. Similarly, when the distractor is lateralized, activity related to distractor processing can be isolated. Results using this approach have identified an early lateralized negativity indexing the attentional selection of a stimulus, and a later lateralized positivity reflecting attentional disengagement from a stimulus.
+
+Specific measures of attentional selection and suppression have provided increased specificity of the role that selection history plays in the orienting of attention. In a follow-up experiment Feldmann-Wüstefeld, Uengoer, and Schubö (2015) adapted their task in order to allow for the dissociation of target and distractor processing. Their results showed that for participants who categorized based on color in the learning task, the presentation of a colored distractor in the search task elicited an ND (a lateralised negativity to distractors) follow by a relatively large PD (a lateralised positivity to distractors). This implies that for these participants, the color distractor captured attention reflexively in the search task (reflected by ND) and therefore required increased subsequent suppression (reflected by increased PD). Participants who had learned to categorize based on shape however did not show this effect. The color distractor in this case elicited no ND during search trials, and a small PD indexing a lack of attentional capture and decreased distractor suppression respectively.
+
+An open question remains as to whether increased top-down control can be used to attenuate, or eliminate the effects of selection history on attention. Previously, dual task investigations of the effect have attempted to enhance top-down control processes by providing cues to participants which inform them of which task they’re about to perform (Kadel, Feldmann-Wustefeld, Schubo, 2017). While this allows participants to switch task sets in preparation for the upcoming trial, the effect of selection history on attention has remained suggesting that top-down control cannot be used to override the effects of selection history. However, recent work has suggested that these cues are insufficient for allowing participants to optimally engage top-down control before the trial begins. A novel approach to increasing top-down attentional control in dual tasks is the voluntary task-switching paradigm developed by Arrington (.X.). In this version of the task, participants are not cued as to what trial type will be performed next, but rather they are given the choice of which trial type they would like to perform next. Evidence suggests that the voluntary task switching paradigm allows for stronger proactive control over performance of each task - behavioural/EEG.
+
+In the present study, we adapted the design of Feldmann-Wüstefeld, Uengoer, and Schubö (2015) to a voluntary task switching paradigm in order to investigate the relationship between top-down control and selection history. By allowing participants to determine whether they would perform search or learning on the next trial, participants would be able to proactively engage the task set for the upcoming trial and exercise greater top-down control. We also recorded EEG during their performance of the task and leveraged the procedure of Hickey, DiLollo, and McDonald (2009) to allow for the isolation of target and distractor activity. This approach provides specific measures of target selection and disengagement, as well as distractor selection and suppression during the task, and therefore provides a fine grained understanding of how increased top-down control interacts with selection history during attentional orienting. We expected to see… specific hypotheses.
+
 # Methods
 
 # Results
-```{r organiseData, echo=FALSE}
+
+## Behavioral results
+
+```{r loadBehavData}
+#Load group data
+behavdata = read.csv(file="BehaviouralData.csv")
+behavdata = behavdata %>% mutate(GroupLabels = ifelse(Group == 1, "Colour", "Shape"))
+
+#Calculate distractor interference effect
+behavdata = behavdata %>% mutate(DistInt = SearchTDrt-SearchTOrt)
+```
+
+(ref:behavDistInt) Violin plot showing the interference caused by a colored distractor during visual search for both the shape and color trained groups. 
+
+```{r DistIntViolin, fig.cap = "(ref:behavDistInt)"}
+behavdata %>%
+  filter(SwitchRate>0.2) %>%
+ggplot( aes(x = Group, y = DistInt, fill = GroupLabels)) +
+  geom_flat_violin(aes(fill = GroupLabels),position = position_nudge(x = .1, y = 0), adjust = 1.5, trim = FALSE, alpha = .5, colour = NA)+
+  geom_point(aes(x = Group-0.25, y = DistInt, colour = GroupLabels),position = position_jitter(width = .05), size = 4, shape = 20)+
+  geom_boxplot(aes(x = Group, y = DistInt, fill = GroupLabels),outlier.shape = NA, alpha = .5, width = .1, colour = "black")+
+  scale_colour_brewer(palette = "Set1")+
+  scale_fill_brewer(palette = "Set1")+
+  labs(y = "Distractor Interference (ms)") +
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        panel.background = element_blank(),
+        axis.line = element_line(colour = "black"),
+        axis.text.x = element_blank(),
+        axis.title.x = element_blank(),
+        axis.ticks = element_blank(),
+        text= element_text(size=12))
+```
+
+## ERP results
+```{r organiseData}
 dPath = 'CSL_Visuals/'
 fPrefix = 'N2pc'
 
@@ -135,13 +318,15 @@ allData$Object <- recode(allData$Object, ShapePredictor = "Shape", ColourPredict
 rm(epochInfo,lHemData,rHemData,scalpData, gathercols)
 ```
 
-```{r plotParams, echo=FALSE}
+```{r plotParams}
 baseline = 200
 plotWidth = 24
 plotHeight = 9
 ```
 
-```{r makeLearnPlots, echo=FALSE}
+(ref:learnERPCap) Subtractracted ERPs showing the lateralized response to the shape singleton (top) and color singleton (bottom) for each group in the categorization task. 
+
+```{r makeLearnPlots, fig.cap="(ref:learnERPCap)"}
 #Subtracted
 allData %>%
   filter(Event == "Learn" & Reject == 0) %>%
@@ -159,10 +344,12 @@ allData %>%
     geom_vline(xintercept = 0,linetype = "dashed" ) +
     geom_hline(yintercept = 0,linetype = "dashed") +
     theme_minimal() +
-    theme(panel.spacing.y = unit(2, "lines"), text= element_text(size=14))
+    theme(panel.spacing.y = unit(2, "lines"), text= element_text(size=12))
 ```
 
-```{r makeSearchPlots, echo=FALSE}
+(ref:searchERPCap) Subtractracted ERPs showing the lateralized response to the colored distractor (top), the shape target (middle), and the shape target in the absence of distraction (bottom) for each group in the search task.
+
+```{r makeSearchPlots, fig.cap="(ref:searchERPCap)"}
 allData %>%
   filter(Event == "Search" & LatStim != "None" & Reject == 0) %>%
   mutate(sample = sample-baseline) %>%
@@ -179,8 +366,10 @@ allData %>%
     geom_vline(xintercept = 0,linetype = "dashed" )+
     geom_hline(yintercept = 0,linetype = "dashed") +
     theme_minimal() +
-    theme(panel.spacing.y = unit(2, "lines"),text= element_text(size=14))
+    theme(panel.spacing.y = unit(2, "lines"),text= element_text(size=12))
 ```
+
+### Categorization task
 
 ```{r learnStats, echo=FALSE}
 learnNtShape <- allData %>%
@@ -195,6 +384,7 @@ learn.NtShape.aov <- aov_ez(
   within = c("Contra"),
   between = "Group"
 )
+learn.NtShape.results <- apa_print(learn.NtShape.aov)
 
 learnNtCol <- allData %>%
   mutate(sample = sample-baseline) %>%
@@ -208,6 +398,7 @@ learn.NtCol.aov <- aov_ez(
   within = c("Contra"),
   between = "Group"
 )
+learn.NtCol.results <- apa_print(learn.NtCol.aov)
 
 learnPdShape <- allData %>%
   mutate(sample = sample-baseline) %>%
@@ -221,6 +412,7 @@ learn.PdShape.aov <- aov_ez(
   within = c("Contra"),
   between = "Group"
 )
+learn.PdShape.results <- apa_print(learn.PdShape.aov)
 
 learnPdCol <- allData %>%
   mutate(sample = sample-baseline) %>%
@@ -234,14 +426,14 @@ learn.PdCol.aov <- aov_ez(
   within = c("Contra"),
   between = "Group"
 )
+learn.PdCol.results <- apa_print(learn.PdCol.aov)
 ```
 
-Stats results (`r papaja::apa_print.afex_aov(learn.NtShape.aov)$full_result`) and then also 
-(`r papaja::apa_print.afex_aov(learn.NtCol.aov)$full_result`) and then also 
-(`r papaja::apa_print.afex_aov(learn.PdShape.aov)$full_result`) and then also 
-(`r papaja::apa_print.afex_aov(learn.PdCol.aov)$full_result`) and then also 
+There is a significant interaction between group and Nt for lateralized shape singletons (`r learn.NtShape.results$full$Group_Contra`), Nt for lateralized color singletons (`r learn.NtCol.results$full$Group_Contra`), Pd for lateralized shape singletons (`r learn.PdShape.results$full$Group_Contra`), and Pd for lateralized color singletons (`r learn.PdCol.results$full$Group_Contra`).
 
-```{r searchStats}
+### Search task
+
+```{r searchStats, echo=FALSE}
 searchNtTO <- allData %>%
   mutate(sample = sample-baseline) %>%
   filter(Event == "Search" & LatStim != "None" & Reject == 0 & sample>185 & sample < 250 & Stimulus == "Target  ( None  mid)") %>%
@@ -254,6 +446,7 @@ search.NtTO.aov <- aov_ez(
   within = c("Contra"),
   between = "Group"
 )
+search.NtTO.results <- apa_print(search.NtTO.aov)
 
 searchNtTD <- allData %>%
   mutate(sample = sample-baseline) %>%
@@ -267,6 +460,7 @@ search.NtTD.aov <- aov_ez(
   within = c("Contra"),
   between = "Group"
 )
+search.NtTD.results <- apa_print(search.NtTD.aov)
 
 searchNtDT <- allData %>%
   mutate(sample = sample-baseline) %>%
@@ -280,6 +474,7 @@ search.NtDT.aov <- aov_ez(
   within = c("Contra"),
   between = "Group"
 )
+search.NtDT.results <- apa_print(search.NtDT.aov)
 
 searchPdTO <- allData %>%
   mutate(sample = sample-baseline) %>%
@@ -293,6 +488,7 @@ search.PdTO.aov <- aov_ez(
   within = c("Contra"),
   between = "Group"
 )
+search.PdTO.results <- apa_print(search.PdTO.aov)
 
 searchPdTD <- allData %>%
   mutate(sample = sample-baseline) %>%
@@ -306,6 +502,7 @@ search.PdTD.aov <- aov_ez(
   within = c("Contra"),
   between = "Group"
 )
+search.PdTD.results <- apa_print(search.PdTD.aov)
 
 searchPdDT <- allData %>%
   mutate(sample = sample-baseline) %>%
@@ -319,14 +516,12 @@ search.PdDT.aov <- aov_ez(
   within = c("Contra"),
   between = "Group"
 )
+search.PdDT.results <- apa_print(search.PdDT.aov)
 ```
 
-`r papaja::apa_print.afex_aov(search.NtTO.aov)$full_result`
-`r papaja::apa_print.afex_aov(search.NtTD.aov)$full_result`
-`r papaja::apa_print.afex_aov(search.NtDT.aov)$full_result`
-`r papaja::apa_print.afex_aov(search.PdTO.aov)$full_result`
-`r papaja::apa_print.afex_aov(search.PdTD.aov)$full_result`
-`r papaja::apa_print.afex_aov(search.PdDT.aov)$full_result`
+Nt results for search task; lateralized target with no distractor (`r search.NtTO.results$full$Group_Contra`), lateralized target with distractor present (`r search.NtTD.results$full$Group_Contra`), and lateralized distractor (`r search.NtDT.results$full$Group_Contra`)
+
+Pd results for search task; lateralized target with no distractor (`r search.PdTO.results$full$Group_Contra`), lateralized target with distractor present (`r search.PdTD.results$full$Group_Contra`), and lateralized distractor (`r search.PdDT.results$full$Group_Contra`)
 
 # Discussion
 

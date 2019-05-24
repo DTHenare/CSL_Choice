@@ -38,3 +38,10 @@ rsconnect/
 CSL_Visuals/
 LRP/
 CNV/
+*.docx
+*.pdf
+*.tex
+CSL_Choice_paper_files/
+LERPStats/
+statsLERP.R
+BehaviouralData.csv

@@ -41,7 +41,7 @@ CNV/
 *.docx
 *.pdf
 *.tex
-CSL_Choice_paper_files/
+CSL_Choice_Paper_files/
 LERPStats/
 statsLERP.R
 BehaviouralData.csv

@@ -332,14 +332,15 @@ epochInfo$VarName11 = NULL
 #clear stuff that I don't need
 rm(curEpochInfo,curLHemData,curRHemData, fPrefix, eFileList, eFilePattern, lFileList, lFilePattern, rFileList, rFilePattern, subj, groupdata)
 #####
+#Permutation can be done at this stage using epochInfo$Hemifield = sample(epochInfo$Hemifield, replace=FALSE)
 #combine all the data together into one long table
 gathercols = colnames(lHemData)
 lHemData$Hem = "Left"
 rHemData$Hem = "Right"
 scalpData = rbind(lHemData,rHemData)
-epochInfo = rbind(epochInfo,epochInfo)
+origEpochInfo = rbind(epochInfo,epochInfo)
 
-allData <- cbind(epochInfo, scalpData)
+allData <- cbind(origEpochInfo, scalpData)
 allData <- gather(allData, "sample", "voltage", gathercols, factor_key = TRUE)
 
 #Tidy variable names etc. and create any necessary variables - could use unite
@@ -350,7 +351,7 @@ allData <- allData %>% mutate(Object = as.factor(paste(Group,LatStim, sep="")))
 allData$Object <- recode(allData$Object, ShapePredictor = "Shape", ColourPredictor="Colour", ShapeNonPred = "Colour", ColourNonPred = "Shape")
 
 #clear stuff that I don't need
-rm(epochInfo,lHemData,rHemData,scalpData, gathercols)
+rm(origEpochInfo,scalpData)
 ```
 
 ```{r setParams}
@@ -564,6 +565,46 @@ search.PdDT.results <- apa_print(search.PdDT.aov)
 Nt results for search task; lateralized target with no distractor (`r search.NtTO.results$full$Group_Contra`), lateralized target with distractor present (`r search.NtTD.results$full$Group_Contra`), and lateralized distractor (`r search.NtDT.results$full$Group_Contra`)
 
 Pd results for search task; lateralized target with no distractor (`r search.PdTO.results$full$Group_Contra`), lateralized target with distractor present (`r search.PdTD.results$full$Group_Contra`), and lateralized distractor (`r search.PdDT.results$full$Group_Contra`)
+
+### Permutatikon testing
+
+```{r permutationTesting, echo=FALSE}
+nPermutes = 100
+
+for (permutation in 1:2) {
+#Shuffle the $X condition
+permEpochInfo = epochInfo
+permEpochInfo$Hemisphere = sample(permEpochInfo$Hemisphere, replace=FALSE)
+
+#recreate allData in permAllData
+scalpData = rbind(lHemData,rHemData)
+origEpochInfo = rbind(permEpochInfo,permEpochInfo)
+
+permAllData <- cbind(origEpochInfo, scalpData)
+permAllData <- gather(permAllData, "sample", "voltage", gathercols, factor_key = TRUE)
+
+#Tidy variable names etc. and create any necessary variables - could use unite
+permAllData$sample <- as.integer(substring(permAllData$sample,2))
+permAllData <- permAllData %>% mutate(Contra = ifelse(Hemifield==Hem, "Ipsilateral", "Contralateral"))
+permAllData <- permAllData %>% mutate(Stimulus = paste(LatStim," (",MidStim," mid)"))
+permAllData <- permAllData %>% mutate(Object = as.factor(paste(Group,LatStim, sep="")))
+permAllData$Object <- recode(permAllData$Object, ShapePredictor = "Shape", ColourPredictor="Colour", ShapeNonPred = "Colour", ColourNonPred = "Shape")
+
+searchNtTD <- permAllData %>%
+  mutate(sample = sample-baseline) %>%
+  filter(Event == "Search" & LatStim != "None" & Reject == 0 & sample>NtStart & sample < NtEnd & Stimulus == "Target  ( Distractor  mid)") %>%
+  group_by(Stimulus,Subject,Contra,Group) %>%
+  summarise(mV = mean(voltage))
+search.NtTD.aov <- aov_ez(
+  data = searchNtTD,
+  dv = "mV",
+  id = "Subject", 
+  within = c("Contra"),
+  between = "Group"
+)
+search.NtTD.results <- apa_print(search.NtTD.aov)
+}
+```
 
 # Discussion
 

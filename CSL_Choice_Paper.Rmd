@@ -351,6 +351,8 @@ allData$Object <- recode(allData$Object, ShapePredictor = "Shape", ColourPredict
 
 #clear stuff that I don't need
 rm(origEpochInfo,scalpData)
+#Change factor labels
+allData$Object = factor(allData$Object, labels = c("ColourDistractor", "ColourNone", "Lateralised Shape", "Lateralised Colour", "ColourTarget", "ShapeDistractor", "ShapeNone", "ShapeTarget"))
 ```
 
 ```{r setParams}
@@ -362,53 +364,6 @@ NtStart = 185
 NtEnd = 250
 PdStart = 250
 PdEnd = 350
-```
-
-(ref:learnERPCap) Subtractracted ERPs showing the lateralized response to the shape singleton (top) and color singleton (bottom) for each group in the categorization task. 
-
-```{r makeLearnPlots, fig.cap="(ref:learnERPCap)"}
-#Change factor labels
-allData$Object = factor(allData$Object, labels = c("ColourDistractor", "ColourNone", "Lateralised Shape", "Lateralised Colour", "ColourTarget", "ShapeDistractor", "ShapeNone", "ShapeTarget"))
-#Subtracted
-allData %>%
-  filter(Event == "Learn", Reject == 0) %>%
-  mutate(sample = sample-baseline) %>%
-  group_by(Object,sample,Contra,Group) %>%
-  summarise(mean = mean(voltage)) %>%
-  spread(Contra, mean) %>% 
-  mutate(diff = Contralateral - Ipsilateral) %>%
-  ggplot(., aes(sample,diff)) +
-    geom_line(aes(colour = Group),size=0.5) +
-    scale_colour_brewer(palette = "Set1") +
-    scale_x_continuous(name ="Latency (ms)", expand = c(0, 0)) +
-    scale_y_reverse(name =expression(paste("Amplitude (",mu,"v)")), expand = c(0, 0)) +
-    facet_grid(Object~., labeller = ) +
-    geom_vline(xintercept = 0,linetype = "dashed" ) +
-    geom_hline(yintercept = 0,linetype = "dashed") +
-    theme_minimal() +
-    theme(panel.spacing.y = unit(2, "lines"), text= element_text(size=12))
-```
-
-(ref:searchERPCap) Subtractracted ERPs showing the lateralized response to the colored distractor (top), the shape target (middle), and the shape target in the absence of distraction (bottom) for each group in the search task.
-
-```{r makeSearchPlots, fig.cap="(ref:searchERPCap)"}
-allData %>%
-  filter( Event == "Search" & LatStim != "None" & Reject == 0) %>%
-  mutate(sample = sample-baseline) %>%
-  group_by(Stimulus,sample,Contra,Group) %>%
-  summarise(mean = mean(voltage)) %>%
-  spread(Contra, mean) %>% 
-  mutate(diff = Contralateral - Ipsilateral) %>%
-  ggplot(., aes(sample,diff)) +
-    geom_line(aes(colour = Group),size=0.5) +
-    scale_colour_brewer(palette = "Set1") +
-    scale_x_continuous(name ="Latency (ms)", expand = c(0, 0)) +
-    scale_y_reverse(name =expression(paste("Amplitude (",mu,"v)")), expand = c(0, 0)) +
-    facet_grid(Stimulus~.) +
-    geom_vline(xintercept = 0,linetype = "dashed" )+
-    geom_hline(yintercept = 0,linetype = "dashed") +
-    theme_minimal() +
-    theme(panel.spacing.y = unit(2, "lines"),text= element_text(size=12))
 ```
 
 ### Categorization task
@@ -480,6 +435,76 @@ The results showed that there is a significant interaction between eletrode loca
 #### Colour singleton response
 
 whereas the lateralised respone to the colour singleton is more negatvie for those in colour categoriser group that the shape categoriser group (`r learn.NtCol.results$full$Group_Contra`). There is no interaction between electrode and group in the Pd time range for either the lateralised shape ERP (`r learn.PdShape.results$full$Group_Contra`) or lateralised colour ERP (`r learn.PdCol.results$full$Group_Contra`).
+
+(ref:learnERPCap) Subtractracted ERPs showing the lateralized response to the shape singleton (top) and color singleton (bottom) for each group in the categorization task. 
+
+```{r makeLearnPlots, fig.cap="(ref:learnERPCap)"}
+#Subtracted
+allData %>%
+  filter(Event == "Learn", Reject == 0) %>%
+  mutate(sample = sample-baseline) %>%
+  group_by(Object,sample,Contra,Group) %>%
+  summarise(mean = mean(voltage)) %>%
+  spread(Contra, mean) %>% 
+  mutate(diff = Contralateral - Ipsilateral) %>%
+  ggplot(., aes(sample,diff)) +
+    geom_line(aes(colour = Group),size=0.5) +
+    scale_colour_brewer(palette = "Set1") +
+    scale_x_continuous(name ="Latency (ms)", expand = c(0, 0)) +
+    scale_y_reverse(name =expression(paste("Amplitude (",mu,"v)")), expand = c(0, 0)) +
+    facet_grid(Object~.) +
+    geom_vline(xintercept = 0,linetype = "dashed" ) +
+    geom_hline(yintercept = 0,linetype = "dashed") +
+    theme_apa() +
+    theme(panel.spacing.y = unit(2, "lines"), text= element_text(size=12))
+```
+
+
+(ref:learnERPsbyRepxSw) Subtractracted ERPs showing the lateralized response to the shape singleton (top) and color singleton (bottom) for each group in the categorization task. Responses for trials which were a repeated search trial are plotted separately from those that were performed after a task switch.
+
+```{r learnERPsbyRepxSw, fig.cap="(ref:learnERPsbyRepxSw)"}
+#Subtracted
+allData %>%
+  filter(Event == "Learn", Reject == 0) %>%
+  mutate(sample = sample-baseline) %>%
+  group_by(Object,sample,Contra,Group, TrialType) %>%
+  summarise(mean = mean(voltage)) %>%
+  spread(Contra, mean) %>% 
+  mutate(diff = Contralateral - Ipsilateral) %>%
+  ggplot(., aes(sample,diff)) +
+    geom_line(aes(colour = Group),size=0.5) +
+    scale_colour_brewer(palette = "Set1") +
+    scale_x_continuous(name ="Latency (ms)", expand = c(0, 0)) +
+    scale_y_reverse(name =expression(paste("Amplitude (",mu,"v)")), expand = c(0, 0)) +
+    facet_grid(Object~TrialType) +
+    geom_vline(xintercept = 0,linetype = "dashed" ) +
+    geom_hline(yintercept = 0,linetype = "dashed") +
+    theme_apa() +
+    theme(panel.spacing.y = unit(2, "lines"), text= element_text(size=12))
+```
+
+(ref:learnERPsbyfirstxsec) Subtractracted ERPs showing the lateralized response to the shape singleton (top) and color singleton (bottom) for each group in the categorization task. Responses for trials which were performed in the first half of the experiment are plotted separately from those that were performed in the second half.
+
+```{r learnERPsbyfirstxsec, fig.cap="(ref:learnERPsbyfirstxsec)"}
+#Subtracted
+allData %>%
+  filter(Event == "Learn", Reject == 0) %>%
+  mutate(sample = sample-baseline) %>%
+  group_by(Object,sample,Contra,Group, Timepoint) %>%
+  summarise(mean = mean(voltage)) %>%
+  spread(Contra, mean) %>% 
+  mutate(diff = Contralateral - Ipsilateral) %>%
+  ggplot(., aes(sample,diff)) +
+    geom_line(aes(colour = Group),size=0.5) +
+    scale_colour_brewer(palette = "Set1") +
+    scale_x_continuous(name ="Latency (ms)", expand = c(0, 0)) +
+    scale_y_reverse(name =expression(paste("Amplitude (",mu,"v)")), expand = c(0, 0)) +
+    facet_grid(Object~Timepoint) +
+    geom_vline(xintercept = 0,linetype = "dashed" ) +
+    geom_hline(yintercept = 0,linetype = "dashed") +
+    theme_apa() +
+    theme(panel.spacing.y = unit(2, "lines"), text= element_text(size=12))
+```
 
 ### Search task
 
@@ -582,6 +607,72 @@ Results for the lateralised target in the presence of a distractor show that the
 #### Target response - Distractor absent trials
 
 In the target only displays there is no effect of group assignment on either the Nt (`r search.NtTO.results$full$Group_Contra`) or the Pd component (`r search.PdTO.results$full$Group_Contra`).
+
+(ref:searchERPCap) Subtractracted ERPs showing the lateralized response to the colored distractor (top), the shape target (middle), and the shape target in the absence of distraction (bottom) for each group in the search task.
+
+```{r makeSearchPlots, fig.cap="(ref:searchERPCap)"}
+allData %>%
+  filter( Event == "Search" & LatStim != "None" & Reject == 0) %>%
+  mutate(sample = sample-baseline) %>%
+  group_by(Stimulus,sample,Contra,Group) %>%
+  summarise(mean = mean(voltage)) %>%
+  spread(Contra, mean) %>% 
+  mutate(diff = Contralateral - Ipsilateral) %>%
+  ggplot(., aes(sample,diff)) +
+    geom_line(aes(colour = Group),size=0.5) +
+    scale_colour_brewer(palette = "Set1") +
+    scale_x_continuous(name ="Latency (ms)", expand = c(0, 0)) +
+    scale_y_reverse(name =expression(paste("Amplitude (",mu,"v)")), expand = c(0, 0)) +
+    facet_grid(Stimulus~.) +
+    geom_vline(xintercept = 0,linetype = "dashed" )+
+    geom_hline(yintercept = 0,linetype = "dashed") +
+    theme_apa() +
+    theme(panel.spacing.y = unit(2, "lines"),text= element_text(size=12))
+```
+
+(ref:searchERPbyRepxSw) Subtractracted ERPs showing the lateralized response to the colored distractor (top), the shape target (middle), and the shape target in the absence of distraction (bottom) for each group in the search task. Responses for trials which were a repeated search trial are plotted separately from those that were performed after a task switch.
+
+```{r searchERPbyRepxSw, fig.cap="(ref:searchERPCap)"}
+allData %>%
+  filter( Event == "Search" & LatStim != "None" & Reject == 0) %>%
+  mutate(sample = sample-baseline) %>%
+  group_by(Stimulus,sample,Contra,Group,TrialType) %>%
+  summarise(mean = mean(voltage)) %>%
+  spread(Contra, mean) %>% 
+  mutate(diff = Contralateral - Ipsilateral) %>%
+  ggplot(., aes(sample,diff)) +
+    geom_line(aes(colour = Group),size=0.5) +
+    scale_colour_brewer(palette = "Set1") +
+    scale_x_continuous(name ="Latency (ms)", expand = c(0, 0)) +
+    scale_y_reverse(name =expression(paste("Amplitude (",mu,"v)")), expand = c(0, 0)) +
+    facet_grid(Stimulus~TrialType) +
+    geom_vline(xintercept = 0,linetype = "dashed" )+
+    geom_hline(yintercept = 0,linetype = "dashed") +
+    theme_apa() +
+    theme(panel.spacing.y = unit(2, "lines"),text= element_text(size=12))
+```
+
+(ref:searchERPbyfirstxsec) Subtractracted ERPs showing the lateralized response to the colored distractor (top), the shape target (middle), and the shape target in the absence of distraction (bottom) for each group in the search task. Responses for trials which were performed in the first half of the experiment are plotted separately from those that were performed in the second half.
+
+```{r searchERPbyfirstxsec, fig.cap="(ref:searchERPbyfirstxsec)"}
+allData %>%
+  filter( Event == "Search" & LatStim != "None" & Reject == 0) %>%
+  mutate(sample = sample-baseline) %>%
+  group_by(Stimulus,sample,Contra,Group,Timepoint) %>%
+  summarise(mean = mean(voltage)) %>%
+  spread(Contra, mean) %>% 
+  mutate(diff = Contralateral - Ipsilateral) %>%
+  ggplot(., aes(sample,diff)) +
+    geom_line(aes(colour = Group),size=0.5) +
+    scale_colour_brewer(palette = "Set1") +
+    scale_x_continuous(name ="Latency (ms)", expand = c(0, 0)) +
+    scale_y_reverse(name =expression(paste("Amplitude (",mu,"v)")), expand = c(0, 0)) +
+    facet_grid(Stimulus~Timepoint) +
+    geom_vline(xintercept = 0,linetype = "dashed" )+
+    geom_hline(yintercept = 0,linetype = "dashed") +
+    theme_apa() +
+    theme(panel.spacing.y = unit(2, "lines"),text= element_text(size=12))
+```
 
 ### Permutation testing
 

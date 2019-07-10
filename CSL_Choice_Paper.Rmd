@@ -345,14 +345,19 @@ allData <- gather(allData, "sample", "voltage", gathercols, factor_key = TRUE)
 #Tidy variable names etc. and create any necessary variables - could use unite
 allData$sample <- as.integer(substring(allData$sample,2))
 allData <- allData %>% mutate(Contra = ifelse(Hemifield==Hem, "Ipsilateral", "Contralateral"))
-allData <- allData %>% mutate(Stimulus = paste(LatStim," (",MidStim," mid)"))
+allData <- allData %>% mutate(Stimulus = as.factor(paste(LatStim," (",MidStim," mid)", sep = "")))
 allData <- allData %>% mutate(Object = as.factor(paste(Group,LatStim, sep="")))
 allData$Object <- recode(allData$Object, ShapePredictor = "Shape", ColourPredictor="Colour", ShapeNonPred = "Colour", ColourNonPred = "Shape")
 
 #clear stuff that I don't need
 rm(origEpochInfo,scalpData)
 #Change factor labels
-allData$Object = factor(allData$Object, labels = c("ColourDistractor", "ColourNone", "Lateralised Shape", "Lateralised Colour", "ColourTarget", "ShapeDistractor", "ShapeNone", "ShapeTarget"))
+allData$Object = factor(allData$Object, labels = c("ColourDistractor", "ColourNone", "Lat. Shape", "Lat. Colour", "ColourTarget", "ShapeDistractor", "ShapeNone", "ShapeTarget"))
+allData$Object = factor(allData$Object, levels = c("Lat. Colour", "Lat. Shape", "ColourNone", "ShapeNone", "ColourTarget", "ShapeTarget", "ColourDistractor", "ShapeDistractor"))
+allData$Group = factor(allData$Group, levels = c("Colour", "Shape"))
+allData$TrialType = factor(allData$TrialType, levels = c("Switch", "Rep"))
+allData$Stimulus = factor(allData$Stimulus, levels = c("Target (None mid)", "Target (Distractor mid)", "Distractor (Target mid)"))
+
 ```
 
 ```{r setParams}
@@ -370,8 +375,8 @@ PdEnd = 350
 
 ```{r learnStats, echo=FALSE}
 learnNtShape <- allData %>%
-  mutate(sample = sample-baseline) %>%
-  filter(Event == "Learn" & Reject == 0 & sample>NtStart & sample < NtEnd & Object == "Lateralised Shape") %>%
+  mutate(sample = sample*2-baseline) %>%
+  filter(Event == "Learn" & Reject == 0 & sample>NtStart & sample < NtEnd & Object == "Lat. Shape") %>%
   group_by(Object,Subject,Contra,Group) %>%
   summarise(mV = mean(voltage))
 learn.NtShape.aov <- aov_ez(
@@ -384,8 +389,8 @@ learn.NtShape.aov <- aov_ez(
 learn.NtShape.results <- apa_print(learn.NtShape.aov)
 
 learnNtCol <- allData %>%
-  mutate(sample = sample-baseline) %>%
-  filter(Event == "Learn" & Reject == 0 & sample>NtStart & sample < NtEnd & Object == "Lateralised Colour") %>%
+  mutate(sample = sample*2-baseline) %>%
+  filter(Event == "Learn" & Reject == 0 & sample>NtStart & sample < NtEnd & Object == "Lat. Colour") %>%
   group_by(Object,Subject,Contra,Group) %>%
   summarise(mV = mean(voltage))
 learn.NtCol.aov <- aov_ez(
@@ -398,8 +403,8 @@ learn.NtCol.aov <- aov_ez(
 learn.NtCol.results <- apa_print(learn.NtCol.aov)
 
 learnPdShape <- allData %>%
-  mutate(sample = sample-baseline) %>%
-  filter(Event == "Learn" & Reject == 0 & sample>PdStart & sample < PdEnd & Object == "Lateralised Shape") %>%
+  mutate(sample = sample*2-baseline) %>%
+  filter(Event == "Learn" & Reject == 0 & sample>PdStart & sample < PdEnd & Object == "Lat. Shape") %>%
   group_by(Object,Subject,Contra,Group) %>%
   summarise(mV = mean(voltage))
 learn.PdShape.aov <- aov_ez(
@@ -412,8 +417,8 @@ learn.PdShape.aov <- aov_ez(
 learn.PdShape.results <- apa_print(learn.PdShape.aov)
 
 learnPdCol <- allData %>%
-  mutate(sample = sample-baseline) %>%
-  filter(Event == "Learn" & Reject == 0 & sample>PdStart & sample < PdEnd & Object == "Lateralised Colour") %>%
+  mutate(sample = sample*2-baseline) %>%
+  filter(Event == "Learn" & Reject == 0 & sample>PdStart & sample < PdEnd & Object == "Lat. Colour") %>%
   group_by(Object,Subject,Contra,Group) %>%
   summarise(mV = mean(voltage))
 learn.PdCol.aov <- aov_ez(
@@ -442,13 +447,15 @@ whereas the lateralised respone to the colour singleton is more negatvie for tho
 #Subtracted
 allData %>%
   filter(Event == "Learn", Reject == 0) %>%
-  mutate(sample = sample-baseline) %>%
+  mutate(sample = sample*2-baseline) %>%
   group_by(Object,sample,Contra,Group) %>%
   summarise(mean = mean(voltage)) %>%
   spread(Contra, mean) %>% 
   mutate(diff = Contralateral - Ipsilateral) %>%
   ggplot(., aes(sample,diff)) +
-    geom_line(aes(colour = Group),size=0.5) +
+    geom_rect(aes(xmin = NtStart, xmax = NtEnd, ymin = -Inf, ymax = 0), fill = "lightblue1") +
+    geom_rect(aes(xmin = PdStart, xmax = PdEnd, ymin = 0, ymax = Inf), fill = "mistyrose") +
+    geom_line(aes(colour = Group),size=1) +
     scale_colour_brewer(palette = "Set1") +
     scale_x_continuous(name ="Latency (ms)", expand = c(0, 0)) +
     scale_y_reverse(name =expression(paste("Amplitude (",mu,"v)")), expand = c(0, 0)) +
@@ -456,7 +463,14 @@ allData %>%
     geom_vline(xintercept = 0,linetype = "dashed" ) +
     geom_hline(yintercept = 0,linetype = "dashed") +
     theme_apa() +
-    theme(panel.spacing.y = unit(2, "lines"), text= element_text(size=12))
+    theme(panel.spacing.y = unit(2, "lines"), text= element_text(size=30),
+          axis.text.x = element_text(size = 26),
+          axis.text.y = element_text(size = 26),
+          legend.title = element_text( size = 26),
+          legend.text = element_text( size = 24),
+          legend.position = "bottom"
+          )
+ggsave("LearnSubtracted.pdf", dpi = 300, width = 30, height = 20, units = c("cm"))
 ```
 
 
@@ -466,13 +480,15 @@ allData %>%
 #Subtracted
 allData %>%
   filter(Event == "Learn", Reject == 0) %>%
-  mutate(sample = sample-baseline) %>%
+  mutate(sample = sample*2-baseline) %>%
   group_by(Object,sample,Contra,Group, TrialType) %>%
   summarise(mean = mean(voltage)) %>%
   spread(Contra, mean) %>% 
   mutate(diff = Contralateral - Ipsilateral) %>%
   ggplot(., aes(sample,diff)) +
-    geom_line(aes(colour = Group),size=0.5) +
+    geom_rect(aes(xmin = NtStart, xmax = NtEnd, ymin = -Inf, ymax = 0), fill = "lightblue1") +
+    geom_rect(aes(xmin = PdStart, xmax = PdEnd, ymin = 0, ymax = Inf), fill = "mistyrose") +
+    geom_line(aes(colour = Group),size=1) +
     scale_colour_brewer(palette = "Set1") +
     scale_x_continuous(name ="Latency (ms)", expand = c(0, 0)) +
     scale_y_reverse(name =expression(paste("Amplitude (",mu,"v)")), expand = c(0, 0)) +
@@ -480,7 +496,14 @@ allData %>%
     geom_vline(xintercept = 0,linetype = "dashed" ) +
     geom_hline(yintercept = 0,linetype = "dashed") +
     theme_apa() +
-    theme(panel.spacing.y = unit(2, "lines"), text= element_text(size=12))
+    theme(panel.spacing.y = unit(2, "lines"), text= element_text(size=30),
+          axis.text.x = element_text(size = 26),
+          axis.text.y = element_text(size = 26),
+          legend.title = element_text( size = 26),
+          legend.text = element_text( size = 24),
+          legend.position = "bottom"
+          )
+ggsave("LearnSubtracted_byRep.pdf", dpi = 300, width = 30, height = 20, units = c("cm"))
 ```
 
 (ref:learnERPsbyfirstxsec) Subtractracted ERPs showing the lateralized response to the shape singleton (top) and color singleton (bottom) for each group in the categorization task. Responses for trials which were performed in the first half of the experiment are plotted separately from those that were performed in the second half.
@@ -489,13 +512,15 @@ allData %>%
 #Subtracted
 allData %>%
   filter(Event == "Learn", Reject == 0) %>%
-  mutate(sample = sample-baseline) %>%
+  mutate(sample = sample*2-baseline) %>%
   group_by(Object,sample,Contra,Group, Timepoint) %>%
   summarise(mean = mean(voltage)) %>%
   spread(Contra, mean) %>% 
   mutate(diff = Contralateral - Ipsilateral) %>%
   ggplot(., aes(sample,diff)) +
-    geom_line(aes(colour = Group),size=0.5) +
+    geom_rect(aes(xmin = NtStart, xmax = NtEnd, ymin = -Inf, ymax = 0), fill = "lightblue1") +
+    geom_rect(aes(xmin = PdStart, xmax = PdEnd, ymin = 0, ymax = Inf), fill = "mistyrose") +
+    geom_line(aes(colour = Group),size=1) +
     scale_colour_brewer(palette = "Set1") +
     scale_x_continuous(name ="Latency (ms)", expand = c(0, 0)) +
     scale_y_reverse(name =expression(paste("Amplitude (",mu,"v)")), expand = c(0, 0)) +
@@ -503,15 +528,22 @@ allData %>%
     geom_vline(xintercept = 0,linetype = "dashed" ) +
     geom_hline(yintercept = 0,linetype = "dashed") +
     theme_apa() +
-    theme(panel.spacing.y = unit(2, "lines"), text= element_text(size=12))
+    theme(panel.spacing.y = unit(2, "lines"), text= element_text(size=30),
+          axis.text.x = element_text(size = 26),
+          axis.text.y = element_text(size = 26),
+          legend.title = element_text( size = 26),
+          legend.text = element_text( size = 24),
+          legend.position = "bottom"
+          )
+ggsave("LearnSubtracted_byTime.pdf", dpi = 300, width = 30, height = 20, units = c("cm"))
 ```
 
 ### Search task
 
 ```{r searchStats, echo=FALSE}
 searchNtTO <- allData %>%
-  mutate(sample = sample-baseline) %>%
-  filter(Event == "Search" & LatStim != "None" & Reject == 0 & sample>NtStart & sample < NtEnd & Stimulus == "Target  ( None  mid)") %>%
+  mutate(sample = sample*2-baseline) %>%
+  filter(Event == "Search" & LatStim != "None" & Reject == 0 & sample>NtStart & sample < NtEnd & Stimulus == "Target (None mid)") %>%
   group_by(Stimulus,Subject,Contra,Group) %>%
   summarise(mV = mean(voltage))
 search.NtTO.aov <- aov_ez(
@@ -524,8 +556,8 @@ search.NtTO.aov <- aov_ez(
 search.NtTO.results <- apa_print(search.NtTO.aov)
 
 searchNtTD <- allData %>%
-  mutate(sample = sample-baseline) %>%
-  filter(Event == "Search" & LatStim != "None" & Reject == 0 & sample>NtStart & sample < NtEnd & Stimulus == "Target  ( Distractor  mid)") %>%
+  mutate(sample = sample*2-baseline) %>%
+  filter(Event == "Search" & LatStim != "None" & Reject == 0 & sample>NtStart & sample < NtEnd & Stimulus == "Target (Distractor mid)") %>%
   group_by(Stimulus,Subject,Contra,Group) %>%
   summarise(mV = mean(voltage))
 search.NtTD.aov <- aov_ez(
@@ -538,8 +570,8 @@ search.NtTD.aov <- aov_ez(
 search.NtTD.results <- apa_print(search.NtTD.aov)
 
 searchNtDT <- allData %>%
-  mutate(sample = sample-baseline) %>%
-  filter(Event == "Search" & LatStim != "None" & Reject == 0 & sample>NtStart & sample < NtEnd & Stimulus == "Distractor  ( Target  mid)") %>%
+  mutate(sample = sample*2-baseline) %>%
+  filter(Event == "Search" & LatStim != "None" & Reject == 0 & sample>NtStart & sample < NtEnd & Stimulus == "Distractor (Target mid)") %>%
   group_by(Stimulus,Subject,Contra,Group) %>%
   summarise(mV = mean(voltage))
 search.NtDT.aov <- aov_ez(
@@ -552,8 +584,8 @@ search.NtDT.aov <- aov_ez(
 search.NtDT.results <- apa_print(search.NtDT.aov)
 
 searchPdTO <- allData %>%
-  mutate(sample = sample-baseline) %>%
-  filter( Event == "Search" & LatStim != "None" & Reject == 0 & sample>PdStart & sample < PdEnd & Stimulus == "Target  ( None  mid)") %>%
+  mutate(sample = sample*2-baseline) %>%
+  filter( Event == "Search" & LatStim != "None" & Reject == 0 & sample>PdStart & sample < PdEnd & Stimulus == "Target (None mid)") %>%
   group_by(Stimulus,Subject,Contra,Group) %>%
   summarise(mV = mean(voltage))
 search.PdTO.aov <- aov_ez(
@@ -566,8 +598,8 @@ search.PdTO.aov <- aov_ez(
 search.PdTO.results <- apa_print(search.PdTO.aov)
 
 searchPdTD <- allData %>%
-  mutate(sample = sample-baseline) %>%
-  filter(Event == "Search" & LatStim != "None" & Reject == 0 & sample>PdStart & sample < PdEnd & Stimulus == "Target  ( Distractor  mid)") %>%
+  mutate(sample = sample*2-baseline) %>%
+  filter(Event == "Search" & LatStim != "None" & Reject == 0 & sample>PdStart & sample < PdEnd & Stimulus == "Target (Distractor mid)") %>%
   group_by(Stimulus,Subject,Contra,Group) %>%
   summarise(mV = mean(voltage))
 search.PdTD.aov <- aov_ez(
@@ -580,8 +612,8 @@ search.PdTD.aov <- aov_ez(
 search.PdTD.results <- apa_print(search.PdTD.aov)
 
 searchPdDT <- allData %>%
-  mutate(sample = sample-baseline) %>%
-  filter( Event == "Search" & LatStim != "None" & Reject == 0 & sample>PdStart & sample < PdEnd & Stimulus == "Distractor  ( Target  mid)") %>%
+  mutate(sample = sample*2-baseline) %>%
+  filter( Event == "Search" & LatStim != "None" & Reject == 0 & sample>PdStart & sample < PdEnd & Stimulus == "Distractor (Target mid)") %>%
   group_by(Stimulus,Subject,Contra,Group) %>%
   summarise(mV = mean(voltage))
 search.PdDT.aov <- aov_ez(
@@ -613,12 +645,14 @@ In the target only displays there is no effect of group assignment on either the
 ```{r makeSearchPlots, fig.cap="(ref:searchERPCap)"}
 allData %>%
   filter( Event == "Search" & LatStim != "None" & Reject == 0) %>%
-  mutate(sample = sample-baseline) %>%
+  mutate(sample = sample*2-baseline) %>%
   group_by(Stimulus,sample,Contra,Group) %>%
   summarise(mean = mean(voltage)) %>%
   spread(Contra, mean) %>% 
   mutate(diff = Contralateral - Ipsilateral) %>%
   ggplot(., aes(sample,diff)) +
+    geom_rect(aes(xmin = NtStart, xmax = NtEnd, ymin = -Inf, ymax = 0), fill = "lightblue1") +
+    geom_rect(aes(xmin = PdStart, xmax = PdEnd, ymin = 0, ymax = Inf), fill = "mistyrose") +
     geom_line(aes(colour = Group),size=0.5) +
     scale_colour_brewer(palette = "Set1") +
     scale_x_continuous(name ="Latency (ms)", expand = c(0, 0)) +
@@ -627,7 +661,14 @@ allData %>%
     geom_vline(xintercept = 0,linetype = "dashed" )+
     geom_hline(yintercept = 0,linetype = "dashed") +
     theme_apa() +
-    theme(panel.spacing.y = unit(2, "lines"),text= element_text(size=12))
+    theme(panel.spacing.y = unit(2, "lines"), text= element_text(size=30),
+          axis.text.x = element_text(size = 26),
+          axis.text.y = element_text(size = 26),
+          legend.title = element_text( size = 26),
+          legend.text = element_text( size = 24),
+          legend.position = "bottom"
+          )
+ggsave("SearchSubtracted.pdf", dpi = 300, width = 30, height = 20, units = c("cm"))
 ```
 
 (ref:searchERPbyRepxSw) Subtractracted ERPs showing the lateralized response to the colored distractor (top), the shape target (middle), and the shape target in the absence of distraction (bottom) for each group in the search task. Responses for trials which were a repeated search trial are plotted separately from those that were performed after a task switch.
@@ -635,12 +676,14 @@ allData %>%
 ```{r searchERPbyRepxSw, fig.cap="(ref:searchERPCap)"}
 allData %>%
   filter( Event == "Search" & LatStim != "None" & Reject == 0) %>%
-  mutate(sample = sample-baseline) %>%
+  mutate(sample = sample*2-baseline) %>%
   group_by(Stimulus,sample,Contra,Group,TrialType) %>%
   summarise(mean = mean(voltage)) %>%
   spread(Contra, mean) %>% 
   mutate(diff = Contralateral - Ipsilateral) %>%
   ggplot(., aes(sample,diff)) +
+    geom_rect(aes(xmin = NtStart, xmax = NtEnd, ymin = -Inf, ymax = 0), fill = "lightblue1") +
+    geom_rect(aes(xmin = PdStart, xmax = PdEnd, ymin = 0, ymax = Inf), fill = "mistyrose") +
     geom_line(aes(colour = Group),size=0.5) +
     scale_colour_brewer(palette = "Set1") +
     scale_x_continuous(name ="Latency (ms)", expand = c(0, 0)) +
@@ -649,7 +692,14 @@ allData %>%
     geom_vline(xintercept = 0,linetype = "dashed" )+
     geom_hline(yintercept = 0,linetype = "dashed") +
     theme_apa() +
-    theme(panel.spacing.y = unit(2, "lines"),text= element_text(size=12))
+    theme(panel.spacing.y = unit(2, "lines"), text= element_text(size=30),
+          axis.text.x = element_text(size = 26),
+          axis.text.y = element_text(size = 26),
+          legend.title = element_text( size = 26),
+          legend.text = element_text( size = 24),
+          legend.position = "bottom"
+          )
+ggsave("SearchSubtracted_byRep.pdf", dpi = 300, width = 30, height = 20, units = c("cm"))
 ```
 
 (ref:searchERPbyfirstxsec) Subtractracted ERPs showing the lateralized response to the colored distractor (top), the shape target (middle), and the shape target in the absence of distraction (bottom) for each group in the search task. Responses for trials which were performed in the first half of the experiment are plotted separately from those that were performed in the second half.
@@ -657,12 +707,14 @@ allData %>%
 ```{r searchERPbyfirstxsec, fig.cap="(ref:searchERPbyfirstxsec)"}
 allData %>%
   filter( Event == "Search" & LatStim != "None" & Reject == 0) %>%
-  mutate(sample = sample-baseline) %>%
+  mutate(sample = sample*2-baseline) %>%
   group_by(Stimulus,sample,Contra,Group,Timepoint) %>%
   summarise(mean = mean(voltage)) %>%
   spread(Contra, mean) %>% 
   mutate(diff = Contralateral - Ipsilateral) %>%
   ggplot(., aes(sample,diff)) +
+    geom_rect(aes(xmin = NtStart, xmax = NtEnd, ymin = -Inf, ymax = 0), fill = "lightblue1") +
+    geom_rect(aes(xmin = PdStart, xmax = PdEnd, ymin = 0, ymax = Inf), fill = "mistyrose") +
     geom_line(aes(colour = Group),size=0.5) +
     scale_colour_brewer(palette = "Set1") +
     scale_x_continuous(name ="Latency (ms)", expand = c(0, 0)) +
@@ -671,7 +723,14 @@ allData %>%
     geom_vline(xintercept = 0,linetype = "dashed" )+
     geom_hline(yintercept = 0,linetype = "dashed") +
     theme_apa() +
-    theme(panel.spacing.y = unit(2, "lines"),text= element_text(size=12))
+    theme(panel.spacing.y = unit(2, "lines"), text= element_text(size=30),
+          axis.text.x = element_text(size = 26),
+          axis.text.y = element_text(size = 26),
+          legend.title = element_text( size = 26),
+          legend.text = element_text( size = 24),
+          legend.position = "bottom"
+          )
+ggsave("SearchSubtracted_byTime.pdf", dpi = 300, width = 30, height = 20, units = c("cm"))
 ```
 
 ### Permutation testing
@@ -700,8 +759,8 @@ permAllData <- permAllData %>% mutate(Object = as.factor(paste(Group,LatStim, se
 permAllData$Object <- recode(permAllData$Object, ShapePredictor = "Shape", ColourPredictor="Colour", ShapeNonPred = "Colour", ColourNonPred = "Shape")
 
 searchNtTD <- permAllData %>%
-  mutate(sample = sample-baseline) %>%
-  filter(Event == "Search" & LatStim != "None" & Reject == 0 & sample>NtStart & sample < NtEnd & Stimulus == "Target  ( Distractor  mid)") %>%
+  mutate(sample = sample*2-baseline) %>%
+  filter(Event == "Search" & LatStim != "None" & Reject == 0 & sample>NtStart & sample < NtEnd & Stimulus == "Target (Distractor mid)") %>%
   group_by(Stimulus,Subject,Contra,Group) %>%
   summarise(mV = mean(voltage))
 search.NtTD.aov <- aov_ez(

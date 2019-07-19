@@ -237,16 +237,18 @@ minSwitchRate = 0.2
 
 
 ## Behavioral results
-
 ```{r loadBehavData}
 #Load group data
 behavdata = read.csv(file="BehaviouralData.csv")
-behavdata = behavdata %>% mutate(GroupNum = Group)
-behavdata = behavdata %>% mutate(Group = ifelse(Group == 1, "Colour", "Shape"))
-#behavdata$Group = factor(behavdata$Group, labels = c("Shape", "Colour"))
-
+behavdata = behavdata %>% mutate(GroupLabels = ifelse(Group == 1, "Colour", "Shape"))
 #Calculate distractor interference effect
 behavdata = behavdata %>% mutate(DistInt = SearchTDrt-SearchTOrt)
+
+#Load all data
+behavData = read.csv(file="Behaviour/CSL_Choice_behav.csv")
+behavData <- select(behavData,-c(ExperimentName, Session, Clock.Information, DataFile.Basename, Display.RefreshRate, ExperimentVersion, RandomSeed, RuntimeCapabilities, RuntimeVersion, RuntimeVersionExpected, SessionDate, SessionStartDateTimeUtc, SessionTime, StudioVersion)
+)
+gc()
 ```
 
 ```{r behavStats, echo = FALSE}

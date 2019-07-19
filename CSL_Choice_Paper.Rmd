@@ -241,7 +241,9 @@ minSwitchRate = 0.2
 ```{r loadBehavData}
 #Load group data
 behavdata = read.csv(file="BehaviouralData.csv")
-behavdata = behavdata %>% mutate(GroupLabels = ifelse(Group == 1, "Colour", "Shape"))
+behavdata = behavdata %>% mutate(GroupNum = Group)
+behavdata = behavdata %>% mutate(Group = ifelse(Group == 1, "Colour", "Shape"))
+#behavdata$Group = factor(behavdata$Group, labels = c("Shape", "Colour"))
 
 #Calculate distractor interference effect
 behavdata = behavdata %>% mutate(DistInt = SearchTDrt-SearchTOrt)
@@ -249,9 +251,9 @@ behavdata = behavdata %>% mutate(DistInt = SearchTDrt-SearchTOrt)
 
 ```{r behavStats, echo = FALSE}
 shapeBehav <- behavdata %>%
-  filter(SwitchRate>minSwitchRate, GroupLabels == "Shape")
+  filter(SwitchRate>minSwitchRate, Group == "Shape")
 colourBehav <- behavdata %>%
-  filter(SwitchRate>minSwitchRate, GroupLabels == "Colour")
+  filter(SwitchRate>minSwitchRate, Group == "Colour")
 
 t.out = t.test(colourBehav$DistInt,shapeBehav$DistInt)
 intEffectTTest = apa_print(t.out)
@@ -264,12 +266,12 @@ In order to test for the effect of selection history when top-down control was m
 ```{r DistIntViolin, fig.cap = "(ref:behavDistInt)"}
 behavdata %>%
   filter(SwitchRate>minSwitchRate) %>%
-ggplot( aes(x = Group, y = DistInt, fill = GroupLabels)) +
-  geom_flat_violin(aes(fill = GroupLabels),position = position_nudge(x = .1, y = 0), adjust = 1.5, trim = FALSE, alpha = .5, colour = NA)+
-  geom_point(aes(x = Group-0.25, y = DistInt, colour = GroupLabels),position = position_jitter(width = .05), size = 4, shape = 20)+
-  geom_boxplot(aes(x = Group, y = DistInt, fill = GroupLabels),outlier.shape = NA, alpha = .5, width = .1, colour = "black")+
-  scale_colour_brewer(palette = "Set1")+
-  scale_fill_brewer(palette = "Set1")+
+ggplot( aes(x = GroupNum, y = DistInt, fill = Group)) +
+  geom_flat_violin(aes(fill = Group),position = position_nudge(x = .1, y = 0), adjust = 1.5, trim = FALSE, alpha = .5, colour = NA)+
+  geom_point(aes(x = GroupNum-0.25, y = DistInt, colour = Group),position = position_jitter(width = .05), size = 4, shape = 20)+
+  geom_boxplot(aes(x = GroupNum, y = DistInt, fill = Group),outlier.shape = NA, alpha = .5, width = .1, colour = "black")+
+  scale_color_manual(values=c("green4", "gray42"))+
+  scale_fill_manual(values=c("green4", "gray42"))+
   labs(y = "Distractor Interference (ms)") +
   theme(panel.grid.major = element_blank(), 
         panel.grid.minor = element_blank(),
@@ -278,7 +280,8 @@ ggplot( aes(x = Group, y = DistInt, fill = GroupLabels)) +
         axis.text.x = element_blank(),
         axis.title.x = element_blank(),
         axis.ticks = element_blank(),
-        text= element_text(size=12))
+        text= element_text(size=18),
+        legend.position = "None")
 ```
 
 ## ERP results
@@ -348,7 +351,7 @@ allData <- allData %>% mutate(Contra = ifelse(Hemifield==Hem, "Ipsilateral", "Co
 allData <- allData %>% mutate(Stimulus = as.factor(paste(LatStim," (",MidStim," mid)", sep = "")))
 allData <- allData %>% mutate(Object = as.factor(paste(Group,LatStim, sep="")))
 allData$Object <- recode(allData$Object, ShapePredictor = "Shape", ColourPredictor="Colour", ShapeNonPred = "Colour", ColourNonPred = "Shape")
-allData$Stimulus <- recode(allData$Stimulus, "Target (None mid)" = "Target alone", "Target (Distractor mid)"="Target (Dist mid)", "Distractor (Target mid)" = "Distractor (Targ mid)")
+allData$Stimulus <- recode(allData$Stimulus, "Target (None mid)" = "Target only", "Target (Distractor mid)"="Target", "Distractor (Target mid)" = "Distractor")
 
 #clear stuff that I don't need
 rm(origEpochInfo,scalpData)
@@ -357,7 +360,7 @@ allData$Object = factor(allData$Object, labels = c("ColourDistractor", "ColourNo
 allData$Object = factor(allData$Object, levels = c("Lat. Colour", "Lat. Shape", "ColourNone", "ShapeNone", "ColourTarget", "ShapeTarget", "ColourDistractor", "ShapeDistractor"))
 allData$Group = factor(allData$Group, levels = c("Colour", "Shape"))
 allData$TrialType = factor(allData$TrialType, levels = c("Switch", "Rep"))
-allData$Stimulus = factor(allData$Stimulus, levels = c("Target alone", "Target (Dist mid)", "Distractor (Targ mid)"))
+allData$Stimulus = factor(allData$Stimulus, levels = c("Target only", "Target", "Distractor"))
 
 ```
 
@@ -653,7 +656,7 @@ allData %>%
   mutate(diff = Contralateral - Ipsilateral) %>%
   ggplot(., aes(sample,diff)) +
     geom_rect(aes(xmin = NtStart, xmax = NtEnd, ymin = -Inf, ymax = 0), fill = "lemonchiffon") +
-    geom_rect(data = . %>% filter(Stimulus  == "Distractor (Targ mid)"),aes(xmin = PdStart, xmax = PdEnd, ymin = 0, ymax = Inf), fill = "lemonchiffon") +
+    geom_rect(data = . %>% filter(Stimulus  == "Distractor"),aes(xmin = PdStart, xmax = PdEnd, ymin = 0, ymax = Inf), fill = "lemonchiffon") +
     geom_line(aes(colour = Group),size=1) +
     scale_color_manual(values=c("green4", "gray42"))+
     #scale_colour_brewer(palette = "Set1") +

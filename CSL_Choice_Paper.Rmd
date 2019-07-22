@@ -238,25 +238,54 @@ minSwitchRate = 0.2
 
 ## Behavioral results
 ```{r loadBehavData}
-#Load group data
-behavdata = read.csv(file="BehaviouralData.csv")
-behavdata = behavdata %>% mutate(GroupLabels = ifelse(Group == 1, "Colour", "Shape"))
-#Calculate distractor interference effect
-behavdata = behavdata %>% mutate(DistInt = SearchTDrt-SearchTOrt)
-
+groupInfo = read.csv(file="BehaviouralData.csv")
 #Load all data
 behavData = read.csv(file="Behaviour/CSL_Choice_behav.csv")
-behavData <- select(behavData,-c(ExperimentName, Session, Clock.Information, DataFile.Basename, Display.RefreshRate, ExperimentVersion, RandomSeed, RuntimeCapabilities, RuntimeVersion, RuntimeVersionExpected, SessionDate, SessionStartDateTimeUtc, SessionTime, StudioVersion)
+behavData <- select(behavData,-c(ExperimentName, Session, Clock.Information, DataFile.Basename, Display.RefreshRate, ExperimentVersion, RandomSeed, RuntimeCapabilities, RuntimeVersion, RuntimeVersionExpected, SessionDate, SessionStartDateTimeUtc, SessionTime, StudioVersion,BlockAccC, BlockAccL, BlockRTC, BlockRTL, Group, pos1, pos2, pos3, pos4, pos5, pos6, pos7, pos8, Response.DurationError, Response.OnsetDelay, Response.OnsetTime, Response2.DurationError, Response2.OnsetDelay, Response2.OnsetTime)
 )
-gc()
 ```
 
-```{r behavStats, echo = FALSE}
-shapeBehav <- behavdata %>%
-  filter(SwitchRate>minSwitchRate, Group == "Shape")
-colourBehav <- behavdata %>%
-  filter(SwitchRate>minSwitchRate, Group == "Colour")
+```{r , include=FALSE}
 
+for (sub in unique(behavData$Subject)) {
+  behavData$Group[behavData$Subject==sub] = groupInfo$Group[groupInfo$Subject==sub]
+  behavData$switchRate[behavData$Subject==sub] = groupInfo$SwitchRate[groupInfo$Subject==sub]
+  behavData$compSD[behavData$Subject==sub] = sd(filter(behavData,Subject ==sub, Procedure.Trial. == "TaskC")$CompSearch.RT)
+  behavData$compMean[behavData$Subject==sub] = mean(filter(behavData,Subject ==sub, Procedure.Trial. == "TaskC")$CompSearch.RT)
+  behavData$learnSD[behavData$Subject==sub] = sd(filter(behavData,Subject ==sub, Procedure.Trial. == "TaskL")$LearnSearch.RT)
+  behavData$learnMean[behavData$Subject==sub] = mean(filter(behavData,Subject ==sub, Procedure.Trial. == "TaskL")$LearnSearch.RT)
+  
+  
+}
+behavData$compCutoff = behavData$compMean + (behavData$compSD * 2.5)
+behavData$learnCutoff = behavData$learnMean + (behavData$learnSD * 2.5)
+behavData <- behavData %>% 
+  mutate(SwitchCount = ifelse(repswitch=="switch",1,0))
+
+#Subject group table
+behavData %>% 
+  group_by(Subject) %>%
+  summarise(Group = mean(Group))
+behavData = behavData %>% mutate(Group = ifelse(Group==1,"Colour","Shape"))
+behavData$Group = as.factor(behavData$Group)
+```
+
+```{r behavStats}
+colourBehav <- behavData %>%
+  filter(Procedure.Trial. == "TaskC",switchRate>minSwitchRate, CompSearch.ACC==1, CompSearch.RT < compCutoff) %>%
+  group_by(Subject, TrialType, Group) %>%
+  summarise(RT = mean(CompSearch.RT)) %>%
+  spread(TrialType, RT) %>%
+  mutate(DistInt = TD-Tonly, GroupNum = as.integer(Group)) %>%
+  filter(Group=="Colour")
+
+shapeBehav <- behavData %>%
+  filter(Procedure.Trial. == "TaskC",switchRate>minSwitchRate, CompSearch.ACC==1, CompSearch.RT < compCutoff) %>%
+  group_by(Subject, TrialType, Group) %>%
+  summarise(RT = mean(CompSearch.RT)) %>%
+  spread(TrialType, RT) %>%
+  mutate(DistInt = TD-Tonly, GroupNum = as.integer(Group)) %>%
+  filter(Group=="Shape")
 t.out = t.test(colourBehav$DistInt,shapeBehav$DistInt)
 intEffectTTest = apa_print(t.out)
 ```
@@ -266,14 +295,18 @@ In order to test for the effect of selection history when top-down control was m
 (ref:behavDistInt) Violin plot showing the interference caused by a colored distractor during visual search for both the shape and color trained groups. 
 
 ```{r DistIntViolin, fig.cap = "(ref:behavDistInt)"}
-behavdata %>%
-  filter(SwitchRate>minSwitchRate) %>%
-ggplot( aes(x = GroupNum, y = DistInt, fill = Group)) +
-  geom_flat_violin(aes(fill = Group),position = position_nudge(x = .1, y = 0), adjust = 1.5, trim = FALSE, alpha = .5, colour = NA)+
-  geom_point(aes(x = GroupNum-0.25, y = DistInt, colour = Group),position = position_jitter(width = .05), size = 4, shape = 20)+
-  geom_boxplot(aes(x = GroupNum, y = DistInt, fill = Group),outlier.shape = NA, alpha = .5, width = .1, colour = "black")+
-  scale_color_manual(values=c("green4", "gray42"))+
-  scale_fill_manual(values=c("green4", "gray42"))+
+behavData %>%
+  filter(Procedure.Trial. == "TaskC",switchRate>minSwitchRate, CompSearch.ACC==1, CompSearch.RT < compCutoff) %>%
+  group_by(Subject, TrialType, Group) %>%
+  summarise(RT = mean(CompSearch.RT)) %>%
+  spread(TrialType, RT) %>%
+  mutate(DistInt = TD-Tonly, GroupNum = as.integer(Group)) %>%
+  ggplot( aes(x = GroupNum, y = DistInt, fill = Group)) +
+  geom_flat_violin(aes(fill = Group),position = position_nudge(x = .1, y = 0), adjust = 1.5, trim = FALSE, alpha = .5, colour = NA) +
+  geom_point(aes(x = GroupNum-0.15, y = DistInt, colour = Group),position = position_jitter(width = .05), size = 4, shape = 20) +
+  geom_boxplot(aes(x = GroupNum, y = DistInt, fill = Group),outlier.shape = NA, alpha = .5, width = .1, colour = "black") +
+  scale_color_manual(values=c("green4", "gray42")) +
+  scale_fill_manual(values=c("green4", "gray42")) +
   labs(y = "Distractor Interference (ms)") +
   theme(panel.grid.major = element_blank(), 
         panel.grid.minor = element_blank(),
@@ -282,8 +315,8 @@ ggplot( aes(x = GroupNum, y = DistInt, fill = Group)) +
         axis.text.x = element_blank(),
         axis.title.x = element_blank(),
         axis.ticks = element_blank(),
-        text= element_text(size=18),
-        legend.position = "None")
+        text= element_text(size=18)
+        )
 ```
 
 ## ERP results
@@ -363,7 +396,6 @@ allData$Object = factor(allData$Object, levels = c("Lat. Colour", "Lat. Shape", 
 allData$Group = factor(allData$Group, levels = c("Colour", "Shape"))
 allData$TrialType = factor(allData$TrialType, levels = c("Switch", "Rep"))
 allData$Stimulus = factor(allData$Stimulus, levels = c("Target only", "Target", "Distractor"))
-
 ```
 
 ```{r setParams}
@@ -375,6 +407,8 @@ NtStart = 185
 NtEnd = 250
 PdStart = 250
 PdEnd = 350
+
+fontSize = 12
 ```
 
 ### Categorization task
@@ -459,21 +493,21 @@ allData %>%
   spread(Contra, mean) %>% 
   mutate(diff = Contralateral - Ipsilateral) %>%
   ggplot(., aes(sample,diff)) +
-    geom_rect(aes(xmin = NtStart, xmax = NtEnd, ymin = -Inf, ymax = 0), fill = "lightblue1") +
-    geom_rect(aes(xmin = PdStart, xmax = PdEnd, ymin = 0, ymax = Inf), fill = "mistyrose") +
+    geom_rect(aes(xmin = NtStart, xmax = NtEnd, ymin = -Inf, ymax = 0), fill = "lemonchiffon") +
+    geom_rect(aes(xmin = PdStart, xmax = PdEnd, ymin = 0, ymax = Inf), fill = "lemonchiffon") +
     geom_line(aes(colour = Group),size=1) +
-    scale_colour_brewer(palette = "Set1") +
+    scale_color_manual(values=c("green4", "gray42"))+
     scale_x_continuous(name ="Latency (ms)", expand = c(0, 0)) +
     scale_y_reverse(name =expression(paste("Amplitude (",mu,"v)")), expand = c(0, 0)) +
     facet_grid(Object~.) +
     geom_vline(xintercept = 0,linetype = "dashed" ) +
     geom_hline(yintercept = 0,linetype = "dashed") +
     theme_apa() +
-    theme(panel.spacing.y = unit(2, "lines"), text= element_text(size=30),
-          axis.text.x = element_text(size = 26),
-          axis.text.y = element_text(size = 26),
-          legend.title = element_text( size = 26),
-          legend.text = element_text( size = 24),
+    theme(panel.spacing.y = unit(3, "lines"), text= element_text(size=fontSize),
+          axis.text.x = element_text(size = fontSize*0.93),
+          axis.text.y = element_text(size = fontSize*0.93),
+          legend.title = element_text( size = fontSize*1.1),
+          legend.text = element_text( size = fontSize*0.93),
           legend.position = "bottom"
           )
 ggsave("LearnSubtracted.pdf", dpi = 300, width = 30, height = 20, units = c("cm"))
@@ -492,21 +526,21 @@ allData %>%
   spread(Contra, mean) %>% 
   mutate(diff = Contralateral - Ipsilateral) %>%
   ggplot(., aes(sample,diff)) +
-    geom_rect(aes(xmin = NtStart, xmax = NtEnd, ymin = -Inf, ymax = 0), fill = "lightblue1") +
-    geom_rect(aes(xmin = PdStart, xmax = PdEnd, ymin = 0, ymax = Inf), fill = "mistyrose") +
+    geom_rect(aes(xmin = NtStart, xmax = NtEnd, ymin = -Inf, ymax = 0), fill = "lemonchiffon") +
+    geom_rect(aes(xmin = PdStart, xmax = PdEnd, ymin = 0, ymax = Inf), fill = "lemonchiffon") +
     geom_line(aes(colour = Group),size=1) +
-    scale_colour_brewer(palette = "Set1") +
+    scale_color_manual(values=c("green4", "gray42"))+
     scale_x_continuous(name ="Latency (ms)", expand = c(0, 0)) +
     scale_y_reverse(name =expression(paste("Amplitude (",mu,"v)")), expand = c(0, 0)) +
     facet_grid(Object~TrialType) +
     geom_vline(xintercept = 0,linetype = "dashed" ) +
     geom_hline(yintercept = 0,linetype = "dashed") +
     theme_apa() +
-    theme(panel.spacing.y = unit(2, "lines"), text= element_text(size=30),
-          axis.text.x = element_text(size = 26),
-          axis.text.y = element_text(size = 26),
-          legend.title = element_text( size = 26),
-          legend.text = element_text( size = 24),
+    theme(panel.spacing.y = unit(3, "lines"), text= element_text(size=fontSize),
+          axis.text.x = element_text(size = fontSize*0.93),
+          axis.text.y = element_text(size = fontSize*0.93),
+          legend.title = element_text( size = fontSize*1.1),
+          legend.text = element_text( size = fontSize*0.93),
           legend.position = "bottom"
           )
 ggsave("LearnSubtracted_byRep.pdf", dpi = 300, width = 30, height = 20, units = c("cm"))
@@ -524,21 +558,21 @@ allData %>%
   spread(Contra, mean) %>% 
   mutate(diff = Contralateral - Ipsilateral) %>%
   ggplot(., aes(sample,diff)) +
-    geom_rect(aes(xmin = NtStart, xmax = NtEnd, ymin = -Inf, ymax = 0), fill = "lightblue1") +
-    geom_rect(aes(xmin = PdStart, xmax = PdEnd, ymin = 0, ymax = Inf), fill = "mistyrose") +
+    geom_rect(aes(xmin = NtStart, xmax = NtEnd, ymin = -Inf, ymax = 0), fill = "lemonchiffon") +
+    geom_rect(aes(xmin = PdStart, xmax = PdEnd, ymin = 0, ymax = Inf), fill = "lemonchiffon") +
     geom_line(aes(colour = Group),size=1) +
-    scale_colour_brewer(palette = "Set1") +
+    scale_color_manual(values=c("green4", "gray42"))+
     scale_x_continuous(name ="Latency (ms)", expand = c(0, 0)) +
     scale_y_reverse(name =expression(paste("Amplitude (",mu,"v)")), expand = c(0, 0)) +
     facet_grid(Object~Timepoint) +
     geom_vline(xintercept = 0,linetype = "dashed" ) +
     geom_hline(yintercept = 0,linetype = "dashed") +
     theme_apa() +
-    theme(panel.spacing.y = unit(2, "lines"), text= element_text(size=30),
-          axis.text.x = element_text(size = 26),
-          axis.text.y = element_text(size = 26),
-          legend.title = element_text( size = 26),
-          legend.text = element_text( size = 24),
+    theme(panel.spacing.y = unit(3, "lines"), text= element_text(size=fontSize),
+          axis.text.x = element_text(size = fontSize*0.93),
+          axis.text.y = element_text(size = fontSize*0.93),
+          legend.title = element_text( size = fontSize*1.1),
+          legend.text = element_text( size = fontSize*0.93),
           legend.position = "bottom"
           )
 ggsave("LearnSubtracted_byTime.pdf", dpi = 300, width = 30, height = 20, units = c("cm"))
@@ -549,7 +583,7 @@ ggsave("LearnSubtracted_byTime.pdf", dpi = 300, width = 30, height = 20, units =
 ```{r searchStatsBasic, echo=FALSE}
 searchNtTO <- allData %>%
   mutate(sample = sample*2-baseline) %>%
-  filter(Event == "Search" & LatStim != "None" & Reject == 0 & sample>NtStart & sample < NtEnd & Stimulus == "Target (None mid)") %>%
+  filter(Event == "Search" & LatStim != "None" & Reject == 0 & sample>NtStart & sample < NtEnd & Stimulus == "Target only") %>%
   group_by(Stimulus,Subject,Contra,Group) %>%
   summarise(mV = mean(voltage))
 search.NtTO.aov <- aov_ez(
@@ -563,7 +597,7 @@ search.NtTO.results <- apa_print(search.NtTO.aov)
 
 searchNtTD <- allData %>%
   mutate(sample = sample*2-baseline) %>%
-  filter(Event == "Search" & LatStim != "None" & Reject == 0 & sample>NtStart & sample < NtEnd & Stimulus == "Target (Distractor mid)") %>%
+  filter(Event == "Search" & LatStim != "None" & Reject == 0 & sample>NtStart & sample < NtEnd & Stimulus == "Target") %>%
   group_by(Stimulus,Subject,Contra,Group) %>%
   summarise(mV = mean(voltage))
 search.NtTD.aov <- aov_ez(
@@ -577,7 +611,7 @@ search.NtTD.results <- apa_print(search.NtTD.aov)
 
 searchNtDT <- allData %>%
   mutate(sample = sample*2-baseline) %>%
-  filter(Event == "Search" & LatStim != "None" & Reject == 0 & sample>NtStart & sample < NtEnd & Stimulus == "Distractor (Target mid)") %>%
+  filter(Event == "Search" & LatStim != "None" & Reject == 0 & sample>NtStart & sample < NtEnd & Stimulus == "Distractor") %>%
   group_by(Stimulus,Subject,Contra,Group) %>%
   summarise(mV = mean(voltage))
 search.NtDT.aov <- aov_ez(
@@ -591,7 +625,7 @@ search.NtDT.results <- apa_print(search.NtDT.aov)
 
 searchPdTO <- allData %>%
   mutate(sample = sample*2-baseline) %>%
-  filter( Event == "Search" & LatStim != "None" & Reject == 0 & sample>PdStart & sample < PdEnd & Stimulus == "Target (None mid)") %>%
+  filter( Event == "Search" & LatStim != "None" & Reject == 0 & sample>PdStart & sample < PdEnd & Stimulus == "Target only") %>%
   group_by(Stimulus,Subject,Contra,Group) %>%
   summarise(mV = mean(voltage))
 search.PdTO.aov <- aov_ez(
@@ -605,7 +639,7 @@ search.PdTO.results <- apa_print(search.PdTO.aov)
 
 searchPdTD <- allData %>%
   mutate(sample = sample*2-baseline) %>%
-  filter(Event == "Search" & LatStim != "None" & Reject == 0 & sample>PdStart & sample < PdEnd & Stimulus == "Target (Distractor mid)") %>%
+  filter(Event == "Search" & LatStim != "None" & Reject == 0 & sample>PdStart & sample < PdEnd & Stimulus == "Target") %>%
   group_by(Stimulus,Subject,Contra,Group) %>%
   summarise(mV = mean(voltage))
 search.PdTD.aov <- aov_ez(
@@ -619,7 +653,7 @@ search.PdTD.results <- apa_print(search.PdTD.aov)
 
 searchPdDT <- allData %>%
   mutate(sample = sample*2-baseline) %>%
-  filter( Event == "Search" & LatStim != "None" & Reject == 0 & sample>PdStart & sample < PdEnd & Stimulus == "Distractor (Target mid)") %>%
+  filter( Event == "Search" & LatStim != "None" & Reject == 0 & sample>PdStart & sample < PdEnd & Stimulus == "Distractor") %>%
   group_by(Stimulus,Subject,Contra,Group) %>%
   summarise(mV = mean(voltage))
 search.PdDT.aov <- aov_ez(
@@ -648,7 +682,14 @@ In the target only displays there is no effect of group assignment on either the
 
 (ref:searchERPCap) Subtractracted ERPs showing the lateralized response to the colored distractor (top), the shape target (middle), and the shape target in the absence of distraction (bottom) for each group in the search task.
 
-```{r makeSearchPlots, fig.cap="(ref:searchERPCap)"}
+```{r makeSearchPlots, fig.cap="(ref:searchERPCap)", fig.height = 5.25,  fig.align = "center"}
+#library(gridExtra)
+#library(cowplot)
+#library(magick)
+
+library(png)
+library(grid)
+img = readPNG("C:/Users/dionh/Pictures/exampleTrial.png")
 allData %>%
   filter( Event == "Search" & LatStim != "None" & Reject == 0) %>%
   mutate(sample = sample*2-baseline) %>%
@@ -659,23 +700,28 @@ allData %>%
   ggplot(., aes(sample,diff)) +
     geom_rect(aes(xmin = NtStart, xmax = NtEnd, ymin = -Inf, ymax = 0), fill = "lemonchiffon") +
     geom_rect(data = . %>% filter(Stimulus  == "Distractor"),aes(xmin = PdStart, xmax = PdEnd, ymin = 0, ymax = Inf), fill = "lemonchiffon") +
+  annotation_custom(rasterGrob(img, 
+                               width = unit(1,"npc"),
+                               height = unit(1,"npc")), 
+                    -150, -50, .5, 2) +
     geom_line(aes(colour = Group),size=1) +
     scale_color_manual(values=c("green4", "gray42"))+
     #scale_colour_brewer(palette = "Set1") +
     scale_x_continuous(name ="Latency (ms)", expand = c(0, 0)) +
     scale_y_reverse(name =expression(paste("Amplitude (",mu,"v)")), expand = c(0, 0)) +
+    coord_cartesian(clip = 'off') +
     facet_grid(Stimulus~.) +
     geom_vline(xintercept = 0,linetype = "dashed" )+
     geom_hline(yintercept = 0,linetype = "dashed") +
     theme_apa() +
-    theme(panel.spacing.y = unit(3, "lines"), text= element_text(size=28),
-          axis.text.x = element_text(size = 26),
-          axis.text.y = element_text(size = 26),
-          legend.title = element_text( size = 26),
-          legend.text = element_text( size = 30),
+    theme(panel.spacing.y = unit(3, "lines"), text= element_text(size=fontSize),
+          axis.text.x = element_text(size = fontSize*0.93),
+          axis.text.y = element_text(size = fontSize*0.93),
+          legend.title = element_text( size = fontSize*1.1),
+          legend.text = element_text( size = fontSize*0.93),
           legend.position = "bottom"
           )
-ggsave("SearchSubtracted.pdf", dpi = 300, width = 30, height = 30, units = c("cm"))
+ggsave("SearchSubtracted.pdf", dpi = 300, width = 30, height = 40, units = c("cm"))
 ```
 
 (ref:searchERPbyRepxSw) Subtractracted ERPs showing the lateralized response to the colored distractor (top), the shape target (middle), and the shape target in the absence of distraction (bottom) for each group in the search task. Responses for trials which were a repeated search trial are plotted separately from those that were performed after a task switch.
@@ -699,11 +745,11 @@ allData %>%
     geom_vline(xintercept = 0,linetype = "dashed" )+
     geom_hline(yintercept = 0,linetype = "dashed") +
     theme_apa() +
-    theme(panel.spacing.y = unit(2, "lines"), text= element_text(size=30),
-          axis.text.x = element_text(size = 26),
-          axis.text.y = element_text(size = 26),
-          legend.title = element_text( size = 26),
-          legend.text = element_text( size = 24),
+    theme(panel.spacing.y = unit(3, "lines"), text= element_text(size=fontSize),
+          axis.text.x = element_text(size = fontSize*0.93),
+          axis.text.y = element_text(size = fontSize*0.93),
+          legend.title = element_text( size = fontSize*1.1),
+          legend.text = element_text( size = fontSize*0.93),
           legend.position = "bottom"
           )
 ggsave("SearchSubtracted_byRep.pdf", dpi = 300, width = 30, height = 20, units = c("cm"))
@@ -730,11 +776,11 @@ allData %>%
     geom_vline(xintercept = 0,linetype = "dashed" )+
     geom_hline(yintercept = 0,linetype = "dashed") +
     theme_apa() +
-    theme(panel.spacing.y = unit(2, "lines"), text= element_text(size=30),
-          axis.text.x = element_text(size = 26),
-          axis.text.y = element_text(size = 26),
-          legend.title = element_text( size = 26),
-          legend.text = element_text( size = 24),
+    theme(panel.spacing.y = unit(3, "lines"), text= element_text(size=fontSize),
+          axis.text.x = element_text(size = fontSize*0.93),
+          axis.text.y = element_text(size = fontSize*0.93),
+          legend.title = element_text( size = fontSize*1.1),
+          legend.text = element_text( size = fontSize*0.93),
           legend.position = "bottom"
           )
 ggsave("SearchSubtracted_byTime.pdf", dpi = 300, width = 30, height = 20, units = c("cm"))

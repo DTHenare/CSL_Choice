@@ -257,10 +257,12 @@ for (sub in unique(behavData$Subject)) {
   
   
 }
-behavData$compCutoff = behavData$compMean + (behavData$compSD * 2.5)
-behavData$learnCutoff = behavData$learnMean + (behavData$learnSD * 2.5)
+behavData$compCutoff <- behavData$compMean + (behavData$compSD * 2.5)
+behavData$learnCutoff <- behavData$learnMean + (behavData$learnSD * 2.5)
 behavData <- behavData %>% 
   mutate(SwitchCount = ifelse(repswitch=="switch",1,0))
+behavData$Trial <- behavData$Block
+behavData$Block <- trunc(unique(behavData$Block)/32-0.00001)+1
 
 #Subject group table
 behavData %>% 
@@ -269,6 +271,53 @@ behavData %>%
 behavData = behavData %>% mutate(Group = ifelse(Group==1,"Colour","Shape"))
 behavData$Group = as.factor(behavData$Group)
 ```
+
+### Switch rates
+
+```{r switchRateStats}
+switch <- behavData %>%
+  summarise(mean = mean(SwitchCount))
+shapeSwitch <- behavData %>%
+  filter(Group == "Shape") %>%
+  group_by(Subject) %>%
+  summarise(mean = mean(SwitchCount))
+colourSwitch <- behavData %>%
+  filter(Group == "Colour") %>%
+  group_by(Subject) %>%
+  summarise(mean = mean(SwitchCount))
+t.out = t.test(colourSwitch$mean,shapeSwitch$mean)
+intEffectTTest = apa_print(t.out)
+```
+
+(ref:switchRatePlot) Voluntary switch rates for each individual across blocks throughout the experiment. Colour differentiates subjects in the shape and colour group. (lines have been smoothed with a loess function for visualisation)
+
+```{r switchRates, fig.cap = "(ref:switchRatePlot)"}
+behavData %>%
+  group_by(Block, Subject, Group) %>%
+  filter(switchRate > minSwitchRate) %>%
+  summarise(switchRate = mean(SwitchCount)) %>%
+  ggplot(aes(x=Block, switchRate, colour = Group, group = Subject)) +
+  geom_smooth(se = FALSE)
+```
+
+Participants in the task were encouraged to try to make their task selections as random as possible, in order to test for this we first analysed switch rates across the task. Average switch rate across all participants was `r as.character(round(switch$mean),2)`, and there was no significant difference between the switch rates of the shape and colour groups (`r intEffectTTest$full_result`). This is shown in figure\ \@ref(fig:switchRates).
+
+### Task choice
+
+(ref:choseSearchPlot) Proportion of search trials chosen by each individual across blocks throughout the experiment. Colour differentiates subjects in the shape and colour group. (lines have been smoothed with a loess function for visualisation)
+
+```{r choseSearch, fig.cap = "(ref:choseSearchPlot)"}
+behavData %>%
+  group_by(Block, Subject, Group) %>%
+  mutate(choseSearch = ifelse(is.na(Compound),0,1)) %>%
+  summarise(percentSearch = mean(choseSearch)) %>%
+  ggplot(aes(x=Block, y=percentSearch, colour = Group, group = Subject)) +
+  geom_smooth(se = FALSE) 
+```
+
+Participants were also informed to attempt to keep the task selection balanced at around 50% search and 50% choice trials throughout the experiment. In order to test for this we calculated task choice across the task. This is shown in figure\ \@ref(fig:choseSearch).
+
+### Distractor cost
 
 ```{r behavStats}
 colourBehav <- behavData %>%
@@ -290,9 +339,9 @@ t.out = t.test(colourBehav$DistInt,shapeBehav$DistInt)
 intEffectTTest = apa_print(t.out)
 ```
 
-In order to test for the effect of selection history when top-down control was maximised, we evaluated the effect of group assignment in the categorisation on performance in the search task. First, we calculated the distractor interference effect caused by the coloured distractor in the search task. Distractor inteference was calculated by taking the difference in response times between the target only trials and the distractor present trials. An independent samples t-test comparing distractor interference between the colour-trained group and the shape-trained group showed that those trained to categorise colours were subject to greater interference by the colour distractor in the search task (`r intEffectTTest$full_result`). This is shown in figure\ \@ref(fig:DistIntViolin).
+In order to test for the effect of selection history when top-down control was maximised, we evaluated the effect of group assignment in the categorisation on performance in the search task. First, we removed removed trials with incorrect responses and abnormally long reaction times (greater than 2.5 standard deviations above the mean, calculated separately for each participant). At this point, we calculated distractor cost by taking the difference in response times between the target only trials and the distractor present trials. An independent samples t-test comparing distractor interference between the colour-trained group and the shape-trained group showed that those trained to categorise colours were subject to greater interference by the colour distractor in the search task (`r intEffectTTest$full_result`). This is shown in figure\ \@ref(fig:DistIntViolin).
 
-(ref:behavDistInt) Violin plot showing the interference caused by a colored distractor during visual search for both the shape and color trained groups. 
+(ref:behavDistInt) Violin plot showing the response time cost caused by a colored distractor during visual search for both the shape and color trained groups. 
 
 ```{r DistIntViolin, fig.cap = "(ref:behavDistInt)"}
 behavData %>%
@@ -307,7 +356,7 @@ behavData %>%
   geom_boxplot(aes(x = GroupNum, y = DistInt, fill = Group),outlier.shape = NA, alpha = .5, width = .1, colour = "black") +
   scale_color_manual(values=c("green4", "gray42")) +
   scale_fill_manual(values=c("green4", "gray42")) +
-  labs(y = "Distractor Interference (ms)") +
+  labs(y = "Distractor Cost (ms)") +
   theme(panel.grid.major = element_blank(), 
         panel.grid.minor = element_blank(),
         panel.background = element_blank(),
@@ -471,15 +520,15 @@ learn.PdCol.aov <- aov_ez(
 learn.PdCol.results <- apa_print(learn.PdCol.aov)
 ```
 
-In the categorisation task, our ERP analyses focused on the lateralised response to each object (either the shape singleton or the colour singleton). For each ERP there were two time windows of interest, the Nt time window (`r sprintf("%i to %ims", NtStart, NtEnd)`) and the Pd time window (`r sprintf("%i to %ims", PdStart, PdEnd)`). 
+In the categorisation task, our ERP analyses focused on the lateralised response to each object (either the shape singleton or the colour singleton). For each ERP there were two time windows of interest, the Nt time window (`r sprintf("%i to %ims", NtStart, NtEnd)`) and the Pd time window (`r sprintf("%i to %ims", PdStart, PdEnd)`). See figure\ \@ref(fig:makeLearnPlots).
 
 #### Shape singleton response
 
-The results showed that there is a significant interaction between eletrode location (contralateral or ipsilateral scalp site) and group (shape categorisers and colour categorisers).  The lateralised response to a shape singleton is more negative for those in the shape categoriser group than the colour categoriser group (`r learn.NtShape.results$full$Group_Contra`), 
+The results showed that there is a significant interaction between eletrode location (contralateral or ipsilateral scalp site) and group (shape categorisers and colour categorisers).  The lateralised response to a shape singleton is more negative for those in the shape categoriser group than the colour categoriser group (`r learn.NtShape.results$full$Group_Contra`). There was no such interaction between hemisphere and group on voltages in the PD time range (`r learn.PdShape.results$full$Group_Contra`).
 
 #### Colour singleton response
 
-whereas the lateralised respone to the colour singleton is more negatvie for those in colour categoriser group that the shape categoriser group (`r learn.NtCol.results$full$Group_Contra`). There is no interaction between electrode and group in the Pd time range for either the lateralised shape ERP (`r learn.PdShape.results$full$Group_Contra`) or lateralised colour ERP (`r learn.PdCol.results$full$Group_Contra`).
+When focussing on the lateralised response to a colour singleton we again see a significant interaction between hemisphere and group (`r learn.NtCol.results$full$Group_Contra`). Here, we see a more negative hemipsheric difference for the colour group than the shape group. There wa no interaction between hemisphere and group on voltages in the PD time range (`r learn.PdCol.results$full$Group_Contra`).
 
 (ref:learnERPCap) Subtractracted ERPs showing the lateralized response to the shape singleton (top) and color singleton (bottom) for each group in the categorization task. 
 

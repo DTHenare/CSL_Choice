@@ -272,51 +272,6 @@ behavData = behavData %>% mutate(Group = ifelse(Group==1,"Colour","Shape"))
 behavData$Group = as.factor(behavData$Group)
 ```
 
-### Switch rates
-
-```{r switchRateStats}
-switch <- behavData %>%
-  summarise(mean = mean(SwitchCount))
-shapeSwitch <- behavData %>%
-  filter(Group == "Shape") %>%
-  group_by(Subject) %>%
-  summarise(mean = mean(SwitchCount))
-colourSwitch <- behavData %>%
-  filter(Group == "Colour") %>%
-  group_by(Subject) %>%
-  summarise(mean = mean(SwitchCount))
-t.out = t.test(colourSwitch$mean,shapeSwitch$mean)
-intEffectTTest = apa_print(t.out)
-```
-
-(ref:switchRatePlot) Voluntary switch rates for each individual across blocks throughout the experiment. Colour differentiates subjects in the shape and colour group. (lines have been smoothed with a loess function for visualisation)
-
-```{r switchRates, fig.cap = "(ref:switchRatePlot)"}
-behavData %>%
-  group_by(Block, Subject, Group) %>%
-  filter(switchRate > minSwitchRate) %>%
-  summarise(switchRate = mean(SwitchCount)) %>%
-  ggplot(aes(x=Block, switchRate, colour = Group, group = Subject)) +
-  geom_smooth(se = FALSE)
-```
-
-Participants in the task were encouraged to try to make their task selections as random as possible, in order to test for this we first analysed switch rates across the task. Average switch rate across all participants was `r as.character(round(switch$mean),2)`, and there was no significant difference between the switch rates of the shape and colour groups (`r intEffectTTest$full_result`). This is shown in figure\ \@ref(fig:switchRates).
-
-### Task choice
-
-(ref:choseSearchPlot) Proportion of search trials chosen by each individual across blocks throughout the experiment. Colour differentiates subjects in the shape and colour group. (lines have been smoothed with a loess function for visualisation)
-
-```{r choseSearch, fig.cap = "(ref:choseSearchPlot)"}
-behavData %>%
-  group_by(Block, Subject, Group) %>%
-  mutate(choseSearch = ifelse(is.na(Compound),0,1)) %>%
-  summarise(percentSearch = mean(choseSearch)) %>%
-  ggplot(aes(x=Block, y=percentSearch, colour = Group, group = Subject)) +
-  geom_smooth(se = FALSE) 
-```
-
-Participants were also informed to attempt to keep the task selection balanced at around 50% search and 50% choice trials throughout the experiment. In order to test for this we calculated task choice across the task. This is shown in figure\ \@ref(fig:choseSearch).
-
 ### Distractor cost
 
 ```{r behavStats}

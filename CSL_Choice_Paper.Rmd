@@ -10,8 +10,8 @@ header-includes:
   - \captionsetup[figure]{font={stretch=1.5}}
   - \usepackage{booktabs}
 
-title             : "Selection history guides attention during voluntary task selection"
-shorttitle        : "Selection history in voluntary task selection"
+title             : "Selection history guides attention even when top-down control is maximised"
+shorttitle        : "Selection history under top-down control"
 
 author: 
   - name          : "Dion T. Henare"
@@ -68,6 +68,12 @@ library(grid)
 ```
 
 ```{r helperfunctions}
+annotation_custom2 <- 
+function (grob, xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = Inf, data){ layer(data = data, stat = StatIdentity, position = PositionIdentity, 
+        geom = ggplot2:::GeomCustomAnn,
+        inherit.aes = TRUE, params = list(grob = grob, 
+                                          xmin = xmin, xmax = xmax, 
+                                          ymin = ymin, ymax = ymax))}
 #Function for making split violin option in ggplot
 GeomSplitViolin <- ggproto("GeomSplitViolin", GeomViolin, 
                            draw_group = function(self, data, ..., draw_quantiles = NULL) {
@@ -419,8 +425,8 @@ baseline = 200
 srateMultiplier = 1
 plotWidth = 24
 plotHeight = 9
-
 fontSize = 12
+winSize = 50
 
 
 learnRej <- allData %>%
@@ -451,8 +457,8 @@ grandTarget <- allData %>%
   summarise(mean = mean(voltage)) %>%
   spread(Contra, mean) %>% 
   mutate(diff = Contralateral - Ipsilateral)
-NtStart = grandTarget$sample[grandTarget$diff == min(grandTarget$diff)]-50
-NtEnd = grandTarget$sample[grandTarget$diff == min(grandTarget$diff)]+50
+NtStart = grandTarget$sample[grandTarget$diff == min(grandTarget$diff)]-winSize/2
+NtEnd = grandTarget$sample[grandTarget$diff == min(grandTarget$diff)]+winSize/2
 grandDist <- allData %>%
   filter( Event == "Learn" & LatStim == "NonPred" & searchRej == 0) %>%
   mutate(sample = sample*srateMultiplier-baseline) %>%
@@ -461,8 +467,8 @@ grandDist <- allData %>%
   summarise(mean = mean(voltage)) %>%
   spread(Contra, mean) %>% 
   mutate(diff = Contralateral - Ipsilateral)
-PdStart = grandDist$sample[grandDist$diff == max(grandDist$diff)]-50
-PdEnd = grandDist$sample[grandDist$diff == max(grandDist$diff)]+50
+PdStart = grandDist$sample[grandDist$diff == max(grandDist$diff)]-winSize/2
+PdEnd = grandDist$sample[grandDist$diff == max(grandDist$diff)]+winSize/2
 ```
 
 ```{r learnGrand, include = FALSE}
@@ -563,6 +569,8 @@ The results showed that there is a significant interaction between eletrode loca
 (ref:learnERPCap) Subtractracted ERPs showing the lateralized response to the shape singleton (top) and color singleton (bottom) for each group in the categorization task. 
 
 ```{r makeLearnPlots, fig.cap="(ref:learnERPCap)"}
+imgCol <- readPNG("searchTO.png")
+imgShape <- readPNG("searchTD.png")
 #Subtracted
 allData %>%
   filter(Event == "Learn", learnRej == 0) %>%
@@ -578,16 +586,30 @@ allData %>%
     scale_color_manual(values=c("green4", "gray42"))+
     scale_x_continuous(name ="Latency (ms)", expand = c(0, 0)) +
     scale_y_reverse(name =expression(paste("Amplitude (",mu,"v)")), expand = c(0, 0)) +
-    facet_grid(Object~.) +
-    geom_vline(xintercept = 0,linetype = "dashed" ) +
+    coord_cartesian(clip = 'off') +
+    geom_vline(xintercept = 0,linetype = "dashed" )+
     geom_hline(yintercept = 0,linetype = "dashed") +
+    annotation_custom2(rasterGrob(imgCol, interpolate=TRUE), 
+                       xmin=-45, 
+                       xmax=45, 
+                       ymin=0.25, 
+                       ymax=3, 
+                       data=. %>% filter(Object  == "Lat. Colour"))+
+    annotation_custom2(rasterGrob(imgShape, interpolate=TRUE), 
+                       xmin=-45, 
+                       xmax=45, 
+                       ymin=0.25, 
+                       ymax=3, 
+                       data=. %>% filter(Object  == "Lat. Shape"))+
+    facet_grid(Object~.) +
     theme_apa() +
     theme(panel.spacing.y = unit(3, "lines"), text= element_text(size=fontSize),
           axis.text.x = element_text(size = fontSize*0.93),
           axis.text.y = element_text(size = fontSize*0.93),
           legend.title = element_text( size = fontSize*1.1),
           legend.text = element_text( size = fontSize*0.93),
-          legend.position = "bottom"
+          legend.position = "bottom",
+          plot.margin = unit(c(2,2,0,2),"cm")
           )
 ggsave("LearnSubtracted.pdf", dpi = 300, width = 30, height = 20, units = c("cm"))
 ```
@@ -605,8 +627,8 @@ grandTarget <- allData %>%
   summarise(mean = mean(voltage)) %>%
   spread(Contra, mean) %>% 
   mutate(diff = Contralateral - Ipsilateral)
-NtStart = grandTarget$sample[grandTarget$diff == min(grandTarget$diff)]-50
-NtEnd = grandTarget$sample[grandTarget$diff == min(grandTarget$diff)]+50
+NtStart = grandTarget$sample[grandTarget$diff == min(grandTarget$diff)]-winSize/2
+NtEnd = grandTarget$sample[grandTarget$diff == min(grandTarget$diff)]+winSize/2
 grandDist <- allData %>%
   filter( Event == "Search" & LatStim == "Distractor" & searchRej == 0) %>%
   mutate(sample = sample*srateMultiplier-baseline) %>%
@@ -615,8 +637,8 @@ grandDist <- allData %>%
   summarise(mean = mean(voltage)) %>%
   spread(Contra, mean) %>% 
   mutate(diff = Contralateral - Ipsilateral)
-PdStart = grandDist$sample[grandDist$diff == max(grandDist$diff)]-50
-PdEnd = grandDist$sample[grandDist$diff == max(grandDist$diff)]+50
+PdStart = grandDist$sample[grandDist$diff == max(grandDist$diff)]-winSize/2
+PdEnd = grandDist$sample[grandDist$diff == max(grandDist$diff)]+winSize/2
 ```
 
 ```{r searchGrand, include = FALSE}
@@ -649,7 +671,7 @@ allData %>%
 ```{r searchStatsBasic, echo=FALSE}
 searchNtTO <- allData %>%
   mutate(sample = sample*srateMultiplier-baseline) %>%
-  filter(Event == "Search" & LatStim != "None" & searchRej == 0 & sample>NtStart & sample < NtEnd & Stimulus == "Target only") %>%
+  filter(Event == "Search" & LatStim != "None" & searchRej == 0 & sample>NtStart & sample < NtEnd & Stimulus == "Target only", switchRate>minSwitchRate) %>%
   group_by(Stimulus,Subject,Contra,Group) %>%
   summarise(mV = mean(voltage))
 search.NtTO.aov <- aov_ez(
@@ -663,7 +685,7 @@ search.NtTO.results <- apa_print(search.NtTO.aov)
 
 searchNtTD <- allData %>%
   mutate(sample = sample*srateMultiplier-baseline) %>%
-  filter(Event == "Search" & LatStim != "None" & searchRej == 0 & sample>NtStart & sample < NtEnd & Stimulus == "Target") %>%
+  filter(Event == "Search" & LatStim != "None" & searchRej == 0 & sample>NtStart & sample < NtEnd & Stimulus == "Target", switchRate>minSwitchRate) %>%
   group_by(Stimulus,Subject,Contra,Group) %>%
   summarise(mV = mean(voltage))
 search.NtTD.aov <- aov_ez(
@@ -677,7 +699,7 @@ search.NtTD.results <- apa_print(search.NtTD.aov)
 
 searchNtDT <- allData %>%
   mutate(sample = sample*srateMultiplier-baseline) %>%
-  filter(Event == "Search" & LatStim != "None" & searchRej == 0 & sample>NtStart & sample < NtEnd & Stimulus == "Distractor") %>%
+  filter(Event == "Search" & LatStim != "None" & searchRej == 0 & sample>NtStart & sample < NtEnd & Stimulus == "Distractor", switchRate>minSwitchRate) %>%
   group_by(Stimulus,Subject,Contra,Group) %>%
   summarise(mV = mean(voltage))
 search.NtDT.aov <- aov_ez(
@@ -691,7 +713,7 @@ search.NtDT.results <- apa_print(search.NtDT.aov)
 
 searchPdDT <- allData %>%
   mutate(sample = sample*srateMultiplier-baseline) %>%
-  filter( Event == "Search" & LatStim != "None" & searchRej == 0 & sample>PdStart & sample < PdEnd & Stimulus == "Distractor") %>%
+  filter( Event == "Search" & LatStim != "None" & searchRej == 0 & sample>PdStart & sample < PdEnd & Stimulus == "Distractor", switchRate>minSwitchRate) %>%
   group_by(Stimulus,Subject,Contra,Group) %>%
   summarise(mV = mean(voltage))
 search.PdDT.aov <- aov_ez(
@@ -722,7 +744,9 @@ Results for the lateralised distractor show that while there was no significant 
 
 ```{r makeSearchPlots, fig.cap="(ref:searchERPCap)", fig.height = 5.25,  fig.align = "center"}
 
-img = readPNG("C:/Users/dionh/Pictures/exampleTrial.png")
+imgTO = readPNG("searchTO.png")
+imgTD = readPNG("searchTD.png")
+imgDT = readPNG("searchDT.png")
 allData %>%
   filter( Event == "Search" & LatStim != "None" & searchRej == 0) %>%
   mutate(sample = sample*srateMultiplier-baseline) %>%
@@ -741,10 +765,24 @@ allData %>%
     coord_cartesian(clip = 'off') +
     geom_vline(xintercept = 0,linetype = "dashed" )+
     geom_hline(yintercept = 0,linetype = "dashed") +
-    annotation_custom(rasterGrob(img, 
-                               width = unit(1,"npc"),
-                               height = unit(1,"npc")), 
-                    -25, 25, .5, 2) +
+    annotation_custom2(rasterGrob(imgTO, interpolate=TRUE), 
+                       xmin=-45, 
+                       xmax=45, 
+                       ymin=0.5, 
+                       ymax=3.2, 
+                       data=. %>% filter(Stimulus  == "Target only"))+
+    annotation_custom2(rasterGrob(imgTD, interpolate=TRUE), 
+                       xmin=-45, 
+                       xmax=45, 
+                       ymin=0.5, 
+                       ymax=3.2, 
+                       data=. %>% filter(Stimulus  == "Target"))+
+    annotation_custom2(rasterGrob(imgDT, interpolate=TRUE), 
+                       xmin=-45, 
+                       xmax=45, 
+                       ymin=0.5, 
+                       ymax=3.2, 
+                       data=. %>% filter(Stimulus  == "Distractor"))+
     facet_grid(Stimulus~.) +
     theme_apa() +
     theme(panel.spacing.y = unit(3, "lines"), text= element_text(size=fontSize),
@@ -752,7 +790,8 @@ allData %>%
           axis.text.y = element_text(size = fontSize*0.93),
           legend.title = element_text( size = fontSize*1.1),
           legend.text = element_text( size = fontSize*0.93),
-          legend.position = "bottom"
+          legend.position = "bottom",
+          plot.margin = unit(c(2,2,0,2),"cm")
           )
 ggsave("SearchSubtracted.pdf", dpi = 300, width = 30, height = 40, units = c("cm"))
 ```

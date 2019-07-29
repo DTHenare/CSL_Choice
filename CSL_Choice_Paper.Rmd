@@ -62,6 +62,8 @@ library(ggplot2)
 library(afex)
 library(cowplot)
 library(papaja)
+library(png)
+library(grid)
 #colour, grey, center, categorisation, lateralisation, distractor
 ```
 
@@ -270,6 +272,9 @@ behavData %>%
   summarise(Group = mean(Group))
 behavData = behavData %>% mutate(Group = ifelse(Group==1,"Colour","Shape"))
 behavData$Group = as.factor(behavData$Group)
+
+#Save switch rates for ERP
+switchRates <- behavData %>% group_by(Subject) %>%summarise(SR = mean(switchRate))
 ```
 
 ### Distractor cost
@@ -323,9 +328,14 @@ behavData %>%
         )
 ```
 
+
+```{r, include = FALSE}
+rm(behavData, colourBehav, GeomFlatViolin, GeomSplitViolin, groupInfo,intEffectTTest,shapeBehav,t.out, geom_flat_violin,geom_split_violin)
+gc()
+```
 ## ERP results
 ```{r organiseData}
-dPath = 'CSL_VisualsOld/'
+dPath = 'CSL_Visuals/'
 fPrefix = 'N2pc'
 
 #Load group data
@@ -347,6 +357,7 @@ epochInfo = read.csv(file = paste(dPath,eFileList[1], sep=""))
 epochInfo$Subject = 1
 epochInfo$Group = groupdata$Group[1]
 epochInfo$Reject = groupdata$Reject[1]
+epochInfo$switchRate = switchRates$SR[1]
 lHemData = read.csv(file = paste(dPath,lFileList[1], sep=""), header = FALSE)
 rHemData = read.csv(file = paste(dPath,rFileList[1], sep=""), header = FALSE)
 #append the other datasets to the above variables
@@ -355,6 +366,7 @@ for (subj in 2:length(eFileList)) {
   curEpochInfo$Subject = subj
   curEpochInfo$Group = groupdata$Group[subj]
   curEpochInfo$Reject = groupdata$Reject[subj]
+  curEpochInfo$switchRate = switchRates$SR[subj]
   curLHemData = read.csv(file = paste(dPath,lFileList[subj], sep=""), header = FALSE)
   curRHemData = read.csv(file = paste(dPath,rFileList[subj], sep=""), header = FALSE)
   
@@ -408,20 +420,82 @@ srateMultiplier = 1
 plotWidth = 24
 plotHeight = 9
 
-NtStart = 200
-NtEnd = 300
-PdStart = 250
-PdEnd = 350
-
 fontSize = 12
+
+
+learnRej <- allData %>%
+  filter(Event == "Learn", sample == 1, Contra == "Contralateral") %>%
+  group_by(Subject) %>%
+  summarise(Trials = sum(sample)) %>%
+  mutate(learnReject = ifelse(Trials < 400,1,0))
+searchRej <- allData %>%
+  filter(Event == "Search", sample == 1, Contra == "Contralateral") %>%
+  group_by(Subject) %>%
+  summarise(Trials = sum(sample)) %>%
+  mutate(searchReject = ifelse(Trials < 500,1,0))
+#mutate(allData, learnRej = NaN, searchRej = NaN)
+for (i in unique(allData$Subject)) {
+  allData$learnRej[allData$Subject == i] = learnRej$learnReject[learnRej$Subject==i]
+  allData$searchRej[allData$Subject == i] = searchRej$searchReject[searchRej$Subject==i]
+}
 ```
 
 ### Categorization task
 
+```{r}
+grandTarget <- allData %>%
+  filter( Event == "Learn" & LatStim == "Predictor" & searchRej == 0) %>%
+  mutate(sample = sample*srateMultiplier-baseline) %>%
+  filter(sample > 200) %>%
+  group_by(sample,Contra) %>%
+  summarise(mean = mean(voltage)) %>%
+  spread(Contra, mean) %>% 
+  mutate(diff = Contralateral - Ipsilateral)
+NtStart = grandTarget$sample[grandTarget$diff == min(grandTarget$diff)]-50
+NtEnd = grandTarget$sample[grandTarget$diff == min(grandTarget$diff)]+50
+grandDist <- allData %>%
+  filter( Event == "Learn" & LatStim == "NonPred" & searchRej == 0) %>%
+  mutate(sample = sample*srateMultiplier-baseline) %>%
+  filter(sample > 200) %>%
+  group_by(sample,Contra) %>%
+  summarise(mean = mean(voltage)) %>%
+  spread(Contra, mean) %>% 
+  mutate(diff = Contralateral - Ipsilateral)
+PdStart = grandDist$sample[grandDist$diff == max(grandDist$diff)]-50
+PdEnd = grandDist$sample[grandDist$diff == max(grandDist$diff)]+50
+```
+
+```{r learnGrand, include = FALSE}
+allData %>%
+  filter(Event == "Learn", learnRej == 0) %>%
+  mutate(sample = sample*srateMultiplier-baseline) %>%
+  group_by(LatStim,sample,Contra) %>%
+  summarise(mean = mean(voltage)) %>%
+  spread(Contra, mean) %>% 
+  mutate(diff = Contralateral - Ipsilateral) %>%
+  ggplot(., aes(sample,diff)) +
+    geom_rect(aes(xmin = NtStart, xmax = NtEnd, ymin = -Inf, ymax = 0), fill = "lemonchiffon") +
+    geom_rect(aes(xmin = PdStart, xmax = PdEnd, ymin = 0, ymax = Inf), fill = "lemonchiffon") +
+    geom_line(aes(colour = LatStim),size=1) +
+    scale_color_manual(values=c("green4", "gray42"))+
+    scale_x_continuous(name ="Latency (ms)", expand = c(0, 0)) +
+    scale_y_reverse(name =expression(paste("Amplitude (",mu,"v)")), expand = c(0, 0)) +
+    geom_vline(xintercept = 0,linetype = "dashed" ) +
+    geom_hline(yintercept = 0,linetype = "dashed") +
+    theme_apa() +
+    theme(panel.spacing.y = unit(3, "lines"), text= element_text(size=fontSize),
+          axis.text.x = element_text(size = fontSize*0.93),
+          axis.text.y = element_text(size = fontSize*0.93),
+          legend.title = element_text( size = fontSize*1.1),
+          legend.text = element_text( size = fontSize*0.93),
+          legend.position = "bottom"
+          )
+```
+
 ```{r learnStats, echo=FALSE}
 learnNtShape <- allData %>%
   mutate(sample = sample*srateMultiplier-baseline) %>%
-  filter(Event == "Learn" & Reject == 0 & sample>NtStart & sample < NtEnd & Object == "Lat. Shape") %>%
+  filter(Event == "Learn" & learnRej == 0 & sample>NtStart & sample < NtEnd & Object == "Lat. Shape") %>%
   group_by(Object,Subject,Contra,Group) %>%
   summarise(mV = mean(voltage))
 learn.NtShape.aov <- aov_ez(
@@ -435,7 +509,7 @@ learn.NtShape.results <- apa_print(learn.NtShape.aov)
 
 learnNtCol <- allData %>%
   mutate(sample = sample*srateMultiplier-baseline) %>%
-  filter(Event == "Learn" & Reject == 0 & sample>NtStart & sample < NtEnd & Object == "Lat. Colour") %>%
+  filter(Event == "Learn" & learnRej == 0 & sample>NtStart & sample < NtEnd & Object == "Lat. Colour") %>%
   group_by(Object,Subject,Contra,Group) %>%
   summarise(mV = mean(voltage))
 learn.NtCol.aov <- aov_ez(
@@ -449,7 +523,7 @@ learn.NtCol.results <- apa_print(learn.NtCol.aov)
 
 learnPdShape <- allData %>%
   mutate(sample = sample*4-baseline) %>%
-  filter(Event == "Learn" & Reject == 0 & sample>PdStart & sample < PdEnd & Object == "Lat. Shape") %>%
+  filter(Event == "Learn" & learnRej == 0 & sample>PdStart & sample < PdEnd & Object == "Lat. Shape") %>%
   group_by(Object,Subject,Contra,Group) %>%
   summarise(mV = mean(voltage))
 learn.PdShape.aov <- aov_ez(
@@ -463,7 +537,7 @@ learn.PdShape.results <- apa_print(learn.PdShape.aov)
 
 learnPdCol <- allData %>%
   mutate(sample = sample*srateMultiplier-baseline) %>%
-  filter(Event == "Learn" & Reject == 0 & sample>PdStart & sample < PdEnd & Object == "Lat. Colour") %>%
+  filter(Event == "Learn" & learnRej == 0 & sample>PdStart & sample < PdEnd & Object == "Lat. Colour") %>%
   group_by(Object,Subject,Contra,Group) %>%
   summarise(mV = mean(voltage))
 learn.PdCol.aov <- aov_ez(
@@ -491,7 +565,7 @@ The results showed that there is a significant interaction between eletrode loca
 ```{r makeLearnPlots, fig.cap="(ref:learnERPCap)"}
 #Subtracted
 allData %>%
-  filter(Event == "Learn", Reject == 0) %>%
+  filter(Event == "Learn", learnRej == 0) %>%
   mutate(sample = sample*srateMultiplier-baseline) %>%
   group_by(Object,sample,Contra,Group) %>%
   summarise(mean = mean(voltage)) %>%
@@ -518,12 +592,64 @@ allData %>%
 ggsave("LearnSubtracted.pdf", dpi = 300, width = 30, height = 20, units = c("cm"))
 ```
 
+
+
 ### Search task
+
+```{r}
+grandTarget <- allData %>%
+  filter( Event == "Search" & LatStim == "Target" & searchRej == 0) %>%
+  mutate(sample = sample*srateMultiplier-baseline) %>%
+  filter(sample > 200) %>%
+  group_by(sample,Contra) %>%
+  summarise(mean = mean(voltage)) %>%
+  spread(Contra, mean) %>% 
+  mutate(diff = Contralateral - Ipsilateral)
+NtStart = grandTarget$sample[grandTarget$diff == min(grandTarget$diff)]-50
+NtEnd = grandTarget$sample[grandTarget$diff == min(grandTarget$diff)]+50
+grandDist <- allData %>%
+  filter( Event == "Search" & LatStim == "Distractor" & searchRej == 0) %>%
+  mutate(sample = sample*srateMultiplier-baseline) %>%
+  filter(sample > 200) %>%
+  group_by(sample,Contra) %>%
+  summarise(mean = mean(voltage)) %>%
+  spread(Contra, mean) %>% 
+  mutate(diff = Contralateral - Ipsilateral)
+PdStart = grandDist$sample[grandDist$diff == max(grandDist$diff)]-50
+PdEnd = grandDist$sample[grandDist$diff == max(grandDist$diff)]+50
+```
+
+```{r searchGrand, include = FALSE}
+allData %>%
+  filter( Event == "Search" & LatStim != "None" & searchRej == 0) %>%
+  mutate(sample = sample*srateMultiplier-baseline) %>%
+  group_by(LatStim,sample,Contra) %>%
+  summarise(mean = mean(voltage)) %>%
+  spread(Contra, mean) %>% 
+  mutate(diff = Contralateral - Ipsilateral) %>%
+  ggplot(., aes(sample,diff)) +
+    geom_rect(aes(xmin = NtStart, xmax = NtEnd, ymin = -Inf, ymax = 0), fill = "lemonchiffon") +
+    geom_rect(aes(xmin = PdStart, xmax = PdEnd, ymin = 0, ymax = Inf), fill = "lemonchiffon") +
+    geom_line(aes(colour = LatStim),size=1) +
+    #scale_color_manual(values=c("green4", "gray42"))+
+    scale_x_continuous(name ="Latency (ms)", expand = c(0, 0)) +
+    scale_y_reverse(name =expression(paste("Amplitude (",mu,"v)")), expand = c(0, 0)) +
+    geom_vline(xintercept = 0,linetype = "dashed" ) +
+    geom_hline(yintercept = 0,linetype = "dashed") +
+    theme_apa() +
+    theme(panel.spacing.y = unit(3, "lines"), text= element_text(size=fontSize),
+          axis.text.x = element_text(size = fontSize*0.93),
+          axis.text.y = element_text(size = fontSize*0.93),
+          legend.title = element_text( size = fontSize*1.1),
+          legend.text = element_text( size = fontSize*0.93),
+          legend.position = "bottom"
+          )
+```
 
 ```{r searchStatsBasic, echo=FALSE}
 searchNtTO <- allData %>%
   mutate(sample = sample*srateMultiplier-baseline) %>%
-  filter(Event == "Search" & LatStim != "None" & Reject == 0 & sample>NtStart & sample < NtEnd & Stimulus == "Target only") %>%
+  filter(Event == "Search" & LatStim != "None" & searchRej == 0 & sample>NtStart & sample < NtEnd & Stimulus == "Target only") %>%
   group_by(Stimulus,Subject,Contra,Group) %>%
   summarise(mV = mean(voltage))
 search.NtTO.aov <- aov_ez(
@@ -537,7 +663,7 @@ search.NtTO.results <- apa_print(search.NtTO.aov)
 
 searchNtTD <- allData %>%
   mutate(sample = sample*srateMultiplier-baseline) %>%
-  filter(Event == "Search" & LatStim != "None" & Reject == 0 & sample>NtStart & sample < NtEnd & Stimulus == "Target") %>%
+  filter(Event == "Search" & LatStim != "None" & searchRej == 0 & sample>NtStart & sample < NtEnd & Stimulus == "Target") %>%
   group_by(Stimulus,Subject,Contra,Group) %>%
   summarise(mV = mean(voltage))
 search.NtTD.aov <- aov_ez(
@@ -551,7 +677,7 @@ search.NtTD.results <- apa_print(search.NtTD.aov)
 
 searchNtDT <- allData %>%
   mutate(sample = sample*srateMultiplier-baseline) %>%
-  filter(Event == "Search" & LatStim != "None" & Reject == 0 & sample>NtStart & sample < NtEnd & Stimulus == "Distractor") %>%
+  filter(Event == "Search" & LatStim != "None" & searchRej == 0 & sample>NtStart & sample < NtEnd & Stimulus == "Distractor") %>%
   group_by(Stimulus,Subject,Contra,Group) %>%
   summarise(mV = mean(voltage))
 search.NtDT.aov <- aov_ez(
@@ -563,37 +689,9 @@ search.NtDT.aov <- aov_ez(
 )
 search.NtDT.results <- apa_print(search.NtDT.aov)
 
-searchPdTO <- allData %>%
-  mutate(sample = sample*srateMultiplier-baseline) %>%
-  filter( Event == "Search" & LatStim != "None" & Reject == 0 & sample>PdStart & sample < PdEnd & Stimulus == "Target only") %>%
-  group_by(Stimulus,Subject,Contra,Group) %>%
-  summarise(mV = mean(voltage))
-search.PdTO.aov <- aov_ez(
-  data = searchPdTO,
-  dv = "mV",
-  id = "Subject", 
-  within = c("Contra"),
-  between = "Group"
-)
-search.PdTO.results <- apa_print(search.PdTO.aov)
-
-searchPdTD <- allData %>%
-  mutate(sample = sample*srateMultiplier-baseline) %>%
-  filter(Event == "Search" & LatStim != "None" & Reject == 0 & sample>PdStart & sample < PdEnd & Stimulus == "Target") %>%
-  group_by(Stimulus,Subject,Contra,Group) %>%
-  summarise(mV = mean(voltage))
-search.PdTD.aov <- aov_ez(
-  data = searchPdTD,
-  dv = "mV",
-  id = "Subject", 
-  within = c("Contra"),
-  between = "Group"
-)
-search.PdTD.results <- apa_print(search.PdTD.aov)
-
 searchPdDT <- allData %>%
   mutate(sample = sample*srateMultiplier-baseline) %>%
-  filter( Event == "Search" & LatStim != "None" & Reject == 0 & sample>PdStart & sample < PdEnd & Stimulus == "Distractor") %>%
+  filter( Event == "Search" & LatStim != "None" & searchRej == 0 & sample>PdStart & sample < PdEnd & Stimulus == "Distractor") %>%
   group_by(Stimulus,Subject,Contra,Group) %>%
   summarise(mV = mean(voltage))
 search.PdDT.aov <- aov_ez(
@@ -623,15 +721,10 @@ Results for the lateralised distractor show that while there was no significant 
 (ref:searchERPCap) Subtractracted ERPs showing the lateralized response to the colored distractor (top), the shape target (middle), and the shape target in the absence of distraction (bottom) for each group in the search task.
 
 ```{r makeSearchPlots, fig.cap="(ref:searchERPCap)", fig.height = 5.25,  fig.align = "center"}
-#library(gridExtra)
-#library(cowplot)
-#library(magick)
 
-library(png)
-library(grid)
 img = readPNG("C:/Users/dionh/Pictures/exampleTrial.png")
 allData %>%
-  filter( Event == "Search" & LatStim != "None" & Reject == 0) %>%
+  filter( Event == "Search" & LatStim != "None" & searchRej == 0) %>%
   mutate(sample = sample*srateMultiplier-baseline) %>%
   group_by(Stimulus,sample,Contra,Group) %>%
   summarise(mean = mean(voltage)) %>%
@@ -640,19 +733,19 @@ allData %>%
   ggplot(., aes(sample,diff)) +
     geom_rect(aes(xmin = NtStart, xmax = NtEnd, ymin = -Inf, ymax = 0), fill = "lemonchiffon") +
     geom_rect(data = . %>% filter(Stimulus  == "Distractor"),aes(xmin = PdStart, xmax = PdEnd, ymin = 0, ymax = Inf), fill = "lemonchiffon") +
-  annotation_custom(rasterGrob(img, 
-                               width = unit(1,"npc"),
-                               height = unit(1,"npc")), 
-                    -150, -50, .5, 2) +
     geom_line(aes(colour = Group),size=1) +
     scale_color_manual(values=c("green4", "gray42"))+
     #scale_colour_brewer(palette = "Set1") +
     scale_x_continuous(name ="Latency (ms)", expand = c(0, 0)) +
     scale_y_reverse(name =expression(paste("Amplitude (",mu,"v)")), expand = c(0, 0)) +
     coord_cartesian(clip = 'off') +
-    facet_grid(Stimulus~.) +
     geom_vline(xintercept = 0,linetype = "dashed" )+
     geom_hline(yintercept = 0,linetype = "dashed") +
+    annotation_custom(rasterGrob(img, 
+                               width = unit(1,"npc"),
+                               height = unit(1,"npc")), 
+                    -25, 25, .5, 2) +
+    facet_grid(Stimulus~.) +
     theme_apa() +
     theme(panel.spacing.y = unit(3, "lines"), text= element_text(size=fontSize),
           axis.text.x = element_text(size = fontSize*0.93),

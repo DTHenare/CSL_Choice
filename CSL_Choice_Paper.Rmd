@@ -224,7 +224,7 @@ In the present study, we adapted the design of @feldmann2015you to a voluntary t
 
 ## Experimental procedure
 
-Participants came in for two separate sessions and performed two different tasks, a learning task, and a search task. In seession one, the learning and search trials were separated by block whereas in session two, the participants chose whether an upcoming trial would be a learning or search trial. This procedure followed the logic of Feldmann-Wustefeld (XXXX) where selection history is measured as the effect of the learning task on search performance. The addition of voluntary task selection allowed for us to investigate the influence that top-down control may have on the role of selection history.
+Participants came in for two separate sessions and performed two different tasks, a learning task, and a search task. In session one, participants were familiarised with the two tasks by performing them in separate blocks. In session two, the full task began where participants chose on a trial-to-trial basis whether the upcoming trial would be a learning or search trial. This procedure followed the logic of Feldmann-Wustefeld (XXXX) where selection history is measured as the effect of the learning task on performance in the search task. The addition of voluntary task selection allowed for us to investigate the influence that top-down control may have on the role of selection history.
 
 ### Learning trials
 
@@ -236,7 +236,15 @@ Search trials began with a XXXX-XXXX ms fixation cross in the center of the scre
 
 ### Task selection
 
-In session two, every trial began with a task selection screen where participants had to indicate using either their left or right thumbs, whetehr they would like to perform a learn or search trial. This screen stayed on until the participant response. Participants were asked to try to ensure that they distributed their choices evenly between the two options, and to try and make their choice random and unpredictable. Participants were required to perform XXXX of each trial type and after every block of XXXX trials, participants were shown a pictoral display (an exmaple is shown in figXXXX) indicating how many of each trial type was left for them to perform.
+In session two, every trial began with a task selection screen where participants had to indicate using either their left or right thumbs, whether they would like to perform a learn or search trial. This screen stayed on until the participant response. Participants were asked to try to ensure that they distributed their choices evenly between the two options, and to try and make their choice random and unpredictable. Participants were required to perform XXXX of each trial type and after every block of XXXX trials, participants were shown a pictoral display (an exmaple is shown in figXXXX) indicating how many of each trial type was left for them to perform.
+
+### EEG recording
+
+
+
+### EEG processing
+
+EEG data was processed using the EEGLAB toolbox in MATLAB. Epoched, baselined, HEOG and VEOG created and lowpass filtered 35Hz and trials contianing HEOG (+/- 35) and VEOG (+/-80) removed. Trials containing +/- 80mv in the channels of interest were also removed and the data was average referenced. Left hemisphere (PO3,PO7) and right hemisphere (PO4,PO8) pools were created.
 
 # Results
 ```{r exclusion criteria}

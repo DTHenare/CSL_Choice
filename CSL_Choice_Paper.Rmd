@@ -64,6 +64,7 @@ library(cowplot)
 library(papaja)
 library(png)
 library(grid)
+library(emmeans)
 #colour, grey, center, categorisation, lateralisation, distractor
 ```
 
@@ -206,37 +207,46 @@ Everyday visual scenes contain far more information than the human visual system
 
 Selection history refers to an individual’s previous experience of encountering and responding to a stimulus in a given context, and evidence for its impact on attention has come from a range of observations. One such example of how selection history impacts on the deployment of attention is demonstrated by intertrial priming. In visual search tasks where target features vary from trial to trial, intertrial priming refers to the observation that participants respond significantly faster to the current target when it matches the features of the target from the preceding trial [@fecteau2007priming;@nakayama2004short;@maljkovic1994priming;@wolfe2003changing]. Notably, features associated with a previous trial’s target are primed even in cases where they contradict the current top-down goals of the participant [@maljkovic1994priming]. Similarly, associating a stimulus with reward has been shown to produce increased attentional capture by that stimulus long after the reward has stopped [@anderson2011value;@hickey2010reward;@hickey2013reward;@kiss2009reward]. Intertrial priming and reward association both demonstrate the critical role that selection history plays alongside bottom-up and top-down influences on attentional control.
 
-The impact that selection history has on the allocation of attention has also been shown to persist even when participants are performing a different task. @feldmann2015you demonstrated this using a dual task paradigm in which participants performed either a learning task or a search task on each trial. During the learning task participants learned to categorise stimuli based on either colour or shape, while in the search task they searched for a shape singleton and responded to the rotated line that it contained. Their results showed that when colour singletons were present in the search displays, these distractors caused greater interference on the search task for participants who had performed color categorization in the learning task. This implies that colour became more salient as a result of selection history, and follow-up experiments showed that these effects persist when the tasks are performed in separate blocks, and on separate days.
+The impact that selection history has on the allocation of attention has also been shown to persist even when participants are performing a different task. @feldmann2015you demonstrated this using a dual task paradigm in which participants performed either a learning task or a search task on each trial. During the learning task participants learned to categorise stimuli based on either colour or shape, while in the search task they searched for a shape singleton and responded to the rotated line that it contained. Their results showed that when colour singletons were present in the search displays, these distractors caused greater interference on the search task for participants who had performed colour categorization in the learning task. This implies that colour became more salient as a result of selection history, and follow-up experiments showed that these effects persist when the tasks are performed in separate blocks, and on separate days.
 
 Additional insight into the effect of learning history on attention has been provided through the measurement of neural indices of attention processing recorded by EEG. One of the predominant components used to study attention is an enhanced negativity recorded at posterior electrode sites contralateral to an attended stimulus, occurring approximately 200ms after stimulus onset. Referred to as N2pc, this component is generally considered to reflect the deployment of spatially selective attention to the stimulus [@ansorge2011initial;@eimer2007attentional;@luck1994spatial;@luck1994electrophysiological], and has been used as an index of attentional capture by relevant stimuli [@kiss2008n2pc] and pop-out objects [@eimer2007attentional;@holguin2009n2pc]. In their dual task investigation into the effects of learning history on attention, @feldmann2015you showed that during search trials, participants that had performed colour categorisation in the learning task produced an N2pc to the colour distractor whereas participants who performed shape categorisation did not. These data support the suggestion that selection history results in the automatic allocation of attention to stimuli even when they are currently task irrelevant.
 
-Recently, methodological developments have allowed for even more specific measures of attention processing using EEG. Efficient attentional orienting depends not only on efficient mechanisms for identifying and orienting to targets, but also the identification and suppression of possible distractors. Distinguishing between these processes using only behavioural measures has proven difficult, however, recent research has identified a set of lateralized event-related potentials that can provide dissociable measures of object selection and suppression. Central to the calculation of the N2pc is the subtraction of any neural activity that is represented equally in both hemispheres. @hickey2009electrophysiological took advantage of this fact in order to dissociate target and distracter processing. Participants in their task performed a visual search task in which both a target and distractor were present, but only one of these objects were lateralized on a given trial. When a target is lateralized and the distractor is on the midline, calculation of lateralized ERPs results in subtraction of all distractor activity and isolation of lateralized target processing. Similarly, when the distractor is lateralized, activity related to distractor processing can be isolated. Results using this approach have identified an early lateralized negativity indexing the attentional selection of a stimulus, and a later lateralized positivity reflecting attentional disengagement from a stimulus.
+Recently, methodological developments have allowed for even more specific measures of attention processing using EEG. Efficient attentional orienting depends not only on efficient mechanisms for identifying and orienting to targets, but also the identification and suppression of possible distractors. Distinguishing between these processes using only behavioural measures has proven difficult, however, recent research has identified a set of lateralized event-related potentials that can provide dissociable measures of object selection and suppression. Central to the calculation of the N2pc is the subtraction of any neural activity that is represented equally in both hemispheres. @hickey2009electrophysiological took advantage of this fact in order to dissociate target and distracter processing. Participants in their task performed a visual search task in which both a target and distractor were present, but only one of these objects was lateralized on a given trial. When a target is lateralized and the distractor is on the midline, calculation of lateralized ERPs results in subtraction of all distractor activity and isolation of lateralized target processing. Similarly, when the distractor is lateralized, activity related to distractor processing can be isolated. Results using this approach have identified an early lateralized negativity indexing the attentional selection of a stimulus, and a later lateralized positivity reflecting attentional disengagement from a stimulus.
 
 Specific measures of attentional selection and suppression have provided increased specificity of the role that selection history plays in the orienting of attention. In a follow-up experiment @feldmann2015you adapted their task in order to allow for the dissociation of target and distractor processing. Their results showed that for participants who categorized based on color in the learning task, the presentation of a colored distractor in the search task elicited an ND (a lateralised negativity to distractors) follow by a relatively large PD (a lateralised positivity to distractors). This implies that for these participants, the color distractor captured attention reflexively in the search task (reflected by ND) and therefore required increased subsequent suppression (reflected by increased PD). Participants who had learned to categorize based on shape however did not show this effect. The color distractor in this case elicited no ND during search trials, and a small PD indexing a lack of attentional capture and decreased distractor suppression respectively.
 
-An open question remains as to whether increased top-down control can be used to attenuate, or eliminate the effects of selection history on attention. Previously, dual task investigations of the effect have attempted to enhance top-down control processes by providing cues to participants which inform them of which task they’re about to perform [@kadel2017selection]. While this allows participants to switch task sets in preparation for the upcoming trial, the effect of selection history on attention has remained suggesting that top-down control cannot be used to override the effects of selection history. However, recent work has suggested that these cues are insufficient for allowing participants to optimally engage top-down control before the trial begins. A novel approach to increasing top-down attentional control in dual tasks is the voluntary task-switching paradigm developed by @arrington2004cost. In this version of the task, participants are not cued as to what trial type will be performed next, but rather they are given the choice of which trial type they would like to perform next. Evidence suggests that the voluntary task switching paradigm allows for stronger proactive control over performance of each task - behavioural/EEG.
+An open question remains as to whether increased top-down control can be used to attenuate, or eliminate the effects of selection history on attention. Previously, dual task investigations of the effect have attempted to enhance top-down control processes by providing cues to participants which inform them of which task they’re about to perform [@kadel2017selection]. While this allows participants to switch task sets in preparation for the upcoming trial, the effect of selection history on attention has remained suggesting that top-down control cannot be used to override the effects of selection history. However, recent work has suggested that these cues are insufficient for allowing participants to optimally engage top-down control before the trial begins. A novel approach to increasing top-down attentional control in dual tasks is the voluntary task-switching paradigm developed by @arrington2004cost. In this version of the task, participants are not cued as to what trial type will be performed next, but rather they are given the choice of which trial type they would like to perform next. Evidence suggests that the voluntary task switching paradigm allows for stronger proactive control over performance of each task [@arrington2005voluntary;kang2014electrophysiological].
 
-In the present study, we adapted the design of @feldmann2015you to a voluntary task switching paradigm in order to investigate the relationship between top-down control and selection history. By allowing participants to determine whether they would perform search or learning on the next trial, participants would be able to proactively engage the task set for the upcoming trial and exercise greater top-down control. We also recorded EEG during their performance of the task and leveraged the procedure of @hickey2009electrophysiological to allow for the isolation of target and distractor activity. This approach provides specific measures of target selection and disengagement, as well as distractor selection and suppression during the task, and therefore provides a fine grained understanding of how increased top-down control interacts with selection history during attentional orienting. We expected to see… specific hypotheses.
+In the present study, we adapted the design of @feldmann2015you to a voluntary task switching paradigm in order to investigate the relationship between top-down control and selection history. By allowing participants to determine whether they would perform search or learning on the next trial, participants would be able to proactively engage the task set for the upcoming trial and exercise greater top-down control. We also recorded EEG during their performance of the task and leveraged the procedure of @hickey2009electrophysiological to allow for the isolation of target and distractor activity. This approach provides specific measures of target selection and disengagement, as well as distractor selection and suppression during the task, and therefore provides a fine grained understanding of how increased top-down control interacts with selection history during attentional orienting. If increased top-down control is able to eliminate the effects of selection history then we would expect to see distractor costs in the search task to be similar regardless of whether participants were assigned to the shape or colour group in the learning task. We would als expect that group assignment would have no differential effects on the lateralised ERP components elicited by stimuli in the search task. On the other hand, if top-down control cannot be used to override selection history effects then the effect of learning group assignment on distractor costs and ERP component ampolitudes during search should remain.
 
 # Methods
 
 ## Participants
 
+27 participants with normal or corrected-to-normal vision (tested using an Oculus Binoptometer 3) participated in the task for either payment or course credit. All participants gave written and informed consent prior to the start of the experiment. Participants were randomly assigned to either the shape group (ages ranging form XXXX to XXXX, mean = XXXX, SD = XXXX) or the colour group (ages ranging form XXXX to XXXX, mean = XXXX, SD = XXXX). Each group had one left handed participant and all other participants were right handed. One participant did not reach suitable performance during the practice session and was therefore excluded from the experiment.
+
 ## Experimental procedure
 
-Participants came in for two separate sessions and performed two different tasks, a learning task, and a search task. In session one, participants were familiarised with the two tasks by performing them in separate blocks. In session two, the full task began where participants chose on a trial-to-trial basis whether the upcoming trial would be a learning or search trial. This procedure followed the logic of Feldmann-Wustefeld (XXXX) where selection history is measured as the effect of the learning task on performance in the search task. The addition of voluntary task selection allowed for us to investigate the influence that top-down control may have on the role of selection history.
+Participants came in for two separate sessions and performed two different tasks within each session, a learning task and a search task. In session one, participants were familiarised with the two tasks by performing them in separate blocks. In session two, the full task began where participants chose at the start of each trial whether they would perform a learning or search trial. Participants were seated in a comfortable chair in a dimly lit room with their eyes 100cm away from the screen (LCD-TN Samsung Syncmaster 2233). An Erogodex DX1 repsonse pad was placed on their lap with 6 keys arranged so that participants could use the index and middle finger of each hand to respond to the task, while the thumb on each hand could be used to perform task selection between trials. Stimulus presentation and repsonse collection was controlled by E-Prime 2.0 and audio feedback was presented by two stereo speakers (Logitech
+Z120 2.0) placed behind the screen.
+
+This procedure followed the logic of Feldmann-Wustefeld (XXXX) where selection history is measured as the effect of the learning task on performance in the search task. The addition of voluntary task selection allowed for us to investigate the influence that top-down control may have on the role of selection history.
+
+### Stimuli
+
+All stimuli presented during the learn and search trials were presented on a dark grey background and subtended 2.3 degrees of visual angle. A fixation cross (0.6 degrees) was located in the centre of the screen throughout the experiment in order to help participants maintain central fixation. The physical luminance of the grey, green, blue, and red stimulus colours was balanced using a luminance meter (Konica Minolta LS-100).
 
 ### Learning trials
 
-Learning trials began with a XXXX-XXXX ms fixation cross in the center of the screen. Eight stimuli are then presented simultaneously in a circular arrangement for XXXX ms, six of these are unfilled grey circles, one is an unfilled coloured circle (either blue or green randomly selected on each trial), and one is an unfilled grey shape singleton (either pentagon or triangle selected randomly on each trial). Participants have two response keys for the learning task and after selecting one of these keys, they are given feedback informing them whether they have selected the correct response. At the beginning of the task, participants are not told the correct stimulus reponse pairing and must instead learn which key is correct for a given display. For half of the participants (the colour-trained group) the correct response is based on the colour singleton (eg. key 1 when blue is shown, key 2 when green is shown). For the other half of participants (the shape-trained group) the correct response is based on the shape singleton (eg. key 1 when a pentagon is shown, key 2 when a triangle is shown). Participants have XXXX ms to respond on each trial.
+Learning trials began with a 500-XXXX ms fixation cross in the center of the screen. Eight stimuli were then presented simultaneously in a circular arrangement for 200 ms, six of these were unfilled grey circles, one was an unfilled coloured circle (either blue or green randomly selected on each trial), and one was an unfilled grey shape singleton (either pentagon or triangle selected randomly on each trial). Participants had two response keys for the learning task and after selecting one of these keys, they were given feedback informing them whether they had selected the correct response. At the beginning of the task, participants were not told the correct stimulus reponse pairing and instead had to learn which key was correct for a given display. For half of the participants (the colour group) the correct response was based on the colour singleton (eg. key 1 when blue was shown, key 2 when green was shown). For the other half of participants (the shape group) the correct response was based on the shape singleton (eg. key 1 when a pentagon was shown, key 2 when a triangle was shown). Participants had 2000ms to respond on each trial.
 
 ### Search trials
 
-Search trials began with a XXXX-XXXX ms fixation cross in the center of the screen. Eight stimuli are then presented simultaneously in a circular arrangement for XXXX ms, six of these are always unfilled grey circles, and one is the target, an unfilled grey diamond. The final stimulus is either another unfilled grey circle (in the target only condition) or an unfilled red circle (in the distractor present condition). Each of these stimuli contained a straight line of varying orientations and participants were required to indicate whether the line contained by the target diamond was oriented horizontally or vertically. Participants have XXXX ms to respond on each trial.
+Search trials began with a 500-XXXX ms fixation cross in the center of the screen. Eight stimuli were then presented simultaneously in a circular arrangement for 200 ms, six of these were always unfilled grey circles, and one was the target, an unfilled grey diamond. The final stimulus was either another unfilled grey circle (in the target only condition) or an unfilled red circle (in the distractor present condition). Each of these stimuli contained a straight line of varying orientations and participants were required to indicate whether the line contained by the target diamond was oriented horizontally or vertically. Participants had 2000 ms to respond on each trial.
 
 ### Task selection
 
-In session two, every trial began with a task selection screen where participants had to indicate using either their left or right thumbs, whether they would like to perform a learn or search trial. This screen stayed on until the participant response. Participants were asked to try to ensure that they distributed their choices evenly between the two options, and to try and make their choice random and unpredictable. Participants were required to perform XXXX of each trial type and after every block of XXXX trials, participants were shown a pictoral display (an exmaple is shown in figXXXX) indicating how many of each trial type was left for them to perform.
+In session two, every trial began with a task selection screen where participants had to indicate using either their left or right thumbs, whether they would like to perform a learn or search trial. This screen stayed on until the participant response. Participants were asked to try to ensure that they distributed their choices evenly between the two options, and to try and make their choice random and unpredictable. Participants were required to perform 576 of each trial type and after every block of 32 trials, participants were shown a pictoral display (an exmaple is shown in figXXXX) indicating how many of each trial type was left for them to perform.
 
 ### EEG recording
 
@@ -291,6 +301,28 @@ behavData$Group = as.factor(behavData$Group)
 switchRates <- behavData %>% group_by(Subject) %>%summarise(SR = mean(switchRate))
 ```
 
+```{r, echo = FALSE, include = FALSE}
+autoCor <- data.frame(matrix(ncol = 3, nrow = 0))
+colnames(autoCor) <- c("Cor", "Subject", "Group")
+
+for (subj in unique(behavData$Subject)) {
+sData <- behavData %>% filter(Subject == subj)
+Cor <- acf(sData$SwitchCount,lag.max = 576,plot = TRUE)$acf
+Cor = data.frame(Cor)
+Cor$Subject = subj
+Cor$Group = behavData$Group[behavData$Subject==subj][1]
+autoCor <- rbind(autoCor,Cor[])
+}
+
+autoCor$Cor <- sqrt(autoCor$Cor^2)
+
+autoCor %>%
+  filter(Cor < 1) %>%
+  group_by(Subject,Group) %>%
+  summarise(Cor = mean(Cor))
+t.test(autoCor$Cor[autoCor$Group=="Colour"],autoCor$Cor[autoCor$Group=="Shape"], paired = FALSE)
+```
+
 ### Distractor cost
 
 ```{r behavStats}
@@ -313,7 +345,7 @@ t.out = t.test(colourBehav$DistInt,shapeBehav$DistInt)
 intEffectTTest = apa_print(t.out)
 ```
 
-In order to test for the effect of selection history when top-down control was maximised, we evaluated the effect of group assignment in the categorisation on performance in the search task. First, we removed removed trials with incorrect responses and abnormally long reaction times (greater than 2.5 standard deviations above the mean, calculated separately for each participant). At this point, we calculated distractor cost by taking the difference in response times between the target only trials and the distractor present trials. An independent samples t-test comparing distractor interference between the colour-trained group and the shape-trained group showed that those trained to categorise colours were subject to greater interference by the colour distractor in the search task (`r intEffectTTest$full_result`). This is shown in figure\ \@ref(fig:DistIntViolin).
+In order to test for the effect of selection history when top-down control was maximised, we evaluated the effect of group assignment in the categorisation on performance in the search task. First, we removed trials with incorrect responses and abnormally long reaction times (greater than 2.5 standard deviations above the mean, calculated separately for each participant). At this point, we calculated distractor cost by taking the difference in response times between the target only trials and the distractor present trials. An independent samples t-test comparing distractor interference between the colour-trained group and the shape-trained group showed that those trained to categorise colours were subject to greater interference by the colour distractor in the search task (`r intEffectTTest$full_result`). This is shown in figure\ \@ref(fig:DistIntViolin).
 
 (ref:behavDistInt) Violin plot showing the response time cost caused by a colored distractor during visual search for both the shape and color trained groups. 
 
@@ -347,7 +379,9 @@ behavData %>%
 rm(behavData, colourBehav, GeomFlatViolin, GeomSplitViolin, groupInfo,intEffectTTest,shapeBehav,t.out, geom_flat_violin,geom_split_violin)
 gc()
 ```
+
 ## ERP results
+
 ```{r organiseData}
 dPath = 'CSL_Visuals/'
 fPrefix = 'N2pc'
@@ -506,7 +540,7 @@ allData %>%
           )
 ```
 
-```{r learnStats, echo=FALSE}
+```{r learnStats, echo=FALSE, include = FALSE}
 learnNtShape <- allData %>%
   mutate(sample = sample*srateMultiplier-baseline) %>%
   filter(Event == "Learn" & learnRej == 0 & sample>NtStart & sample < NtEnd & Object == "Lat. Shape") %>%
@@ -520,6 +554,12 @@ learn.NtShape.aov <- aov_ez(
   between = "Group"
 )
 learn.NtShape.results <- apa_print(learn.NtShape.aov)
+#Followup
+learn.NtShape.fup <- apa_print.emmGrid(pairs(emmeans(learn.NtShape.aov, ~Contra|Group)))
+diffDirect <- learnNtShape %>%
+  spread(Contra,mV) %>%
+  mutate(difference = Contralateral-Ipsilateral)
+t.test(diffDirect$difference[diffDirect$Group == "Shape"], diffDirect$difference[diffDirect$Group == "Colour"],paired = FALSE)
 
 learnNtCol <- allData %>%
   mutate(sample = sample*srateMultiplier-baseline) %>%
@@ -534,6 +574,12 @@ learn.NtCol.aov <- aov_ez(
   between = "Group"
 )
 learn.NtCol.results <- apa_print(learn.NtCol.aov)
+#Followup
+learn.NtCol.fup <- apa_print.emmGrid(pairs(emmeans(learn.NtCol.aov, ~Contra|Group)))
+diffDirect <- learnNtCol %>%
+  spread(Contra,mV) %>%
+  mutate(difference = Contralateral-Ipsilateral)
+t.test(diffDirect$difference[diffDirect$Group == "Shape"], diffDirect$difference[diffDirect$Group == "Colour"],paired = FALSE)
 
 learnPdShape <- allData %>%
   mutate(sample = sample*4-baseline) %>%
@@ -568,17 +614,17 @@ In the categorisation task, our ERP analyses focused on the lateralised response
 
 #### Colour singleton response
 
-When focussing on the lateralised response to a colour singleton we again see a significant interaction between hemisphere and group (`r learn.NtCol.results$full$Group_Contra`). Here, we see a more negative hemipsheric difference for the colour group than the shape group. There wa no interaction between hemisphere and group on voltages in the PD time range (`r learn.PdCol.results$full$Group_Contra`).
+When focussing on the lateralised response to a colour singleton we see no significant main effects of either group (`r learn.NtCol.results$full$Group`) or hemisphere (`r learn.NtCol.results$full$Contra`), however we do see a significant interaction between group and hemisphere (`r learn.NtCol.results$full$Group_Contra`). Follow-up comparisons reveal that for participants in the colour group, a lateralised colour singleton elicits a significant NT component (`r learn.NtCol.fup$full_result$Contralateral_Ipsilateral_Colour`), whereas for participants in the shape group a significant lateralised positivity is elicited by the colour singleton (`r learn.NtCol.fup$full_result$Contralateral_Ipsilateral_Shape`). When evaluating the PD time range, we observe no main effects of group(`r learn.PdCol.results$full$Group`) or hemisphere (`r learn.PdCol.results$full$Contra`) on voltage, and no interaction between group and hemisphere (`r learn.PdCol.results$full$Group_Contra`).
 
 #### Shape singleton response
 
-The results showed that there is a significant interaction between eletrode location (contralateral or ipsilateral scalp site) and group (shape categorisers and colour categorisers).  The lateralised response to a shape singleton is more negative for those in the shape categoriser group than the colour categoriser group (`r learn.NtShape.results$full$Group_Contra`). There was no such interaction between hemisphere and group on voltages in the PD time range (`r learn.PdShape.results$full$Group_Contra`).
+When focussing on the lateralised response to a shape singleton we again see no significant main effects of either group (`r learn.NtShape.results$full$Group`) or hemisphere (`r learn.NtShape.results$full$Contra`), however we do see a significant interaction between group and hemisphere (`r learn.NtShape.results$full$Group_Contra`). Follow-up comparisons reveal that for participants in the shape group, a lateralised shape singleton elicits a significant NT component (`r learn.NtShape.fup$full_result$Contralateral_Ipsilateral_Shape`), whereas for participants in the colour group a significant lateralised positivity is elicited by the shape singleton (`r learn.NtShape.fup$full_result$Contralateral_Ipsilateral_Colour`).  When evaluating the PD time range, we observe no main effects of group(`r learn.PdShape.results$full$Group`) or hemisphere (`r learn.PdShape.results$full$Contra`) on voltage, and no interaction between group and hemisphere (`r learn.PdShape.results$full$Group_Contra`).
 
-(ref:learnERPCap) Subtractracted ERPs showing the lateralized response to the shape singleton (top) and color singleton (bottom) for each group in the categorization task. 
+(ref:learnERPCap) Subtractracted ERPs showing the lateralized response to the shape singleton (top) and color singleton (bottom) for each group in the categorization task. Example displays are shown for each ERP.
 
 ```{r makeLearnPlots, fig.cap="(ref:learnERPCap)"}
-imgCol <- readPNG("searchTO.png")
-imgShape <- readPNG("searchTD.png")
+imgCol <- readPNG("learnCol.png")
+imgShape <- readPNG("learnShape.png")
 #Subtracted
 allData %>%
   filter(Event == "Learn", learnRej == 0) %>%
@@ -681,7 +727,7 @@ searchNtTO <- allData %>%
   mutate(sample = sample*srateMultiplier-baseline) %>%
   filter(Event == "Search" & LatStim != "None" & searchRej == 0 & sample>NtStart & sample < NtEnd & Stimulus == "Target only", switchRate>minSwitchRate) %>%
   group_by(Stimulus,Subject,Contra,Group) %>%
-  summarise(mV = mean(voltage))
+  summarise(mV = mean(voltage)) 
 search.NtTO.aov <- aov_ez(
   data = searchNtTO,
   dv = "mV",
@@ -690,6 +736,7 @@ search.NtTO.aov <- aov_ez(
   between = "Group"
 )
 search.NtTO.results <- apa_print(search.NtTO.aov)
+search.NtTO.fup <- apa_print.emmGrid(pairs(emmeans(search.NtTO.aov, ~Contra|Group)))
 
 searchNtTD <- allData %>%
   mutate(sample = sample*srateMultiplier-baseline) %>%
@@ -704,6 +751,11 @@ search.NtTD.aov <- aov_ez(
   between = "Group"
 )
 search.NtTD.results <- apa_print(search.NtTD.aov)
+search.NtTD.fup <- apa_print.emmGrid(pairs(emmeans(search.NtTD.aov, ~Contra|Group)))
+diffDirect <- searchNtTD %>%
+  spread(Contra,mV) %>%
+  mutate(difference = Contralateral-Ipsilateral)
+NtTDdiff <- apa_print(t.test(diffDirect$Contralateral[diffDirect$Group == "Shape"], diffDirect$Ipsilateral[diffDirect$Group == "Shape"],paired = TRUE))
 
 searchNtDT <- allData %>%
   mutate(sample = sample*srateMultiplier-baseline) %>%
@@ -718,6 +770,7 @@ search.NtDT.aov <- aov_ez(
   between = "Group"
 )
 search.NtDT.results <- apa_print(search.NtDT.aov)
+search.NtDT.fup <- apa_print.emmGrid(pairs(emmeans(search.NtDT.aov, ~Contra|Group)))
 
 searchPdDT <- allData %>%
   mutate(sample = sample*srateMultiplier-baseline) %>%
@@ -732,23 +785,29 @@ search.PdDT.aov <- aov_ez(
   between = "Group"
 )
 search.PdDT.results <- apa_print(search.PdDT.aov)
+search.PdDT.fup <- apa_print.emmGrid(pairs(emmeans(search.PdDT.aov, ~Contra|Group)))
+diffDirect <- searchPdDT %>%
+  spread(Contra,mV) %>%
+  mutate(difference = Contralateral-Ipsilateral)
+PdDTdiff <- apa_print(t.test(diffDirect$difference[diffDirect$Group == "Colour"], diffDirect$difference[diffDirect$Group == "Shape"],paired = FALSE))
+
 ```
 
 Next we focused on the lateralised response to stimuli in the search displays as a function of group assignment. Evidence for the effect of selection history would again come from the interaction between group and lateralised ERP activity.
 
 #### Target response - Distractor absent trials
 
-In the target only displays there was no significant interaction between group and hemisphere in the NT time range (`r search.NtTO.results$full$Group_Contra`).
+In the target only displays there was a significant main effect of hemisphere where the contralateral response is more negative than the ipsilateral response (`r search.NtTO.results$full$Contra`), but no siginificant main effect of group (`r search.NtTO.results$full$Group`), and no interaction between group and hemisphere (`r search.NtTO.results$full$Group_Contra`).
 
 #### Target response - Distractor present trials
 
-Results for the lateralised target in the presence of a distractor showed a significant interaction between hemisphere and group such that participants in the shape group had a larger negative difference between hemispheres in the NT time range than participants in the colour group (`r search.NtTD.results$full$Group_Contra`).
+Results for the lateralised target in the presence of a distractor showed no significant main effect of group (`r search.NtTD.results$full$Group`), however there was a significant main effect of hemisphere (`r search.NtTD.results$full$Contra`), as well as a significant interaction between group and hemisphere (`r search.NtTD.results$full$Group_Contra`). Follow-up comparisons reveal that a significant NT was elicited for participants in both the colour (`r search.NtTD.fup$full_result$Contralateral_Ipsilateral_Colour`) and shape group (`r search.NtTD.fup$full_result$Contralateral_Ipsilateral_Colour`). When NT amplitude is compared directly with an independent samples t test, the results show that the NT is significantly larger for the shape group than the colour group (`r NtTDdiff$full_result`).
 
 #### Distractor response
 
-Results for the lateralised distractor show that while there was no significant interaction between group and hemisphere in the NT time range (`r search.NtDT.results$full$Group_Contra`), there was a significant interaction in the PDtime range such that the hemisphere difference was larger for the colour group than the shape group (`r search.PdDT.results$full$Group_Contra`). 
+Results for the lateralised distractor showed no significant main effect of group (`r search.PdDT.results$full$Group`), however there was a significant main effect of hemisphere (`r search.PdDT.results$full$Contra`), as well as a significant interaction between group and hemisphere (`r search.PdDT.results$full$Group_Contra`). Follow-up comparisons reveal that a significant Pd was elicited for participants in the colour group (`r search.PdDT.fup$full_result$Contralateral_Ipsilateral_Colour`), however there was no significant difference between the contralateral and ipsilateral electrodes for the shape group (`r search.PdDT.fup$full_result$Contralateral_Ipsilateral_Shape`). When Pd amplitude is compared directly with an independent samples t test, the results show that the Pd is significantly larger for the colour group than the shape group (`r PdDTdiff$full_result`).
 
-(ref:searchERPCap) Subtractracted ERPs showing the lateralized response to the colored distractor (top), the shape target (middle), and the shape target in the absence of distraction (bottom) for each group in the search task.
+(ref:searchERPCap) Subtractracted ERPs showing the lateralized response to a target in the absence of distractors (top, the target in the presence of a distractor (middle), and the distractor (bottom) for each group in the search task. Example displays are shown for each ERP.
 
 ```{r makeSearchPlots, fig.cap="(ref:searchERPCap)", fig.height = 5.25,  fig.align = "center"}
 
@@ -806,7 +865,10 @@ ggsave("SearchSubtracted.pdf", dpi = 300, width = 30, height = 40, units = c("cm
 
 # Discussion
 
-In both cases, the singleton elicits a greater lateralised negativity when it is the target for categorisation.
+Previous research has established that an individual's learning history biases their attention during visual search, even when that learning history is task irrelevant and impairs search performance. In this study, we aimed to test whether the effects of learning history on attention guidance can be eliminated in situations where top-down control is maximised. To this end, we used a voluntary task selection design which allowed participants to decide which task they would like to perform on each trial. The results showed that learning history continues to bias attention during visual search leading to impaired target selection and distractor suppression. These effects are reflected both in response times as increased distractor costs, and in lateralised ERP components as simultaneous attenuation of the NT component and increase of the PD component.
+
+Specifically, if participants learn to make categorisation judgements based on differentiating between two colours and subsequently search for a shape target while a coloured distractor is present, the NT component elicited by the shape target is attenuated and the PD elicited by the colour distractor is increased.
+
+Learning history acts implicitly
 
 # References
-

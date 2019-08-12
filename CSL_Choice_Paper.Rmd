@@ -261,7 +261,6 @@ EEG data was processed using the EEGLAB toolbox in MATLAB. Epoched, baselined, H
 minSwitchRate = 0.2
 ```
 
-
 ## Behavioral results
 ```{r loadBehavData}
 groupInfo = read.csv(file="BehaviouralData.csv")
@@ -280,8 +279,6 @@ for (sub in unique(behavData$Subject)) {
   behavData$compMean[behavData$Subject==sub] = mean(filter(behavData,Subject ==sub, Procedure.Trial. == "TaskC")$CompSearch.RT)
   behavData$learnSD[behavData$Subject==sub] = sd(filter(behavData,Subject ==sub, Procedure.Trial. == "TaskL")$LearnSearch.RT)
   behavData$learnMean[behavData$Subject==sub] = mean(filter(behavData,Subject ==sub, Procedure.Trial. == "TaskL")$LearnSearch.RT)
-  
-  
 }
 behavData$compCutoff <- behavData$compMean + (behavData$compSD * 2.5)
 behavData$learnCutoff <- behavData$learnMean + (behavData$learnSD * 2.5)
@@ -301,7 +298,7 @@ behavData$Group = as.factor(behavData$Group)
 switchRates <- behavData %>% group_by(Subject) %>%summarise(SR = mean(switchRate))
 ```
 
-```{r, echo = FALSE, include = FALSE}
+```{r, include = FALSE}
 autoCor <- data.frame(matrix(ncol = 3, nrow = 0))
 colnames(autoCor) <- c("Cor", "Subject", "Group")
 
@@ -323,29 +320,73 @@ autoCor %>%
 t.test(autoCor$Cor[autoCor$Group=="Colour"],autoCor$Cor[autoCor$Group=="Shape"], paired = FALSE)
 ```
 
-### Distractor cost
+### Categorisation task
 
-```{r behavStats}
-colourBehav <- behavData %>%
+```{r, categorisationStats, include = FALSE}
+
+catAcc <- behavData %>%
+  filter(Procedure.Trial. == "TaskL",switchRate>minSwitchRate, LearnSearch.RT < learnCutoff) %>%
+  group_by(Subject, Group) %>%
+  summarise(Accuracy = mean(LearnSearch.ACC))
+t.out = t.test(catAcc$Accuracy[catAcc$Group == "Colour"],catAcc$Accuracy[catAcc$Group == "Shape"])
+catAcc.res = apa_print(t.out)
+
+behavData %>%
+  filter(Procedure.Trial.== "Task")
+
+catRT <- behavData %>%
+  filter(Procedure.Trial. == "TaskL",switchRate>minSwitchRate, LearnSearch.RT < learnCutoff) %>%
+  group_by(Subject, Group) %>%
+  summarise(RT = mean(LearnSearch.RT))
+t.out = t.test(catRT$RT[catRT$Group == "Colour"],catRT$RT[catRT$Group == "Shape"])
+catRT.res = apa_print(t.out)
+```
+
+In the categorisation task, we see now significant difference between the shape group and the colour group for response times (`r catAcc.res$full_result`) and accuracy (`r catRT.res$full_result`).
+
+### Search task
+
+```{r, SearchStats}
+searchAcc <- behavData %>%
+  filter(Procedure.Trial. == "TaskC",switchRate>minSwitchRate, CompSearch.RT < compCutoff) %>%
+  group_by(Subject, TrialType, Group) %>%
+  summarise(Accuracy = mean(CompSearch.ACC))
+searchAcc.aov <- aov_ez(
+  data = searchAcc,
+  dv = "Accuracy",
+  id = "Subject", 
+  within = c("TrialType"),
+  between = "Group"
+)
+searchAcc.res <- apa_print(searchAcc.aov)
+
+searchRT <- behavData %>%
+  filter(Procedure.Trial. == "TaskC",switchRate>minSwitchRate, CompSearch.ACC==1, CompSearch.RT < compCutoff) %>%
+  group_by(Subject, TrialType, Group) %>%
+  summarise(RT = mean(CompSearch.RT))
+searchRT.aov <- aov_ez(
+  data = searchRT,
+  dv = "RT",
+  id = "Subject", 
+  within = c("TrialType"),
+  between = "Group"
+)
+searchRT.res <- apa_print(searchRT.aov)
+searchRT.fup <- apa_print.emmGrid(pairs(emmeans(searchRT.aov, ~TrialType|Group)))
+
+distCost <- behavData %>%
   filter(Procedure.Trial. == "TaskC",switchRate>minSwitchRate, CompSearch.ACC==1, CompSearch.RT < compCutoff) %>%
   group_by(Subject, TrialType, Group) %>%
   summarise(RT = mean(CompSearch.RT)) %>%
   spread(TrialType, RT) %>%
-  mutate(DistInt = TD-Tonly, GroupNum = as.integer(Group)) %>%
-  filter(Group=="Colour")
-
-shapeBehav <- behavData %>%
-  filter(Procedure.Trial. == "TaskC",switchRate>minSwitchRate, CompSearch.ACC==1, CompSearch.RT < compCutoff) %>%
-  group_by(Subject, TrialType, Group) %>%
-  summarise(RT = mean(CompSearch.RT)) %>%
-  spread(TrialType, RT) %>%
-  mutate(DistInt = TD-Tonly, GroupNum = as.integer(Group)) %>%
-  filter(Group=="Shape")
-t.out = t.test(colourBehav$DistInt,shapeBehav$DistInt)
+  mutate(DistInt = TD-Tonly, GroupNum = as.integer(Group))
+t.out = t.test(distCost$DistInt[distCost$Group == "Colour"],distCost$DistInt[distCost$Group == "Shape"])
 intEffectTTest = apa_print(t.out)
 ```
 
-In order to test for the effect of selection history when top-down control was maximised, we evaluated the effect of group assignment in the categorisation on performance in the search task. First, we removed trials with incorrect responses and abnormally long reaction times (greater than 2.5 standard deviations above the mean, calculated separately for each participant). At this point, we calculated distractor cost by taking the difference in response times between the target only trials and the distractor present trials. An independent samples t-test comparing distractor interference between the colour-trained group and the shape-trained group showed that those trained to categorise colours were subject to greater interference by the colour distractor in the search task (`r intEffectTTest$full_result`). This is shown in figure\ \@ref(fig:DistIntViolin).
+In order to test for the effect of selection history when top-down control was maximised, we evaluated the effect of group assignment in the categorisation on performance in the search task. First, we removed trials with incorrect responses and abnormally long reaction times (greater than 2.5 standard deviations above the mean, calculated separately for each participant). At this point, we calculated distractor cost by taking the difference in response times between the target only trials and the distractor present trials.
+
+Our results failed to detect a significant main effect of group (`r searchAcc.res$full_result$Group`) or trial type (`r searchAcc.res$full_result$TrialType`) on accuracy, and there was no significant interaction between group and trial type (`r searchAcc.res$full_result$Group_TrialType`). We also fail to detect a significant effect of group on response times (`r searchRT.res$full_result$Group`), however we do observe a significant main effect of trial type (`r searchRT.res$full_result$TrialType`), and a significant interaction between group and trial type (`r searchRT.res$full_result$Group_TrialType`). Follow-up tests reveal that participants respond significantly slower when a distractor is present in the search display, and this is true in both the colour group (`r searchRT.fup$full_result$TD_Tonly_Colour`) and the shape group (`r searchRT.fup$full_result$TD_Tonly_Shape`). However, this effect appears to be larger for the colour group and when this is tested directly using an independent samples t-test, the results show that distractor cost is indeed significantly larger for the colour group than the shape group (`r intEffectTTest$full_result`). The effect of group assignment on distractor cost is shown in figure\ \@ref(fig:DistIntViolin).
 
 (ref:behavDistInt) Violin plot showing the response time cost caused by a colored distractor during visual search for both the shape and color trained groups. 
 
@@ -614,11 +655,11 @@ In the categorisation task, our ERP analyses focused on the lateralised response
 
 #### Colour singleton response
 
-When focussing on the lateralised response to a colour singleton we see no significant main effects of either group (`r learn.NtCol.results$full$Group`) or hemisphere (`r learn.NtCol.results$full$Contra`), however we do see a significant interaction between group and hemisphere (`r learn.NtCol.results$full$Group_Contra`). Follow-up comparisons reveal that for participants in the colour group, a lateralised colour singleton elicits a significant NT component (`r learn.NtCol.fup$full_result$Contralateral_Ipsilateral_Colour`), whereas for participants in the shape group a significant lateralised positivity is elicited by the colour singleton (`r learn.NtCol.fup$full_result$Contralateral_Ipsilateral_Shape`). When evaluating the PD time range, we observe no main effects of group(`r learn.PdCol.results$full$Group`) or hemisphere (`r learn.PdCol.results$full$Contra`) on voltage, and no interaction between group and hemisphere (`r learn.PdCol.results$full$Group_Contra`).
+When focussing on the lateralised response to a colour singleton we see no significant main effects of either group (`r learn.NtCol.results$full$Group`) or hemisphere (`r learn.NtCol.results$full$Contra`), however we do see a significant interaction between group and hemisphere (`r learn.NtCol.results$full$Group_Contra`). Follow-up comparisons reveal that for participants in the colour group, a lateralised colour singleton elicits a significant NT component (`r learn.NtCol.fup$full_result$Contralateral_Ipsilateral_Colour`), whereas for participants in the shape group a significant lateralised positivity is elicited by the colour singleton (`r learn.NtCol.fup$full_result$Contralateral_Ipsilateral_Shape`). When evaluating the PD time range, we observe no main effects of group(`r learn.PdCol.results$full$Group`) or hemisphere (`r learn.PdCol.results$full$Contra`), and no interaction between group and hemisphere (`r learn.PdCol.results$full$Group_Contra`).
 
 #### Shape singleton response
 
-When focussing on the lateralised response to a shape singleton we again see no significant main effects of either group (`r learn.NtShape.results$full$Group`) or hemisphere (`r learn.NtShape.results$full$Contra`), however we do see a significant interaction between group and hemisphere (`r learn.NtShape.results$full$Group_Contra`). Follow-up comparisons reveal that for participants in the shape group, a lateralised shape singleton elicits a significant NT component (`r learn.NtShape.fup$full_result$Contralateral_Ipsilateral_Shape`), whereas for participants in the colour group a significant lateralised positivity is elicited by the shape singleton (`r learn.NtShape.fup$full_result$Contralateral_Ipsilateral_Colour`).  When evaluating the PD time range, we observe no main effects of group(`r learn.PdShape.results$full$Group`) or hemisphere (`r learn.PdShape.results$full$Contra`) on voltage, and no interaction between group and hemisphere (`r learn.PdShape.results$full$Group_Contra`).
+When focussing on the lateralised response to a shape singleton we again see no significant main effects of either group (`r learn.NtShape.results$full$Group`) or hemisphere (`r learn.NtShape.results$full$Contra`), however we do see a significant interaction between group and hemisphere (`r learn.NtShape.results$full$Group_Contra`). Follow-up comparisons reveal that for participants in the shape group, a lateralised shape singleton elicits a significant NT component (`r learn.NtShape.fup$full_result$Contralateral_Ipsilateral_Shape`), whereas for participants in the colour group a significant lateralised positivity is elicited by the shape singleton (`r learn.NtShape.fup$full_result$Contralateral_Ipsilateral_Colour`).  When evaluating the PD time range, we observe no main effects of group(`r learn.PdShape.results$full$Group`) or hemisphere (`r learn.PdShape.results$full$Contra`), and no interaction between group and hemisphere (`r learn.PdShape.results$full$Group_Contra`).
 
 (ref:learnERPCap) Subtractracted ERPs showing the lateralized response to the shape singleton (top) and color singleton (bottom) for each group in the categorization task. Example displays are shown for each ERP.
 
@@ -667,8 +708,6 @@ allData %>%
           )
 ggsave("LearnSubtracted.pdf", dpi = 300, width = 30, height = 20, units = c("cm"))
 ```
-
-
 
 ### Search task
 
@@ -867,8 +906,43 @@ ggsave("SearchSubtracted.pdf", dpi = 300, width = 30, height = 40, units = c("cm
 
 Previous research has established that an individual's learning history biases their attention during visual search, even when that learning history is task irrelevant and impairs search performance. In this study, we aimed to test whether the effects of learning history on attention guidance can be eliminated in situations where top-down control is maximised. To this end, we used a voluntary task selection design which allowed participants to decide which task they would like to perform on each trial. The results showed that learning history continues to bias attention during visual search leading to impaired target selection and distractor suppression. These effects are reflected both in response times as increased distractor costs, and in lateralised ERP components as simultaneous attenuation of the NT component and increase of the PD component.
 
-Specifically, if participants learn to make categorisation judgements based on differentiating between two colours and subsequently search for a shape target while a coloured distractor is present, the NT component elicited by the shape target is attenuated and the PD elicited by the colour distractor is increased.
+This pattern of results is consistent with the results of @feldmann2015you who used a version of this task which allowed for only limited top-down control. In their experiment, participants were also randomly assigned to either a colour learning, or shape learning group and asked to perform two tasks. In the ategorisation task their responses depended on group assignment (categorising either the colour or shape singleton) and in the search task all participants had to search for and respond to a line within a shape singleton. In their version of the task, the two tasks were randomly intermixed and participants had no way of knowing whether the upcoming trial would be a categorisation trial or a search trial. Their results showed that colour categorisers incurred greater response time costs when a colour distractor was present in the serach display relative to shape categorisers. The ERP results in their task for the most part align with ours. When search targets are presented alone, there is no difference in the NT amploitude for the two groups. However, when colour distractors are present, the NT to targets is larger in the shape group, and the PD to distractors is larger in the oclour group. The fact that this pattern of results persists when voluntary task selection is allowed suggests that selection history is the result of an implicit accrual of __ and that it biases attention automatically.
+
+@feldmann2015you also observed a greater negativity to colour distractors for participants in the colour group, an effect that we do not observe in our g
+
+```{r, include = FALSE}
+#Specifically, if participants learn to make categorisation judgements based on differentiating between two colours and subsequently search for a shape target while a coloured distractor is present, the NT component elicited by the shape target is attenuated and the PD elicited by the colour distractor is increased.
+```
+
+These results confirm and extend previous attempts to understand how selection history's effects persist under a range of of contexts. In their study, @kadel2017selection used the same dual task paradigm employed here in which participants categorise either shapes or colours on one task, and then search for a shape singleton in the second task. Across three experiments @kadel2017selection used variations in which the participants were cued about the task they would perform on the subsequent trial, performed the tasks in a fixed order, as well as performing the tasks on separate days across two sessions. In all cases @kadel2017selection observed the same selection history effects reported here. Distractor costs in the search task were larger for the colour group in each experiment, and ERP results suggested that participants in the shape group were better able to focus their attention on the shape target in the presence of a colour distractor, whereas those in the colour group were relatively impaired in their ability to select the shape target when a colour distractor was present. These results support the suggestion that top-down preparation cannot overrule the effect that selection history has on attentional filter settings. 
+
+Our study extends on these results in two main ways. Firstly our experiemnt used a voluntary task selection paradigm which has been shown to allow for increased top-down control relative to other procedures in the task switching literature. Secondly, the stimulus displays in our task are arranged in a way which allows for the dissociation of target and distractor responses in the EEG data. 
+
+One notable feature of the ERP in our tasks is the wide shallow nature of the lateralised positivity during the categorisation task, particularly in the case of a lateralised colour singleton. Whereas the lateralised responses evoked in the search task reflect the features of typical NT/PD components, the lateralised response in the categorisation task showed significant overlap in the time ranges of the NT and PD, and a broadly distributed positivty in the case of lateralised colour singletons. We also observe a possible lateralised positivty to the target stimulus (colour singleton for the colour group, and shape singleton for the shape group) which follows the initial NT response.
+
+The observation that top-down control can not be used to eliminate the effects of selection history is consistent with the suggestion that selection history operates reflexively
+
+Our results suggest that learning history operates implicitly and automatically when 
+
+These effects extend on the findings of @kadel2017selection who also attempted to demonstrate the resilience of learning history to top-down control mechanisms. 
 
 Learning history acts implicitly
+
+```{r, previousExamplesOfSelectionHistoryAndPostulatedMechanisms}
+#Several studies showed that when specific stimulus features or dimensions are reliable
+#predictors of an outcome, they induce an attentional bias in favor of these stimuli (e.g., Le
+#Pelley, Suret, & Beesley, 2009; Le Pelley et al., 2013; Mitchell & Le Pelley, 2010).
+#Moreover, stimuli previously shown to be predictive for a specific outcome are more rapidly
+#learned about subsequently (learned predictiveness effect; Le Pelley & McLaren, 2003). Both
+#deliberate attentional selection as well as automatic attentional capture are influenced by
+#learned predictiveness (Le Pelley, Mitchell, Beesley, George, & Wills, 2016). There are two
+#explanatory approaches (see Pinto, Vogel, & Núñez, 2017): associative interpretations and
+#propositional interpretations. According to the associative approach, a link between
+#representations of a stimulus and the representation of an outcome is formed in a relatively
+#automatic way and without much cognitive control. In contrast, the propositional approach
+#(e.g., Mitchell, De Houwer, & Lovibond, 2009) assumes that predictive learning is based on
+#effortful higher-order cognitive processes. Most likely, both associative and propositional
+#influences play a role (Pinto et al., 2017). 
+```
 
 # References

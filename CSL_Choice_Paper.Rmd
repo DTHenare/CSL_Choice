@@ -254,11 +254,19 @@ EEG activity was recorded continuously at 1000Hz using Brain Products 64 channel
 
 ## EEG processing
 
-EEG data was processed using the EEGLAB toolbox in MATLAB. First, data were segmented into 700ms epochs (-200 to 500ms around each search or learn display) and baselined so that the average of the prestimulus period was set to zero for each event. For artifact rejection a HEOG channel was created by taking the voltage difference between the electrodes on the outer canthi of each eye, and a VEOG was created by taking the voltage difference between the electrodes above and below the left eye. These channels were filtered using a lowpass value of 35Hz in order to reduce false positives, and then trials containing either +/- 35mV in the HEOG channel (within 300ms post stimulus presentation) or +/- 80mV in the VEOG channel were removed. Trials containing +/- 80mv in the channels of interest were also removed and the data was average referenced. Left hemisphere (PO3,PO7) and right hemisphere (PO4,PO8) pools were created.
+EEG data was processed using the EEGLAB toolbox in MATLAB. First, data were segmented into 700ms epochs (-200 to 500ms around each search or learn display) and baselined so that the average of the prestimulus period was set to zero for each event. For artifact rejection a HEOG channel was created by taking the voltage difference between the electrodes on the outer canthi of each eye, and a VEOG was created by taking the voltage difference between the electrodes above and below the left eye. These channels were filtered using a lowpass value of 35Hz in order to reduce false positives, and then trials containing either +/- 35mV in the HEOG channel (within 300ms post stimulus presentation) or +/- 80mV in the VEOG channel were removed. Trials containing +/- 80mv in the channels of interest (PO3, PO7, PO4, and PO8) were also removed and the data were referenced to the average of all channels. Left hemisphere channels (PO3,PO7) were averaged together, and right hemisphere channels (PO4,PO8) were averaged together so that contralateral and ipsilateral ERPs could be calculated for each condition.
 
 ## Statistical analysis
 
+### Behavioural analyses
 
+For behavioural analyses we removed any participant whose switch rate for the two tasks was below 0.2, and we removed trials with incorrect responses and abnormally long reaction times (greater than 2.5 standard deviations above the mean, calculated separately for each participant). For analyses where response time is the dependent variable, we also removed trials with incorrect responses. For the categorisation task, independent samples t tests were used to test for differences betweeen participants assigned to the shape group and participants assigned to the colour group. This was performed for both accuracy and response times. For the search task, we used a mixed 2x3 ANOVA where trial type (target only vs target and distractor) was the within-subjects factor, and group (colour vs. shape) was the between-subjects factor. This was performed once with accuracy as the dependent variable and once with repsonse time as the dependent variable. To follow-up the effect of distractor cost we subtracted repsonse times in the target and distractor trials from the target only trial for each participant and ran an independent samples t test to compare distractor cost between the colour and shape group.
+
+### ERP analyses
+
+For the categorisatoin task, participants were excluded if less than 70% of the trials remained in the categorisation task (equivalent to an average of 202 trials remaining in each condition) or if their switch rate between the tasks was less than 0.2. We performed a set of mixed 2x2 ANOVAS where hemisphere (contralateral vs. ipsilateral) was the within-subject factor and group (colour vs. shape) was the between-subject factor.  This was performed with each of the following as the independent variable: NT amplitude in the lateralised shape trials, PD amplitude in the lateralised shape trials, NT amplitude in the lateralise colour trials, and PD amplitude in the lateralised colour trials.
+
+For the search task, trials without a lateralised stimulus were removed, and participants were excluded if less than 85% of trials remained in the search task after artifact rejection (equivalent to an average of 163 trials remaining in each condition) or if their switch rate between the tasks was less than 0.2. We performed a set of mixed 2x2 ANOVAS where hemisphere (contralateral vs. ipsilateral) was the within-subject factor and group (colour vs. shape) was the between-subject factor. This was performed with each of the following as the independent variable: NT amplitude in the target only trials, NT amplitude for the target in the target and distractor trials, ND for the distractor in the target and distractor trials, and PD for the distractor in the target and distractor trials.
 
 # Results
 ```{r exclusion criteria}
@@ -346,7 +354,7 @@ t.out = t.test(catRT$RT[catRT$Group == "Colour"],catRT$RT[catRT$Group == "Shape"
 catRT.res = apa_print(t.out)
 ```
 
-In the categorisation task, we see now significant difference between the shape group and the colour group for response times (`r catAcc.res$full_result`) and accuracy (`r catRT.res$full_result`).
+In the categorisation task, we see no significant difference between the shape group and the colour group for response times (`r catAcc.res$full_result`) and accuracy (`r catRT.res$full_result`).
 
 ### Search task
 
@@ -387,8 +395,6 @@ distCost <- behavData %>%
 t.out = t.test(distCost$DistInt[distCost$Group == "Colour"],distCost$DistInt[distCost$Group == "Shape"])
 intEffectTTest = apa_print(t.out)
 ```
-
-In order to test for the effect of selection history when top-down control was maximised, we evaluated the effect of group assignment in the categorisation on performance in the search task. First, we removed trials with incorrect responses and abnormally long reaction times (greater than 2.5 standard deviations above the mean, calculated separately for each participant). At this point, we calculated distractor cost by taking the difference in response times between the target only trials and the distractor present trials.
 
 Our results failed to detect a significant main effect of group (`r searchAcc.res$full_result$Group`) or trial type (`r searchAcc.res$full_result$TrialType`) on accuracy, and there was no significant interaction between group and trial type (`r searchAcc.res$full_result$Group_TrialType`). We also fail to detect a significant effect of group on response times (`r searchRT.res$full_result$Group`), however we do observe a significant main effect of trial type (`r searchRT.res$full_result$TrialType`), and a significant interaction between group and trial type (`r searchRT.res$full_result$Group_TrialType`). Follow-up tests reveal that participants respond significantly slower when a distractor is present in the search display, and this is true in both the colour group (`r searchRT.fup$full_result$TD_Tonly_Colour`) and the shape group (`r searchRT.fup$full_result$TD_Tonly_Shape`). However, this effect appears to be larger for the colour group and when this is tested directly using an independent samples t-test, the results show that distractor cost is indeed significantly larger for the colour group than the shape group (`r intEffectTTest$full_result`). The effect of group assignment on distractor cost is shown in figure\ \@ref(fig:DistIntViolin).
 
@@ -588,7 +594,7 @@ allData %>%
 ```{r learnStats, echo=FALSE, include = FALSE}
 learnNtShape <- allData %>%
   mutate(sample = sample*srateMultiplier-baseline) %>%
-  filter(Event == "Learn" & learnRej == 0 & sample>NtStart & sample < NtEnd & Object == "Lat. Shape") %>%
+  filter(Event == "Learn" & learnRej == 0 & sample>NtStart & sample < NtEnd & Object == "Lat. Shape", switchRate>minSwitchRate) %>%
   group_by(Object,Subject,Contra,Group) %>%
   summarise(mV = mean(voltage))
 learn.NtShape.aov <- aov_ez(
@@ -608,7 +614,7 @@ t.test(diffDirect$difference[diffDirect$Group == "Shape"], diffDirect$difference
 
 learnNtCol <- allData %>%
   mutate(sample = sample*srateMultiplier-baseline) %>%
-  filter(Event == "Learn" & learnRej == 0 & sample>NtStart & sample < NtEnd & Object == "Lat. Colour") %>%
+  filter(Event == "Learn" & learnRej == 0 & sample>NtStart & sample < NtEnd & Object == "Lat. Colour", switchRate>minSwitchRate) %>%
   group_by(Object,Subject,Contra,Group) %>%
   summarise(mV = mean(voltage))
 learn.NtCol.aov <- aov_ez(
@@ -628,7 +634,7 @@ t.test(diffDirect$difference[diffDirect$Group == "Shape"], diffDirect$difference
 
 learnPdShape <- allData %>%
   mutate(sample = sample*4-baseline) %>%
-  filter(Event == "Learn" & learnRej == 0 & sample>PdStart & sample < PdEnd & Object == "Lat. Shape") %>%
+  filter(Event == "Learn" & learnRej == 0 & sample>PdStart & sample < PdEnd & Object == "Lat. Shape", switchRate>minSwitchRate) %>%
   group_by(Object,Subject,Contra,Group) %>%
   summarise(mV = mean(voltage))
 learn.PdShape.aov <- aov_ez(
@@ -642,7 +648,7 @@ learn.PdShape.results <- apa_print(learn.PdShape.aov)
 
 learnPdCol <- allData %>%
   mutate(sample = sample*srateMultiplier-baseline) %>%
-  filter(Event == "Learn" & learnRej == 0 & sample>PdStart & sample < PdEnd & Object == "Lat. Colour") %>%
+  filter(Event == "Learn" & learnRej == 0 & sample>PdStart & sample < PdEnd & Object == "Lat. Colour", switchRate>minSwitchRate) %>%
   group_by(Object,Subject,Contra,Group) %>%
   summarise(mV = mean(voltage))
 learn.PdCol.aov <- aov_ez(

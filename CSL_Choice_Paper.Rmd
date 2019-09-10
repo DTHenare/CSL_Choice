@@ -936,11 +936,108 @@ behavData %>%
   lims(y=c(0,100))
 ```
 
-Participants were also informed to attempt to keep the task selection balanced at around 50% search and 50% choice trials throughout the experiment. In order to test for this we calculated task choice across the task. This is shown in figure\ \@ref(fig:choseSearch)
+Participants were also informed to attempt to keep the task selection balanced at around 50% search and 50% choice trials throughout the experiment. In order to measure this we calculated task choice across the task and show that participants typically succeeded in maintaining approximately 50% of each trial across the task. This is shown in figure\ \@ref(fig:choseSearch).
+
+### Choice response time
+
+```{r choiceRT}
+choiceRT.dat <- behavData %>%
+  filter(switchRate > minSwitchRate,CompSearch.RT < compCutoff | LearnSearch.RT < learnCutoff, Choice1.RT>0) %>%
+  group_by(Subject,Group, repswitch) %>%
+  summarise(mean = mean(Choice1.RT))
+choiceRT.stat <- aov_ez(
+  data = choiceRT.dat,
+  dv = "mean",
+  id = "Subject", 
+  within = c("repswitch"),
+  between = "Group"
+)
+choiceRT.res <- apa_print(choiceRT.stat)
+choiceRT.fup <- apa_print.emmGrid(pairs(emmeans(choiceRT.stat, ~repswitch|Group)))
+
+```
+
+A 2x2 ANOVA was performed in order to evaluate the effect of decision (repeat vs switch) and group (colour vs shape) on the time taken to make a task choice. Results show no significant main effects of Group (F(1, 21) = 0.02, MSE = 11, 994.94, p = .900, ηˆ2 G = .000) and decision (F(1.03, 21.69) = 28.70, MSE = 9, 634.54, p < .001, ηˆ2 G = .383), as well as no significant interaction between group and decision (F(1.03, 21.69) = 0.01, MSE = 9, 634.54, p = .921, ηˆ2 G = .000)
+
+```{r choiceRTPlot}
+choiceRTAvg <- behavData %>%
+  filter(switchRate > minSwitchRate, Choice1.RT>0) %>%
+  group_by(Group, repswitch) %>%
+  summarise(mean = mean(Choice1.RT))
+behavData %>%
+  filter(switchRate > minSwitchRate, Choice1.RT>0) %>%
+  group_by(Subject,Group, repswitch) %>%
+  summarise(mean = mean(Choice1.RT)) %>%
+  ggplot(aes(x = repswitch, y = mean)) +
+  geom_point(aes(colour = Group), size = 2, alpha = 0.5) +
+  geom_line(aes(x=repswitch, y = mean, colour = Group, group = Subject), alpha = 0.5) +
+  geom_point(data = choiceRTAvg, size =3.5) +
+  facet_grid(.~Group) +
+  scale_color_manual(values=c("green4", "gray42")) +
+  lims(y = c(0,500)) +
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        panel.background = element_blank(),
+        axis.line = element_line(colour = "black"),
+        #axis.text.x = element_blank(),
+        axis.title.x = element_blank(),
+        axis.ticks = element_blank(),
+        #strip.text.x = element_blank(),
+        strip.background = element_rect(fill = "white"),
+        legend.position = "none",
+        text= element_text(size=18)
+        )
+```
 
 ### Switch Rates
 
-### Sitch Costs
+```{r switchRateStats}
+switch <- behavData %>%
+  filter(switchRate > minSwitchRate,CompSearch.RT < compCutoff | LearnSearch.RT < learnCutoff) %>%
+  summarise(mean = mean(SwitchCount))
+SR <- behavData %>%
+  filter(switchRate > minSwitchRate,CompSearch.RT < compCutoff | LearnSearch.RT < learnCutoff) %>%
+  group_by(Subject,Group) %>%
+  summarise(mean = mean(SwitchCount))
+shapeSR.t <- t.test(SR$mean[SR$Group=="Shape"], mu = 0.5)
+shapeSR.res <- apa_print(shapeSR.t)
+colourSR.t <- t.test(SR$mean[SR$Group=="Colour"], mu = 0.5)
+colourSR.res <- apa_print(colourSR.t)
+comparisonSR = t.test(SR$mean[SR$Group=="Colour"],SR$mean[SR$Group=="Shape"], alternative = "less")
+comparisonSR.res = apa_print(comparisonSR)
+```
+
+Participants in the task were encouraged to try to make their task selections as random as possible which would produce a switch rate of 50%, however average switch rate across all participants was `r as.character(round(switch$mean, digits = 2))`%. Analysis of the voluntary task choice shows that while participants in the shape group showed no significant deviation from a switch rate of 50% (`r shapeSR.res$full_result`), participants in the colour group showed a significant repetiton bias (`r colourSR.res$full_result`). When we directly tested whether switch rates in the colour group were lower than the shape group we also see a significant difference (`r comparisonSR.res$full_result`). Switch rates are shown in figure\ \@ref(fig:SwitchRateViolin).
+
+(ref:SRPlot) Voluntary switch rates for each individual separated by group assignment. A switch rate of 50% is the expected switch rate when participants are randomly selecting the task on each trial as instructed. This point has been marked with a horizontal line for reference.
+
+```{r SwitchRateViolin, fig.cap = "(ref:SRPlot)"}
+behavData %>%
+  filter(switchRate > minSwitchRate,CompSearch.RT < compCutoff | LearnSearch.RT < learnCutoff) %>%
+  mutate(GroupNum = as.integer(Group)) %>%
+  group_by(Subject,Group, GroupNum) %>%
+  summarise(mean = mean(SwitchCount)*100) %>%
+  ggplot( aes(x = GroupNum, y = mean, fill = Group)) +
+  geom_hline(aes(yintercept=50), size = 1.5, linetype="dashed") +
+  geom_flat_violin(aes(fill = Group),position = position_nudge(x = .1, y = 0), adjust = 1.5, trim = FALSE, alpha = .5, colour = NA) +
+  geom_point(aes(x = GroupNum-0.15, y = mean, colour = Group),position = position_jitter(width = .05), size = 4, shape = 20) +
+  geom_boxplot(aes(x = GroupNum, y = mean, fill = Group),outlier.shape = NA, alpha = .5, width = .1, colour = "black") +
+  scale_color_manual(values=c("green4", "gray42")) +
+  scale_fill_manual(values=c("green4", "gray42")) +
+  labs(y = "Switch Rate (%)") +
+  lims(y=c(0,100)) +
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        panel.background = element_blank(),
+        axis.line = element_line(colour = "black"),
+        axis.text.x = element_blank(),
+        axis.title.x = element_blank(),
+        axis.ticks = element_blank(),
+        text= element_text(size=18)
+        )
+```
+
+### Switch Costs
 
 # Discussion
 

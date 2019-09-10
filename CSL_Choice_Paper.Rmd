@@ -273,7 +273,9 @@ For the search task, trials without a lateralised stimulus were removed, and par
 minSwitchRate = 0.2
 ```
 
-## Behavioral results
+##Selection History
+
+### Behavioral results
 ```{r loadBehavData}
 groupInfo = read.csv(file="BehaviouralData.csv")
 #Load all data
@@ -332,7 +334,7 @@ autoCor %>%
 t.test(autoCor$Cor[autoCor$Group=="Colour"],autoCor$Cor[autoCor$Group=="Shape"], paired = FALSE)
 ```
 
-### Categorisation task
+#### Categorisation task
 
 ```{r, categorisationStats, include = FALSE}
 
@@ -356,7 +358,7 @@ catRT.res = apa_print(t.out)
 
 In the categorisation task, we see no significant difference between the shape group and the colour group for response times (`r catAcc.res$full_result`) and accuracy (`r catRT.res$full_result`).
 
-### Search task
+#### Search task
 
 ```{r, SearchStats}
 searchAcc <- behavData %>%
@@ -431,7 +433,7 @@ rm(behavData, colourBehav, GeomFlatViolin, GeomSplitViolin, groupInfo,intEffectT
 gc()
 ```
 
-## ERP results
+### ERP results
 
 ```{r organiseData}
 dPath = 'CSL_Visuals/'
@@ -539,11 +541,7 @@ for (i in unique(allData$Subject)) {
 }
 ```
 
-## Task switching
-
-
-
-### Categorization task
+#### Categorization task
 
 ```{r}
 grandTarget <- allData %>%
@@ -667,11 +665,11 @@ learn.PdCol.results <- apa_print(learn.PdCol.aov)
 
 In the categorisation task, our ERP analyses focused on the lateralised response to each object (either the shape singleton or the colour singleton). For each ERP there were two time windows of interest, the Nt time window (`r sprintf("%i to %ims", NtStart, NtEnd)`) and the Pd time window (`r sprintf("%i to %ims", PdStart, PdEnd)`). See figure\ \@ref(fig:makeLearnPlots).
 
-#### Colour singleton response
+##### Colour singleton response
 
 When focussing on the lateralised response to a colour singleton in the NT time range, we see no significant main effects of either group (`r learn.NtCol.results$full$Group`) or hemisphere (`r learn.NtCol.results$full$Contra`), however we do see a significant interaction between group and hemisphere (`r learn.NtCol.results$full$Group_Contra`). Follow-up comparisons reveal that for participants in the colour group, a lateralised colour singleton elicits a significant NT component (`r learn.NtCol.fup$full_result$Contralateral_Ipsilateral_Colour`), whereas for participants in the shape group a significant lateralised positivity is elicited by the colour singleton (`r learn.NtCol.fup$full_result$Contralateral_Ipsilateral_Shape`). When evaluating the PD time range, we observe no main effects of group(`r learn.PdCol.results$full$Group`) or hemisphere (`r learn.PdCol.results$full$Contra`), and no interaction between group and hemisphere (`r learn.PdCol.results$full$Group_Contra`).
 
-#### Shape singleton response
+##### Shape singleton response
 
 When focussing on the lateralised response to a shape singleton in the NT time range, we again see no significant main effects of either group (`r learn.NtShape.results$full$Group`) or hemisphere (`r learn.NtShape.results$full$Contra`), however we do see a significant interaction between group and hemisphere (`r learn.NtShape.results$full$Group_Contra`). Follow-up comparisons reveal that for participants in the shape group, a lateralised shape singleton elicits a significant NT component (`r learn.NtShape.fup$full_result$Contralateral_Ipsilateral_Shape`), whereas for participants in the colour group a significant lateralised positivity is elicited by the shape singleton (`r learn.NtShape.fup$full_result$Contralateral_Ipsilateral_Colour`).  When evaluating the PD time range, we observe no main effects of group(`r learn.PdShape.results$full$Group`) or hemisphere (`r learn.PdShape.results$full$Contra`), and no interaction between group and hemisphere (`r learn.PdShape.results$full$Group_Contra`).
 
@@ -723,7 +721,7 @@ allData %>%
 ggsave("LearnSubtracted.pdf", dpi = 300, width = 30, height = 20, units = c("cm"))
 ```
 
-### Search task
+#### Search task
 
 ```{r}
 grandTarget <- allData %>%
@@ -848,15 +846,15 @@ PdDTdiff <- apa_print(t.test(diffDirect$difference[diffDirect$Group == "Colour"]
 
 Next we focused on the lateralised response to stimuli in the search displays as a function of group assignment. Evidence for the effect of selection history would again come from the interaction between group and lateralised ERP activity.
 
-#### Target response - Distractor absent trials
+##### Target response - Distractor absent trials
 
 In the target only displays there was a significant main effect of hemisphere where the contralateral response is more negative than the ipsilateral response (`r search.NtTO.results$full$Contra`), but no siginificant main effect of group (`r search.NtTO.results$full$Group`), and no interaction between group and hemisphere (`r search.NtTO.results$full$Group_Contra`).
 
-#### Target response - Distractor present trials
+##### Target response - Distractor present trials
 
 Results for the lateralised target in the presence of a distractor showed no significant main effect of group (`r search.NtTD.results$full$Group`), however there was a significant main effect of hemisphere (`r search.NtTD.results$full$Contra`), as well as a significant interaction between group and hemisphere (`r search.NtTD.results$full$Group_Contra`). Follow-up comparisons reveal that a significant NT was elicited for participants in both the colour (`r search.NtTD.fup$full_result$Contralateral_Ipsilateral_Colour`) and shape group (`r search.NtTD.fup$full_result$Contralateral_Ipsilateral_Colour`). When NT amplitude is compared directly with an independent samples t test, the results show that the NT is significantly larger for the shape group than the colour group (`r NtTDdiff$full_result`).
 
-#### Distractor response
+##### Distractor response
 
 For the lateralised distractor response, results of the NT time range shoewd no significant main effect of group(`r search.NtDT.results$full$Group`), no significant main effect of hemisphere (`r search.NtDT.results$full$Contra`), and no interaction between group and hemisphere (`r search.NtDT.results$full$Group_Contra`).
 
@@ -917,6 +915,15 @@ allData %>%
           )
 ggsave("SearchSubtracted.pdf", dpi = 300, width = 30, height = 40, units = c("cm"))
 ```
+
+
+## Task Selection
+
+### Task Choice
+
+### Switch Rates
+
+### Sitch Costs
 
 # Discussion
 

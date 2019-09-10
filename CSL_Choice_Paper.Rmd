@@ -921,6 +921,23 @@ ggsave("SearchSubtracted.pdf", dpi = 300, width = 30, height = 40, units = c("cm
 
 ### Task Choice
 
+(ref:choseSearchPlot) Proportion of search trials chosen by each individual across blocks throughout the experiment. Colour differentiates subjects in the shape and colour group. (lines have been smoothed with a loess function for visualisation)
+
+```{r choseSearch, fig.cap = "(ref:choseSearchPlot)"}
+behavData %>%
+  filter(switchRate > minSwitchRate,CompSearch.RT < compCutoff | LearnSearch.RT < learnCutoff) %>%
+  group_by(Block, Subject, Group) %>%
+  mutate(choseSearch = ifelse(is.na(Compound),0,1)) %>%
+  summarise(percentSearch = mean(choseSearch)*100) %>%
+  ggplot(aes(x=Block, y=percentSearch, colour = Group, group = Subject)) +
+  geom_smooth(se = FALSE, alpha = 0.75) +
+  scale_color_manual(values=c("green4", "gray42")) +
+  labs(y = "Percentage of search trials chosen") +
+  lims(y=c(0,100))
+```
+
+Participants were also informed to attempt to keep the task selection balanced at around 50% search and 50% choice trials throughout the experiment. In order to test for this we calculated task choice across the task. This is shown in figure\ \@ref(fig:choseSearch)
+
 ### Switch Rates
 
 ### Sitch Costs

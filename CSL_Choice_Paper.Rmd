@@ -65,6 +65,7 @@ library(papaja)
 library(png)
 library(grid)
 library(emmeans)
+library(gridExtra)
 #colour, grey, center, categorisation, lateralisation, distractor
 ```
 
@@ -1039,6 +1040,74 @@ behavData %>%
 
 ### Switch Costs
 
+
+```{r switchCostsPlot}
+switchCost.se <- behavData %>%
+filter(Procedure.Trial. == "TaskC") %>%
+filter(switchRate > minSwitchRate,CompSearch.RT < compCutoff | LearnSearch.RT < learnCutoff) %>%
+mutate(respTime = ifelse(!is.na(CompSearch.RT),CompSearch.RT,LearnSearch.RT), SwitchCount = ifelse(SwitchCount == 1, "Switch", "Rep")) %>%
+group_by(Subject, Group, SwitchCount) %>%
+summarise(RT = mean(respTime)) %>%
+group_by(Group, SwitchCount) %>%
+summarise(se = sd(RT)/sqrt(length(unique(Subject))),RT = mean(RT))
+plot1 <- behavData %>%
+filter(Procedure.Trial. == "TaskC") %>%
+filter(switchRate > minSwitchRate,CompSearch.RT < compCutoff | LearnSearch.RT < learnCutoff) %>%
+mutate(respTime = ifelse(!is.na(CompSearch.RT),CompSearch.RT,LearnSearch.RT), SwitchCount = ifelse(SwitchCount == 1, "Switch", "Rep")) %>%
+group_by(Group, SwitchCount) %>%
+summarise(RT = mean(respTime)) %>%
+ggplot(aes(x=SwitchCount, y=RT, fill = Group)) +
+geom_bar(stat = "identity", alpha = 0.75) +
+geom_errorbar(data = switchCost.se, aes(ymin=RT-se, ymax=RT+se),width=.2) +
+facet_grid(.~Group) +
+scale_color_manual(values=c("green4", "gray42")) +
+scale_fill_manual(values=c("green4", "gray42")) +
+scale_y_continuous(expand = c(0, 0)) +
+labs(y = "Response time (ms)", x = "Search Task") +
+theme(panel.grid.major = element_blank(),
+panel.grid.minor = element_blank(),
+panel.background = element_blank(),
+axis.line = element_line(colour = "black"),
+#axis.title.x = element_text("Search Task"),
+axis.ticks = element_blank(),
+text= element_text(size=18),
+strip.background = element_blank(),
+legend.position = "none"
+)
+switchCost.se <- behavData %>%
+filter(Procedure.Trial. == "TaskL") %>%
+filter(switchRate > minSwitchRate,CompSearch.RT < compCutoff | LearnSearch.RT < learnCutoff) %>%
+mutate(respTime = ifelse(!is.na(CompSearch.RT),CompSearch.RT,LearnSearch.RT), SwitchCount = ifelse(SwitchCount == 1, "Switch", "Rep")) %>%
+group_by(Subject, Group, SwitchCount) %>%
+summarise(RT = mean(respTime)) %>%
+group_by(Group, SwitchCount) %>%
+summarise(se = sd(RT)/sqrt(length(unique(Subject))),RT = mean(RT))
+plot2 <- behavData %>%
+filter(Procedure.Trial. == "TaskL") %>%
+filter(switchRate > minSwitchRate,CompSearch.RT < compCutoff | LearnSearch.RT < learnCutoff) %>%
+mutate(respTime = ifelse(!is.na(CompSearch.RT),CompSearch.RT,LearnSearch.RT), SwitchCount = ifelse(SwitchCount == 1, "Switch", "Rep")) %>%
+group_by(Group, SwitchCount) %>%
+summarise(RT = mean(respTime)) %>%
+ggplot(aes(x=SwitchCount, y=RT, fill = Group)) +
+geom_bar(stat = "identity", alpha = 0.75) +
+geom_errorbar(data = switchCost.se, aes(ymin=RT-se, ymax=RT+se),width=.2) +
+facet_grid(.~Group) +
+scale_color_manual(values=c("green4", "gray42")) +
+scale_fill_manual(values=c("green4", "gray42")) +
+scale_y_continuous(expand = c(0, 0)) +
+labs(y = "Response time (ms)", x = "Learn Task") +
+theme(panel.grid.major = element_blank(),
+panel.grid.minor = element_blank(),
+panel.background = element_blank(),
+axis.line = element_line(colour = "black"),
+axis.title.y = element_text(colour = "white"),
+axis.ticks = element_blank(),
+text= element_text(size=18),
+strip.background = element_blank(),
+legend.position = "none"
+)
+grid.arrange(plot1,plot2, ncol = 2, nrow = 1)
+```
 # Discussion
 
 Previous research has established that an individual's learning history biases their attention during visual search, even when that learning history is task irrelevant and impairs search performance. In this study, we aimed to test whether the effects of learning history on attention guidance can be eliminated in situations where top-down control is maximised. To this end, we used a voluntary task selection design which allowed participants to decide which task they would like to perform on each trial. The results showed that learning history continues to bias attention during visual search leading to impaired target selection and an increased need for distractor suppression. These effects are reflected both in response times as increased distractor costs, and in lateralised ERP components as simultaneous attenuation of the NT component and increase of the PD component.

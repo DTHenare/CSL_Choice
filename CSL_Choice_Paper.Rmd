@@ -430,7 +430,7 @@ behavData %>%
 
 
 ```{r, include = FALSE}
-rm(behavData, colourBehav, GeomFlatViolin, GeomSplitViolin, groupInfo,intEffectTTest,shapeBehav,t.out, geom_flat_violin,geom_split_violin)
+rm( colourBehav, groupInfo,intEffectTTest,shapeBehav,t.out)
 gc()
 ```
 
@@ -958,7 +958,7 @@ choiceRT.fup <- apa_print.emmGrid(pairs(emmeans(choiceRT.stat, ~repswitch|Group)
 
 ```
 
-A 2x2 ANOVA was performed in order to evaluate the effect of decision (repeat vs switch) and group (colour vs shape) on the time taken to make a task choice. Results show no significant main effects of Group (F(1, 21) = 0.02, MSE = 11, 994.94, p = .900, ηˆ2 G = .000) and decision (F(1.03, 21.69) = 28.70, MSE = 9, 634.54, p < .001, ηˆ2 G = .383), as well as no significant interaction between group and decision (F(1.03, 21.69) = 0.01, MSE = 9, 634.54, p = .921, ηˆ2 G = .000)
+A 2x2 ANOVA was performed in order to evaluate the effect of decision (repeat vs switch) and group (colour vs shape) on the time taken to make a task choice. Results show no significant main effects of Group (`r choiceRT.res$full_result$Group`) and decision (`r choiceRT.res$full_result$repswitch`), as well as no significant interaction between group and decision (`r choiceRT.res$full_result$Group_repswitch`).
 
 ```{r choiceRTPlot}
 choiceRTAvg <- behavData %>%

@@ -45,7 +45,7 @@ mask              : no
 
 numbersection     : no
 class             : "man"
-output            : papaja::apa6_pdf
+output            : papaja::apa6_word
 
 ---
 
@@ -411,9 +411,9 @@ behavData %>%
   spread(TrialType, RT) %>%
   mutate(DistInt = TD-Tonly, GroupNum = as.integer(Group)) %>%
   ggplot( aes(x = GroupNum, y = DistInt, fill = Group)) +
-  geom_flat_violin(aes(fill = Group),position = position_nudge(x = .1, y = 0), adjust = 1.5, trim = FALSE, alpha = .5, colour = NA) +
+  geom_flat_violin(aes(fill = Group),position = position_nudge(x = .1, y = 0), adjust = 1.5, trim = FALSE, alpha = .75, colour = NA) +
   geom_point(aes(x = GroupNum-0.15, y = DistInt, colour = Group),position = position_jitter(width = .05), size = 4, shape = 20) +
-  geom_boxplot(aes(x = GroupNum, y = DistInt, fill = Group),outlier.shape = NA, alpha = .5, width = .1, colour = "black") +
+  geom_boxplot(aes(x = GroupNum, y = DistInt, fill = Group),outlier.shape = NA, alpha = .75, width = .1, colour = "black") +
   scale_color_manual(values=c("green4", "gray42")) +
   scale_fill_manual(values=c("green4", "gray42")) +
   labs(y = "Distractor Cost (ms)") +
@@ -958,9 +958,11 @@ choiceRT.fup <- apa_print.emmGrid(pairs(emmeans(choiceRT.stat, ~repswitch|Group)
 
 ```
 
-A 2x2 ANOVA was performed in order to evaluate the effect of decision (repeat vs switch) and group (colour vs shape) on the time taken to make a task choice. Results show no significant main effects of Group (`r choiceRT.res$full_result$Group`) and decision (`r choiceRT.res$full_result$repswitch`), as well as no significant interaction between group and decision (`r choiceRT.res$full_result$Group_repswitch`).
+A 2x2 ANOVA was performed in order to evaluate the effect of decision (repeat vs switch) and group (colour vs shape) on the time taken to make a task choice. Results (depicted in figure\ \@ref(fig:choiceRTPlot)) show no significant main effects of Group (`r choiceRT.res$full_result$Group`) and decision (`r choiceRT.res$full_result$repswitch`), as well as no significant interaction between group and decision (`r choiceRT.res$full_result$Group_repswitch`). Response times
 
-```{r choiceRTPlot}
+(ref:chRTPlot) Time taken for participants in each group to make their task selection at the start of each trial.
+
+```{r choiceRTPlot, fig.cap="(ref:chRTPlot)"}
 choiceRTAvg <- behavData %>%
   filter(switchRate > minSwitchRate, Choice1.RT>0) %>%
   group_by(Group, repswitch) %>%
@@ -971,11 +973,13 @@ behavData %>%
   summarise(mean = mean(Choice1.RT)) %>%
   ggplot(aes(x = repswitch, y = mean)) +
   geom_point(aes(colour = Group), size = 2, alpha = 0.5) +
-  geom_line(aes(x=repswitch, y = mean, colour = Group, group = Subject), alpha = 0.5) +
-  geom_point(data = choiceRTAvg, size =3.5) +
+  geom_line(aes(x=repswitch, y = mean, colour = Group, group = Subject), alpha = 0.3) +
+  geom_point(data = choiceRTAvg, aes(colour = Group),size = 5) +
+  geom_line(data = choiceRTAvg, aes(group = Group, colour = Group), size=2) +
   facet_grid(.~Group) +
   scale_color_manual(values=c("green4", "gray42")) +
-  lims(y = c(0,500)) +
+  scale_y_continuous(name = "Time taken for task choice (ms)",limits = c(0,500)) +
+  scale_x_discrete(labels = c("Repetition", "Switch")) +
   theme(panel.grid.major = element_blank(), 
         panel.grid.minor = element_blank(),
         panel.background = element_blank(),
@@ -1020,9 +1024,9 @@ behavData %>%
   summarise(mean = mean(SwitchCount)*100) %>%
   ggplot( aes(x = GroupNum, y = mean, fill = Group)) +
   geom_hline(aes(yintercept=50), size = 1.5, linetype="dashed") +
-  geom_flat_violin(aes(fill = Group),position = position_nudge(x = .1, y = 0), adjust = 1.5, trim = FALSE, alpha = .5, colour = NA) +
+  geom_flat_violin(aes(fill = Group),position = position_nudge(x = .1, y = 0), adjust = 1.5, trim = FALSE, alpha = .75, colour = NA) +
   geom_point(aes(x = GroupNum-0.15, y = mean, colour = Group),position = position_jitter(width = .05), size = 4, shape = 20) +
-  geom_boxplot(aes(x = GroupNum, y = mean, fill = Group),outlier.shape = NA, alpha = .5, width = .1, colour = "black") +
+  geom_boxplot(aes(x = GroupNum, y = mean, fill = Group),outlier.shape = NA, alpha = .75, width = .1, colour = "black") +
   scale_color_manual(values=c("green4", "gray42")) +
   scale_fill_manual(values=c("green4", "gray42")) +
   labs(y = "Switch Rate (%)") +
@@ -1040,8 +1044,46 @@ behavData %>%
 
 ### Switch Costs
 
+```{r switchCostStats}
+searchSC.dat <- behavData %>%
+filter(Procedure.Trial. == "TaskC") %>%
+filter(switchRate > minSwitchRate,CompSearch.RT < compCutoff | LearnSearch.RT < learnCutoff) %>%
+mutate(respTime = ifelse(!is.na(CompSearch.RT),CompSearch.RT,LearnSearch.RT), SwitchCount = ifelse(SwitchCount == 1, "Switch", "Rep")) %>%
+group_by(Subject, Group, SwitchCount) %>%
+summarise(RT = mean(respTime))
+searchSC.stat <- aov_ez(
+  data = searchSC.dat,
+  dv = "RT",
+  id = "Subject", 
+  within = c("SwitchCount"),
+  between = "Group"
+)
+searchSC.res <- apa_print(searchSC.stat)
 
-```{r switchCostsPlot}
+learnSC.dat <- behavData %>%
+filter(Procedure.Trial. == "TaskL") %>%
+filter(switchRate > minSwitchRate,CompSearch.RT < compCutoff | LearnSearch.RT < learnCutoff) %>%
+mutate(respTime = ifelse(!is.na(CompSearch.RT),CompSearch.RT,LearnSearch.RT), SwitchCount = ifelse(SwitchCount == 1, "Switch", "Rep")) %>%
+group_by(Subject, Group, SwitchCount) %>%
+summarise(RT = mean(respTime))
+learnSC.stat <- aov_ez(
+  data = learnSC.dat,
+  dv = "RT",
+  id = "Subject", 
+  within = c("SwitchCount"),
+  between = "Group"
+)
+learnSC.res <- apa_print(learnSC.stat)
+learnSC.fup <- apa_print.emmGrid(pairs(emmeans(learnSC.stat, ~SwitchCount|Group)))
+```
+
+We carried out a 2x2 ANOVA in order to evaluate the effect of decision (repeat vs switch) and Group (shape vs colour) on the response times to the search task displays. The results showed no significant main effect of group(`r searchSC.res$full_result$Group`), however there was a significant main effect of decision on response times where switching tasks resulted in a significant slowing of responses to the task display (`r searchSC.res$full_result$SwitchCount`). There was no significant interaction between group and decision(`r searchSC.res$full_result$Group_SwitchCount`).
+
+We also performed a 2x2 ANOVA in order to evaluate the effect of decision (repeat vs switch) and Group (shape vs colour) on the response times to the learning task displays. The results showed no significant main effect of Group (`r learnSC.res$full_result$Group`) , however there was a significant main effect of decision on response times where switching tasks resulted in a significant slowing of responses to the task display (`r learnSC.res$full_result$SwitchCount`). There was also a significant interaction between group and decision (`r learnSC.res$full_result$SwitchCount_Group`). When we follow up this interaction we see that there are significant switch costs for the colour group (`r learnSC.fup$full_result$Rep_Switch_Colour`) however we do not observe significant switch costs for participants in the shape group (`r learnSC.fup$full_result$Rep_Switch_Shape`). Switch costs for both groups in each task are shown in figure\ \@ref(fig:switchCostPlot).
+
+(ref:SCPlot) Response times for switch and repeat trials for both groups in each task. No significant switch costs are observed in the search task however in the learn task participants in the colour group show significant costs to response times in switch trials relative to repetition trials.
+
+```{r switchCostPlot, fig.cap= "(ref:SCPlot"}
 switchCost.se <- behavData %>%
 filter(Procedure.Trial. == "TaskC") %>%
 filter(switchRate > minSwitchRate,CompSearch.RT < compCutoff | LearnSearch.RT < learnCutoff) %>%

@@ -972,8 +972,8 @@ behavData %>%
   group_by(Subject,Group, repswitch) %>%
   summarise(mean = mean(Choice1.RT)) %>%
   ggplot(aes(x = repswitch, y = mean)) +
-  geom_point(aes(colour = Group), size = 2, alpha = 0.5) +
-  geom_line(aes(x=repswitch, y = mean, colour = Group, group = Subject), alpha = 0.3) +
+  geom_point(aes(colour = Group), size = 2, alpha = 0.3) +
+  geom_line(aes(colour = Group, group = Subject), alpha = 0.3) +
   geom_point(data = choiceRTAvg, aes(colour = Group),size = 5) +
   geom_line(data = choiceRTAvg, aes(group = Group, colour = Group), size=2) +
   facet_grid(.~Group) +
@@ -1083,7 +1083,7 @@ We also performed a 2x2 ANOVA in order to evaluate the effect of decision (repea
 
 (ref:SCPlot) Response times for switch and repeat trials for both groups in each task. No significant switch costs are observed in the search task however in the learn task participants in the colour group show significant costs to response times in switch trials relative to repetition trials.
 
-```{r switchCostPlot, fig.cap= "(ref:SCPlot"}
+```{r switchCostPlot, fig.cap= "(ref:SCPlot)"}
 switchCost.se <- behavData %>%
 filter(Procedure.Trial. == "TaskC") %>%
 filter(switchRate > minSwitchRate,CompSearch.RT < compCutoff | LearnSearch.RT < learnCutoff) %>%
@@ -1096,15 +1096,18 @@ plot1 <- behavData %>%
 filter(Procedure.Trial. == "TaskC") %>%
 filter(switchRate > minSwitchRate,CompSearch.RT < compCutoff | LearnSearch.RT < learnCutoff) %>%
 mutate(respTime = ifelse(!is.na(CompSearch.RT),CompSearch.RT,LearnSearch.RT), SwitchCount = ifelse(SwitchCount == 1, "Switch", "Rep")) %>%
-group_by(Group, SwitchCount) %>%
+group_by(Subject, Group, SwitchCount) %>%
 summarise(RT = mean(respTime)) %>%
 ggplot(aes(x=SwitchCount, y=RT, fill = Group)) +
-geom_bar(stat = "identity", alpha = 0.75) +
-geom_errorbar(data = switchCost.se, aes(ymin=RT-se, ymax=RT+se),width=.2) +
+geom_point(aes(colour = Group), size = 2, alpha = 0.3) +
+geom_line(aes(colour = Group, group = Subject), alpha = 0.3) +
+geom_point(data = switchCost.se, aes(colour = Group),size = 5) +
+geom_line(data = switchCost.se, aes(group = Group, colour = Group), size=2) +
 facet_grid(.~Group) +
 scale_color_manual(values=c("green4", "gray42")) +
 scale_fill_manual(values=c("green4", "gray42")) +
-scale_y_continuous(expand = c(0, 0)) +
+scale_y_continuous(limits = c(0,1100), expand = c(0, 0)) +
+scale_x_discrete(labels = c("Rep", "Switch")) +
 labs(y = "Response time (ms)", x = "Search Task") +
 theme(panel.grid.major = element_blank(),
 panel.grid.minor = element_blank(),
@@ -1128,15 +1131,18 @@ plot2 <- behavData %>%
 filter(Procedure.Trial. == "TaskL") %>%
 filter(switchRate > minSwitchRate,CompSearch.RT < compCutoff | LearnSearch.RT < learnCutoff) %>%
 mutate(respTime = ifelse(!is.na(CompSearch.RT),CompSearch.RT,LearnSearch.RT), SwitchCount = ifelse(SwitchCount == 1, "Switch", "Rep")) %>%
-group_by(Group, SwitchCount) %>%
+group_by(Subject, Group, SwitchCount) %>%
 summarise(RT = mean(respTime)) %>%
 ggplot(aes(x=SwitchCount, y=RT, fill = Group)) +
-geom_bar(stat = "identity", alpha = 0.75) +
-geom_errorbar(data = switchCost.se, aes(ymin=RT-se, ymax=RT+se),width=.2) +
+geom_point(aes(colour = Group), size = 2, alpha = 0.3) +
+geom_line(aes(colour = Group, group = Subject), alpha = 0.3) +
+geom_point(data = switchCost.se, aes(colour = Group),size = 5) +
+geom_line(data = switchCost.se, aes(group = Group, colour = Group), size=2) +
 facet_grid(.~Group) +
 scale_color_manual(values=c("green4", "gray42")) +
 scale_fill_manual(values=c("green4", "gray42")) +
-scale_y_continuous(expand = c(0, 0)) +
+scale_y_continuous(limits = c(0,1100), expand = c(0, 0)) +
+scale_x_discrete(labels = c("Rep", "Switch")) +
 labs(y = "Response time (ms)", x = "Learn Task") +
 theme(panel.grid.major = element_blank(),
 panel.grid.minor = element_blank(),
@@ -1150,6 +1156,7 @@ legend.position = "none"
 )
 grid.arrange(plot1,plot2, ncol = 2, nrow = 1)
 ```
+
 # Discussion
 
 Previous research has established that an individual's learning history biases their attention during visual search, even when that learning history is task irrelevant and impairs search performance. In this study, we aimed to test whether the effects of learning history on attention guidance can be eliminated in situations where top-down control is maximised. To this end, we used a voluntary task selection design which allowed participants to decide which task they would like to perform on each trial. The results showed that learning history continues to bias attention during visual search leading to impaired target selection and an increased need for distractor suppression. These effects are reflected both in response times as increased distractor costs, and in lateralised ERP components as simultaneous attenuation of the NT component and increase of the PD component.

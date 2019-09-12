@@ -349,7 +349,6 @@ acc.stat <- aov_ez(
   between = "Group"
 )
 acc.res <- apa_print(acc.stat)
-acc.fup <- apa_print.emmGrid(pairs(emmeans(acc.stat, ~SwitchCount|Group)))
 
 rt <- behavData %>%
   filter(switchRate>minSwitchRate, LearnSearch.RT < learnCutoff | CompSearch.RT < compCutoff, LearnSearch.ACC==1 | CompSearch.ACC==1) %>%

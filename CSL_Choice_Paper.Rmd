@@ -45,7 +45,7 @@ mask              : no
 
 numbersection     : no
 class             : "man"
-output            : papaja::apa6_word
+output            : papaja::apa6_pdf
 
 ---
 
@@ -216,7 +216,7 @@ Recently, methodological developments have allowed for even more specific measur
 
 Specific measures of attentional selection and suppression have provided increased specificity of the role that selection history plays in the orienting of attention. In a follow-up experiment @feldmann2015you adapted their task in order to allow for the dissociation of target and distractor processing. Their results showed that for participants who categorised based on colour in the categorisation task, the presentation of a coloured distractor in the search task elicited an ND (a lateralised negativity to distractors) followed by a relatively large PD (a lateralised positivity to distractors). This implies that for these participants, the colour distractor captured attention reflexively in the search task (reflected by ND) and therefore required increased subsequent suppression (reflected by increased PD). Participants who had learned to categorise based on shape however did not show this effect. The colour distractor in their case elicited no ND during search trials and a small PD, indexing a lack of attentional capture and decreased distractor suppression respectively.
 
-An open question remains as to whether increased top-down control can be used to attenuate, or eliminate the effects of selection history on attention. Previously, dual task investigations of the effect have attempted to enhance top-down control processes by providing cues to participants which inform them of which task they’re about to perform [@kadel2017selection]. While this allows participants to switch task sets in preparation for the upcoming trial, the effect of selection history on attention has remained suggesting that top-down control cannot be used to override the effects of selection history. However, recent work has suggested that these cues are insufficient for allowing participants to optimally engage top-down control before the trial begins @[kiesel2010control]. A novel approach to increasing top-down attentional control in dual tasks is the voluntary task-switching paradigm developed by @arrington2004cost. In this version of the task, participants are not cued as to what trial type will be performed next, but rather they are given the choice of which trial type they would like to perform next. Evidence suggests that the voluntary task switching paradigm allows for stronger proactive control over performance of each task [@arrington2005voluntary;@kang2014electrophysiological].
+An open question remains as to whether increased top-down control can be used to attenuate, or eliminate the effects of selection history on attention. Previously, dual task investigations of the effect have attempted to enhance top-down control processes by providing cues to participants which inform them of which task they’re about to perform [@kadel2017selection]. While this allows participants to switch task sets in preparation for the upcoming trial, the effect of selection history on attention has remained suggesting that top-down control cannot be used to override the effects of selection history. However, recent work has suggested that these cues are insufficient for allowing participants to optimally engage top-down control before the trial begins [@kiesel2010control]. A novel approach to increasing top-down attentional control in dual tasks is the voluntary task-switching paradigm developed by @arrington2004cost. In this version of the task, participants are not cued as to what trial type will be performed next, but rather they are given the choice of which trial type they would like to perform next. Evidence suggests that the voluntary task switching paradigm allows for stronger proactive control over performance of each task [@arrington2005voluntary;@kang2014electrophysiological].
 
 In the present study, we adapted the design of @feldmann2015you to a voluntary task switching paradigm in order to investigate the relationship between top-down control and selection history. By allowing participants to determine whether they would perform search or categorisation on the next trial, participants would be able to proactively engage the task set for the upcoming trial and exercise maximal top-down control. We also recorded EEG during their performance of the task and leveraged the procedure of @hickey2009electrophysiological to allow for the isolation of target and distractor activity. This approach provides specific measures of target selection, distractor capture, and distractor suppression during the task, and therefore provides a fine grained understanding of how top-down control interacts with selection history during attentional orienting. If increased top-down control is able to eliminate the effects of selection history, then we would expect to see distractor costs in the search task to be similar regardless of whether participants were assigned to the shape or colour group in the categorisation task. We would also expect that group assignment would not have differential effects on the lateralised ERP components elicited by stimuli in the search task. On the other hand, if top-down control cannot be used to override selection history effects then the effect of categorisation group assignment on distractor costs and ERP component amplitudes during search should remain.
 
@@ -448,14 +448,14 @@ behavData %>%
 ```
 
 
-```{r, echo = FALSE}
-rm( colourBehav, groupInfo,intEffectTTest,shapeBehav,t.out, acc, acc.res, acc.stat, autoCor, Cor, distCost, rt, rt.res, rt.stat, sData, searchAcc, searchAcc.aov, searchAcc.res, searchRT, searchRT.aov, searchRT.fup, searchRT.res, t.out, sub, subj)
+```{r, echo = FALSE, include = FALSE}
+rm( groupInfo,intEffectTTest, acc, acc.res, acc.stat, autoCor, Cor, distCost, rt, rt.res, rt.stat, sData, searchAcc, searchAcc.aov, searchAcc.res, searchRT, searchRT.aov, searchRT.fup, searchRT.res, t.out, sub, subj)
 gc()
 ```
 
 ### ERP results
 
-```{r organiseData}
+```{r organiseData, echo = FALSE, include = FALSE}
 dPath = 'CSL_Visuals/'
 fPrefix = 'N2pc'
 

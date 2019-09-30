@@ -232,7 +232,7 @@ Participants came in for two separate sessions and performed two different tasks
 
 ### Stimuli
 
-All stimuli presented during the categorisation and search trials were presented on a dark grey background and subtended 2.3 degrees of visual angle. A fixation cross (0.6 degrees) was located in the centre of the screen throughout the experiment in order to help participants maintain central fixation. The physical luminance of the grey, green, blue, and red stimulus colours was balanced using a luminance meter (Konica Minolta LS-100). Examples of the stimulus displays for each task are shown in figure\ \@ref(fig:stimDisplays).
+Each stimulus presented during the categorisation and search trials was presented on a dark grey background and subtended 2.3 degrees of visual angle. A fixation cross (0.6 degrees) was located in the centre of the screen throughout the experiment in order to help participants maintain central fixation. The physical luminance of the grey, green, blue, and red stimulus colours was balanced using a luminance meter (Konica Minolta LS-100). Examples of the stimulus displays for each task are shown in figure\ \@ref(fig:stimDisplays).
 
 (ref:stimDispFig) Example stimulus displays for the categorisation (A) and search tasks (B). In each display, one singleton is lateralised and the other is on the midline in order to allow for the calculation of EEG activity elicited by the lateral stimulus.
 
@@ -687,11 +687,11 @@ learn.PdCol.results <- apa_print(learn.PdCol.aov)
 
 In the categorisation task, our ERP analyses focused on the lateralised response to each object (either the shape singleton or the colour singleton). For each ERP there were two time windows of interest, the Nt time window (`r sprintf("%i to %ims", NtStart, NtEnd)`) and the Pd time window (`r sprintf("%i to %ims", PdStart, PdEnd)`). See figure\ \@ref(fig:makeLearnPlots). We performed a set of mixed 2x2 ANOVAS where hemisphere (contralateral vs. ipsilateral) was the within-subject factor and group (colour vs. shape) was the between-subject factor.  This was performed with each of the following as the independent variable: NT amplitude in the lateralised shape trials, PD amplitude in the lateralised shape trials, NT amplitude in the lateralised colour trials, and PD amplitude in the lateralised colour trials.
 
-##### Colour singleton response
+##### Lateral colour singleton, midline shape
 
 When focussing on the lateralised response to a colour singleton in the NT time range, we see no significant main effects of either group (`r learn.NtCol.results$full$Group`) or hemisphere (`r learn.NtCol.results$full$Contra`), however we do see a significant interaction between group and hemisphere (`r learn.NtCol.results$full$Group_Contra`). Follow-up comparisons reveal that for participants in the colour group, a lateralised colour singleton elicits a significant NT component (`r learn.NtCol.fup$full_result$Contralateral_Ipsilateral_Colour`), whereas for participants in the shape group a significant lateralised positivity is elicited by the colour singleton (`r learn.NtCol.fup$full_result$Contralateral_Ipsilateral_Shape`). When evaluating the PD time range, we observe no main effects of group(`r learn.PdCol.results$full$Group`) or hemisphere (`r learn.PdCol.results$full$Contra`), and no interaction between group and hemisphere (`r learn.PdCol.results$full$Group_Contra`).
 
-##### Shape singleton response
+##### Lateral shape singleton, midline colour
 
 When focussing on the lateralised response to a shape singleton in the NT time range, we again see no significant main effects of either group (`r learn.NtShape.results$full$Group`) or hemisphere (`r learn.NtShape.results$full$Contra`), however we do see a significant interaction between group and hemisphere (`r learn.NtShape.results$full$Group_Contra`). Follow-up comparisons reveal that for participants in the shape group, a lateralised shape singleton elicits a significant NT component (`r learn.NtShape.fup$full_result$Contralateral_Ipsilateral_Shape`), whereas for participants in the colour group a significant lateralised positivity is elicited by the shape singleton (`r learn.NtShape.fup$full_result$Contralateral_Ipsilateral_Colour`).  When evaluating the PD time range, we observe no main effects of group(`r learn.PdShape.results$full$Group`) or hemisphere (`r learn.PdShape.results$full$Contra`), and no interaction between group and hemisphere (`r learn.PdShape.results$full$Group_Contra`).
 

@@ -218,7 +218,7 @@ Specific measures of attentional selection and suppression have provided increas
 
 An open question remains as to whether increased top-down control can be used to attenuate, or eliminate the effects of selection history on attention. Previously, dual task investigations of the effect have attempted to enhance top-down control processes by providing cues to participants which inform them of which task they’re about to perform [@kadel2017selection]. While this allows participants to switch task sets in preparation for the upcoming trial, the effect of selection history on attention has remained suggesting that top-down control cannot be used to override the effects of selection history. However, recent work has suggested that these cues are insufficient for allowing participants to optimally engage top-down control before the trial begins [@kiesel2010control]. A novel approach to increasing top-down attentional control in dual tasks is the voluntary task-switching paradigm developed by @arrington2004cost. In this version of the task, participants are not cued as to what trial type will be performed next, but rather they are given the choice of which trial type they would like to perform next. Evidence suggests that the voluntary task switching paradigm allows for stronger proactive control over performance of each task [@arrington2005voluntary;@kang2014electrophysiological].
 
-Another advantage of voluntary task selection procedures is that the allow us to measure choice processes. 
+Another advantage of voluntary task selection procedures is that the allow us to measure choice processes and therefore give us insight into how this is affected by selection history. In their use of voluntary task selection, @arrington have shown that while participants are typically instructed to perform the two tasks in a random order, there are systematic patterns in task selection which demonstrate an
 
 In the present study, we adapted the design of @feldmann2015you to a voluntary task switching paradigm in order to investigate the relationship between top-down control and selection history. By allowing participants to determine whether they would perform search or categorisation on the next trial, participants would be able to proactively engage the task set for the upcoming trial and exercise maximal top-down control. We also recorded EEG during their performance of the task and leveraged the procedure of @hickey2009electrophysiological to allow for the isolation of target and distractor activity. This approach provides specific measures of target selection, distractor capture, and distractor suppression during the task, and therefore provides a fine grained understanding of how top-down control interacts with selection history during attentional orienting. If increased top-down control is able to eliminate the effects of selection history, then we would expect to see distractor costs in the search task to be similar regardless of whether participants were assigned to the shape or colour group in the categorisation task. We would also expect that group assignment would not have differential effects on the lateralised ERP components elicited by stimuli in the search task. On the other hand, if top-down control cannot be used to override selection history effects then the effect of categorisation group assignment on distractor costs and ERP component amplitudes during search should remain.
 
@@ -236,7 +236,7 @@ Participants came in for two separate sessions and performed two different tasks
 
 Each stimulus presented during the categorisation and search trials was presented on a dark grey background and subtended 2.3 degrees of visual angle. A fixation cross (0.6 degrees) was located in the centre of the screen throughout the experiment in order to help participants maintain central fixation. The physical luminance of the grey, green, blue, and red stimulus colours was balanced using a luminance meter (Konica Minolta LS-100). Examples of the stimulus displays for each task are shown in figure\ \@ref(fig:stimDisplays).
 
-(ref:stimDispFig) Example stimulus displays for the categorisation (A) and search tasks (B). In each display, one singleton is lateralised and the other is on the midline in order to allow for the calculation of EEG activity elicited by the lateral stimulus.
+(ref:stimDispFig) Example stimulus displays for the categorisation (A) and search tasks (B). In each display, one singleton is lateralised and the other is on the midline in order to allow for the calculation of EEG activity elicited by the lateral stimulus. Participants performed 1152 trials in total, 50% of these were required to be categorisation trials (half of each display type) and 50% were required to be search trials (one third of each display type).
 
 ```{r stimDisplays, fig.cap = "(ref:stimDispFig)"}
 include_graphics("Figures/CSL-Choice trial displays.jpg")
@@ -254,7 +254,7 @@ Search trials began with a 500 ms fixation cross in the center of the screen. Ei
 
 In session two, every trial began with a task selection screen where participants had to indicate using either their left or right thumbs, whether they would like to perform a categorisation or search trial. This screen stayed on until the participant response. Participants were asked to try to ensure that they distributed their choices evenly between the two options, and to try and make their choice random and unpredictable. Participants were required to perform 576 of each trial type and after every block of 32 trials, participants were shown a pictoral display indicating how many of each trial type was left for them to perform as well as some feedback about response times and accuracy. Examples of the full trial procedure and a between block feedback display are shown in figure\ \@ref(fig:trialProc).
 
-(ref:trialProcFig) Figure showing the trial procedure (A) and an example of the feedback display shown to participants between blocks (B).
+(ref:trialProcFig) Figure showing the trial procedure (A) where participants started each trial by selecting which of two tasks they would perform next. After a 500ms delay, their chosen task display was presented. In the case of a categorisation dosplay they would categorise eithe rthe shape of colour singleton (depending on group assignment) whereas in the search task all participants would respond to the orientation of the line within the shape singleton. An example of the feedback display (B) shown to participants between blocks which provides information about thepercentage of trials left for each task, as well as the number of blocks completed, average accuracy for each task, and average response time for each task, .
 
 ```{r trialProc, fig.cap = "(ref:trialProcFig)"}
 include_graphics("Figures/CSLChoice Trial Proc and interblock feedback.jpg")
@@ -286,6 +286,7 @@ minSwitchRate = 0.2
 ## Selection History
 
 ### Behavioral performance
+
 ```{r loadBehavData}
 groupInfo = read.csv(file="BehaviouralData.csv")
 #Load all data
@@ -422,7 +423,7 @@ For the search task, we used a mixed 2x2 ANOVA where trial type (target only vs 
 
 In the search task, our results failed to detect a significant main effect of group (`r searchAcc.res$full_result$Group`) or trial type (`r searchAcc.res$full_result$TrialType`) on accuracy, and there was no significant interaction between group and trial type (`r searchAcc.res$full_result$Group_TrialType`). We also fail to detect a significant main effect of group on response times (`r searchRT.res$full_result$Group`), however we do observe a significant main effect of trial type (`r searchRT.res$full_result$TrialType`), and a significant interaction between group and trial type (`r searchRT.res$full_result$Group_TrialType`). Follow-up tests reveal that participants respond significantly slower when a distractor is present in the search display, and this is true in both the colour group (`r searchRT.fup$full_result$TD_Tonly_Colour`) and the shape group (`r searchRT.fup$full_result$TD_Tonly_Shape`). However, this effect appears to be larger for the colour group and when it is tested directly using an independent samples t-test, the results show that distractor cost is indeed significantly larger for the colour group than the shape group (`r intEffectTTest$full_result`). The effect of group assignment on distractor cost is shown in figure\ \@ref(fig:DistIntViolin).
 
-(ref:behavDistInt) Violin plot showing the response time cost caused by a coloured distractor during visual search for both the shape and colour trained groups. 
+(ref:behavDistInt) Plot showing the response time cost caused by the presence of a coloured distractor during the search task for each group. Participants assigned to respond to colour in the categorisation task (shown in green) have significantly higher costs during the search task than participants assigned to repsond to shape in the categorisation task (shown in grey). Individual response time costs are depicted as dots alongside a boxplot and violin plot to visualise the range and distribution of costs for each group.
 
 ```{r DistIntViolin, fig.cap = "(ref:behavDistInt)"}
 behavData %>%
@@ -697,7 +698,7 @@ When focussing on the lateralised response to a colour singleton in the NT time 
 
 When focussing on the lateralised response to a shape singleton in the NT time range, we again see no significant main effects of either group (`r learn.NtShape.results$full$Group`) or hemisphere (`r learn.NtShape.results$full$Contra`), however we do see a significant interaction between group and hemisphere (`r learn.NtShape.results$full$Group_Contra`). Follow-up comparisons reveal that for participants in the shape group, a lateralised shape singleton elicits a significant NT component (`r learn.NtShape.fup$full_result$Contralateral_Ipsilateral_Shape`), whereas for participants in the colour group a significant lateralised positivity is elicited by the shape singleton (`r learn.NtShape.fup$full_result$Contralateral_Ipsilateral_Colour`).  When evaluating the PD time range, we observe no main effects of group(`r learn.PdShape.results$full$Group`) or hemisphere (`r learn.PdShape.results$full$Contra`), and no interaction between group and hemisphere (`r learn.PdShape.results$full$Group_Contra`).
 
-(ref:learnERPCap) Subtractracted ERPs showing the lateralised response to the shape singleton (top) and colour singleton (bottom) for each group in the categorization task. Example displays are shown for each ERP.
+(ref:learnERPCap) Subtractracted ERPs showing the lateralised response to displays in the categorization task. The top panel depicts the different neural responses elicited by a lateralised colour singleton for participants who are tasked with responding to the colour singleton (shown in green) versus those tasked with responding to the shape singleton (shown in grey). The bottom panel depicts the different neural responses elicited by a lateralised colour singleton, again separated by those in the colour group (green) and those in the shape group (grey).
 
 ```{r makeLearnPlots, fig.cap="(ref:learnERPCap)"}
 imgCol <- readPNG("learnCol.png")
@@ -1000,7 +1001,7 @@ choiceRT.fup <- apa_print.emmGrid(pairs(emmeans(choiceRT.stat, ~repswitch|Group)
 
 A 2x2 ANOVA was also performed in order to evaluate the effect of decision (repeat vs switch) and group (colour vs shape) on the time taken to make a task choice. Results (depicted in figure\ \@ref(fig:choiceRTPlot)) show no significant main effects of Group (`r choiceRT.res$full_result$Group`) and decision (`r choiceRT.res$full_result$repswitch`), as well as no significant interaction between group and decision (`r choiceRT.res$full_result$Group_repswitch`). 
 
-(ref:chRTPlot) Time taken for participants in each group to make their task selection at the start of each trial.
+(ref:chRTPlot) Time taken for participants in each group to make their task selection at the start of each trial. This is depicted separately for trials where they chose to switch task versus those where they chose to repeat the previous task. Think lines represent the group averages while thin lines represent individual data.
 
 ```{r choiceRTPlot, fig.cap="(ref:chRTPlot)"}
 choiceRTAvg <- behavData %>%
@@ -1054,7 +1055,7 @@ comparisonSR.res = apa_print(comparisonSR)
 
 Participants in the task were encouraged to try to make their task selections as random as possible which would produce a switch rate of 50%, however average switch rate across all participants was `r as.character(round(switch$mean*100, digits = 2))`%. Analysis of the voluntary task choice shows that while participants in the shape group showed no significant deviation from a switch rate of 50% (`r shapeSR.res$full_result`), participants in the colour group showed a significant repetiton bias (`r colourSR.res$full_result`). When we directly tested whether switch rates in the colour group were lower than the shape group we also see a significant difference (`r comparisonSR.res$full_result`). Switch rates are shown in figure\ \@ref(fig:SwitchRateViolin).
 
-(ref:SRPlot) Voluntary switch rates for each individual separated by group assignment. A switch rate of 50% is the expected switch rate when participants are randomly selecting the task on each trial as instructed. This point has been marked with a horizontal line for reference.
+(ref:SRPlot) Voluntary switch rates for each individual separated by group assignment. Dots show each individual's swithc rate alongside a boxplot and violin plot to display the range and distribution of switch rates. A switch rate of 50% is the expected switch rate when participants are randomly selecting the task on each trial as instructed. This point has been marked with a horizontal line for reference.
 
 ```{r SwitchRateViolin, fig.cap = "(ref:SRPlot)"}
 behavData %>%
@@ -1152,7 +1153,7 @@ geom_line(data = switchCost.se, aes(group = Group, colour = Group), size=2) +
 facet_grid(.~Group) +
 scale_colour_manual(values=c("green4", "gray42")) +
 scale_fill_manual(values=c("green4", "gray42")) +
-scale_y_continuous(limits = c(0,1100), expand = c(0, 0)) +
+scale_y_continuous(limits = c(250,1100), expand = c(0, 0)) +
 scale_x_discrete(labels = c("Rep", "Switch")) +
 labs(y = "Response time (ms)", x = "Search Task") +
 theme(panel.grid.major = element_blank(),
@@ -1187,7 +1188,7 @@ geom_line(data = switchCost.se, aes(group = Group, colour = Group), size=2) +
 facet_grid(.~Group) +
 scale_colour_manual(values=c("green4", "gray42")) +
 scale_fill_manual(values=c("green4", "gray42")) +
-scale_y_continuous(limits = c(0,1100), expand = c(0, 0)) +
+scale_y_continuous(limits = c(250,1100), expand = c(0, 0)) +
 scale_x_discrete(labels = c("Rep", "Switch")) +
 labs(y = "Response time (ms)", x = "Categorisation task") +
 theme(panel.grid.major = element_blank(),

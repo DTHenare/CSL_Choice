@@ -254,7 +254,7 @@ Search trials began with a 500 ms fixation cross in the center of the screen. Ei
 
 In session two, every trial began with a task selection screen where participants had to indicate using either their left or right thumbs, whether they would like to perform a categorisation or search trial. This screen stayed on until the participant response. Participants were asked to try to ensure that they distributed their choices evenly between the two options, and to try and make their choice random and unpredictable. Participants were required to perform 576 of each trial type and after every block of 32 trials, participants were shown a pictoral display indicating how many of each trial type was left for them to perform as well as some feedback about response times and accuracy. Examples of the full trial procedure and a between block feedback display are shown in figure\ \@ref(fig:trialProc).
 
-(ref:trialProcFig) Figure showing the trial procedure (A) where participants started each trial by selecting which of two tasks they would perform next. After a 500ms delay, their chosen task display was presented. In the case of a categorisation dosplay they would categorise eithe rthe shape of colour singleton (depending on group assignment) whereas in the search task all participants would respond to the orientation of the line within the shape singleton. An example of the feedback display (B) shown to participants between blocks which provides information about thepercentage of trials left for each task, as well as the number of blocks completed, average accuracy for each task, and average response time for each task, .
+(ref:trialProcFig) Figure showing the trial procedure (A) where participants started each trial by selecting which of two tasks they would perform next. After a 500ms delay, their chosen task display was presented. In the case of a categorisation dosplay they would categorise eithe rthe shape of colour singleton (depending on group assignment) whereas in the search task all participants would respond to the orientation of the line within the shape singleton. An example of the feedback display (B) shown to participants between blocks which provides information about the percentage of trials left for each task, as well as the number of blocks completed, average accuracy for each task, and average response time for each task.
 
 ```{r trialProc, fig.cap = "(ref:trialProcFig)"}
 include_graphics("Figures/CSLChoice Trial Proc and interblock feedback.jpg")
@@ -270,13 +270,19 @@ EEG data were processed using the EEGLAB toolbox in MATLAB. First, data were seg
 
 ## Statistical analysis
 
-### Behavioural analyses
+### Selection history
 
-For behavioural analyses we removed any participant whose switch rate was below 0.2, and we removed trials with abnormally long reaction times (greater than 2.5 standard deviations above the mean, calculated separately for each participant). For analyses where response time is the dependent variable, we also removed trials with incorrect responses.
+#### Behavioural analyses
 
-### ERP analyses
+For behavioural analyses we removed any participant whose switch rate was below 0.2 (resulting in the removal of 3 participants), and we removed trials with abnormally long reaction times (greater than 2.5 standard deviations above the mean, calculated separately for each participant and each task) resulting in the removal of an average of 2.32% of trials in each task. For analyses where response time is the dependent variable, we also removed trials with incorrect responses resulting in the removal of a further 4.86% of the total categorisation trials and 4.51% of total search trials.
 
-For the categorisatoin task, participants were excluded if less than 70% of the trials remained in the categorisation task (equivalent to an average of 202 trials remaining in each condition) or if their switch rate between the tasks was less than 0.2. For the search task, trials without a lateralised stimulus were removed, and participants were excluded if less than 85% of trials remained in the search task after artifact rejection (equivalent to an average of 163 trials remaining in each condition) or if their switch rate between the tasks was less than 0.2. 
+#### ERP analyses
+
+For the categorisatoin task, participants were excluded if less than 70% of the trials remained in the categorisation task (equivalent to an average of 202 trials remaining in each condition) or if their switch rate between the tasks was less than 0.2 resulting in 4 exclusions. For the search task, trials without a lateralised stimulus were removed, and participants were excluded if less than 85% of trials remained in the search task after artifact rejection (equivalent to an average of 163 trials remaining in each condition) or if their switch rate between the tasks was less than 0.2 resulting in 5 exclusions. 
+
+### Voluntary task selection
+
+To evaluate the choice processes in our task we used both switch rates and switch costs. For all of these analyses we applied the same rejection criteria as we used in the behavioural analyses presented above. Switch rate was calculated simply as the percentage of times a participant chose to switch between the two tasks across the experiment. Switch costs were calculated as the average reposnse time difference between switch trials and repetition trials across the experiment.
 
 # Results
 ```{r exclusion criteria}
@@ -321,6 +327,7 @@ behavData$Group = as.factor(behavData$Group)
 
 #Save switch rates for ERP
 switchRates <- behavData %>% group_by(Subject) %>%summarise(SR = mean(switchRate))
+ParticipantsRejected <- unique(behavData %>% filter(switchRate < minSwitchRate) %>% group_by(Subject) %>% summarise(new = mean(Subject)))$new
 ```
 
 ```{r, include = FALSE}
@@ -346,6 +353,28 @@ t.test(autoCor$Cor[autoCor$Group=="Colour"],autoCor$Cor[autoCor$Group=="Shape"],
 ```
 
 ```{r perfByTaskStats}
+#documenting trial rejection
+alltrials <- behavData %>%
+  filter(switchRate>minSwitchRate) %>%
+  mutate(Acc = ifelse(is.na(LearnSearch.ACC), CompSearch.ACC, LearnSearch.ACC), Tcount = Acc+1-Acc) %>%
+  group_by(Subject, Group, Procedure.Trial.) %>%
+  summarise(Accuracy = sum(Tcount))
+survabrej <- behavData %>%
+  filter(switchRate>minSwitchRate,LearnSearch.RT < learnCutoff | CompSearch.RT < compCutoff) %>%
+  mutate(Acc = ifelse(is.na(LearnSearch.ACC), CompSearch.ACC, LearnSearch.ACC), Tcount = Acc+1-Acc) %>%
+  group_by(Subject, Group, Procedure.Trial.) %>%
+  summarise(Accuracy = sum(Tcount))
+survallrej <- behavData %>%
+  filter(switchRate>minSwitchRate,LearnSearch.RT < learnCutoff | CompSearch.RT < compCutoff,LearnSearch.ACC==1 | CompSearch.ACC==1) %>%
+  mutate(Acc = ifelse(is.na(LearnSearch.ACC), CompSearch.ACC, LearnSearch.ACC), Tcount = Acc+1-Acc) %>%
+  group_by(Subject, Group, Procedure.Trial.) %>%
+  summarise(Accuracy = sum(Tcount))
+alltrials = cbind(alltrials,two = survabrej$Accuracy,three = survallrej$Accuracy)
+alltrials %>%
+  mutate(twoPerc = (Accuracy-two)/Accuracy*100, threePerc = (two - three)/Accuracy*100) %>%
+  group_by(Procedure.Trial.) %>%
+  summarise(twomean = mean(twoPerc), threemean = mean(threePerc))
+
 acc <- behavData %>%
   filter(switchRate>minSwitchRate, LearnSearch.RT < learnCutoff | CompSearch.RT < compCutoff) %>%
   mutate(Acc = ifelse(is.na(LearnSearch.ACC), CompSearch.ACC, LearnSearch.ACC)) %>%
@@ -452,7 +481,7 @@ behavData %>%
 
 
 ```{r, echo = FALSE, include = FALSE}
-rm( groupInfo,intEffectTTest, acc, acc.res, acc.stat, autoCor, Cor, distCost, rt, rt.res, rt.stat, sData, searchAcc, searchAcc.aov, searchAcc.res, searchRT, searchRT.aov, searchRT.fup, searchRT.res, t.out, sub, subj)
+rm( groupInfo,intEffectTTest, acc, acc.res, acc.stat, autoCor, Cor, distCost, rt, rt.res, rt.stat, sData, searchAcc, searchAcc.aov, searchAcc.res, searchRT, searchRT.aov, searchRT.fup, searchRT.res, t.out, sub, subj, survabrej, survallrej, survTrials, alltrials)
 gc()
 ```
 

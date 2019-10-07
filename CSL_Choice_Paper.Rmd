@@ -388,6 +388,12 @@ acc.stat <- aov_ez(
   between = "Group"
 )
 acc.res <- apa_print(acc.stat)
+group.acc <- acc %>%
+  group_by(Group) %>%
+  summarise(mean = mean(Accuracy), se = sqrt(sd(Accuracy)/length(unique(Subject))))
+task.acc <- acc %>%
+  group_by(Procedure.Trial.) %>%
+  summarise(mean = mean(Accuracy), se = sqrt(sd(Accuracy)/length(unique(Subject))))
 
 rt <- behavData %>%
   filter(switchRate>minSwitchRate, LearnSearch.RT < learnCutoff | CompSearch.RT < compCutoff, LearnSearch.ACC==1 | CompSearch.ACC==1) %>%
@@ -402,11 +408,17 @@ rt.stat <- aov_ez(
   between = "Group"
 )
 rt.res <- apa_print(rt.stat)
+group.rt <- rt %>%
+  group_by(Group) %>%
+  summarise(mean = mean(Accuracy), se = sqrt(sd(Accuracy)/length(unique(Subject))))
+task.rt <- rt %>%
+  group_by(Procedure.Trial.) %>%
+  summarise(mean = mean(Accuracy), se = sqrt(sd(Accuracy)/length(unique(Subject))))
 ```
 
-A 2x2 ANOVA was carried out in order to evaluate whether there were effects of group (Shape vs colour) and task (categorisation vs search) on participant accuracy. The results did not show significant main effects of either group (`r acc.res$full_result$Group`) or task (`r acc.res$full_result$Procedure_Trial_`) on accuracy, and the interaction between the two was also not statistically significant (`r acc.res$full_result$Group_Procedure_Trial_`).
+A 2x2 ANOVA was also carried out in order to evaluate whether there were effects of group (shape vs colour) and task (categorisation vs search) on participant response times. The results showed no significant effect of group on response times (`r rt.res$full_result$Group`), however there was a significant main effect of task in which participants responded faster to the categorisation task than the search task (`r rt.res$full_result$Procedure_Trial_`). The interaction between group and task was not significant (`r rt.res$full_result$Group_Procedure_Trial_`).
 
-A 2x2 ANOVA was also carried out in order to evaluate whether there were effects of group and task on participant response times. The results showed no significant effect of group on response times (`r rt.res$full_result$Group`), however there was a significant main effect of task in which participants responded faster to the categorisation task than the search task (`r rt.res$full_result$Procedure_Trial_`). The interaction between group and task was not significant (`r rt.res$full_result$Group_Procedure_Trial_`).
+A 2x2 ANOVA was carried out in order to evaluate whether there were effects of group and task on participant accuracy. The results did not show significant main effects of either group (`r acc.res$full_result$Group`) or task (`r acc.res$full_result$Procedure_Trial_`) on accuracy, and the interaction between the two was also not statistically significant (`r acc.res$full_result$Group_Procedure_Trial_`).
 
 #### Search task distraction
 

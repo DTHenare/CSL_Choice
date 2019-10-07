@@ -467,12 +467,13 @@ intr.srt.mean <- searchRT %>%
   group_by(Group,TrialType) %>%
   summarise(mean = mean(RT)) %>%
   spread(TrialType, mean) %>%
-  mutate(rtDiff = TD-Tonly)
+  mutate(rtDiff = TD-Tonly, text = paste("$\\Delta M = ", as.character(round(rtDiff,2)), sep=""))
 intr.srt.se <- searchRT %>%
   spread(TrialType, RT) %>%
   mutate(seDiff = TD-Tonly) %>%
   group_by(Group) %>%
   summarise(se = sqrt(sd(seDiff)/length(unique(Subject))))
+intr.srt.text <- paste( intr.srt.mean$text, ", se = ", as.character(round(intr.srt.se$se, 2)),"$", sep ="")
 
 distCost <- behavData %>%
   filter(Procedure.Trial. == "TaskC",switchRate>minSwitchRate, CompSearch.ACC==1, CompSearch.RT < compCutoff) %>%
@@ -486,15 +487,15 @@ intEffectTTest = apa_print(t.out)
 
 For the search task, we used a mixed 2x2 ANOVA where trial type (target only vs target and distractor) was the within-subjects factor, and group (colour vs. shape) was the between-subjects factor. This was performed once with response time as the dependent variable and once with accuracy as the dependent variable.
 
-When collapsed across trial type, the colour group's response times (`r group.srt$text[1]`) do not differ significantly from participants in the shape group (`r paste(group.srt$test[2], " ", searchRT.res$full_result$Group,sep="")`), however participants in both groups do appear to respond significantly faster in the distractor absent trials (`r task.srt$text[2]`) than in the distractor present trials (`r paste(task.srt$test[1], " ", searchRT.res$full_result$TrialType,sep="")`). An interaction between trial type and group demonstrates that distractor presence has a significantly larger effect on participants in the colour group () than those in the shape group ().
+Across both trial types, the colour group's response times (`r group.srt$text[1]`) do not differ significantly from participants in the shape group (`r paste(group.srt$test[2], " ", searchRT.res$full_result$Group,sep="")`), however participants in both groups do appear to respond significantly faster in the distractor absent trials (`r task.srt$text[2]`) than in the distractor present trials (`r paste(task.srt$test[1], " ", searchRT.res$full_result$TrialType,sep="")`). An interaction between trial type and group demonstrates that distractor presence has a significantly larger effect on participants in the colour group (`r intr.srt.text[1]`) than those in the shape group (`r paste(intr.srt.text[2], " ", searchRT.res$full_result$Group_TrialType, sep ="")`). This effect of group assignment on distractor cost is shown in figure\ \@ref(fig:DistIntViolin).
 
 When it comes to search task accuracy we do not observe any differences as a result of either group (`r searchAcc.res$full_result$Group`) or trial type (`r searchAcc.res$full_result$TrialType`), nor any interaction between the two (`r searchAcc.res$full_result$Group_TrialType`).
 
-We also fail to detect a significant main effect of group on response times (`r searchRT.res$full_result$Group`), however we do observe a significant main effect of trial type (`r searchRT.res$full_result$TrialType`), and a significant interaction between group and trial type (`r searchRT.res$full_result$Group_TrialType`). 
+```{r }
+#Follow-up tests reveal that participants respond significantly slower when a distractor is present in the search display, and this is true in both the colour group (`r searchRT.fup$full_result$TD_Tonly_Colour`) and the shape group (`r searchRT.fup$full_result$TD_Tonly_Shape`). However, this effect appears to be larger for the colour group and when it is tested directly using an independent samples t-test, the results show that distractor cost is indeed significantly larger for the colour group than the shape group (`r intEffectTTest$full_result`). 
+```
 
-Follow-up tests reveal that participants respond significantly slower when a distractor is present in the search display, and this is true in both the colour group (`r searchRT.fup$full_result$TD_Tonly_Colour`) and the shape group (`r searchRT.fup$full_result$TD_Tonly_Shape`). However, this effect appears to be larger for the colour group and when it is tested directly using an independent samples t-test, the results show that distractor cost is indeed significantly larger for the colour group than the shape group (`r intEffectTTest$full_result`). The effect of group assignment on distractor cost is shown in figure\ \@ref(fig:DistIntViolin).
-
-(ref:behavDistInt) Plot showing the response time cost caused by the presence of a coloured distractor during the search task for each group. Participants assigned to respond to colour in the categorisation task (shown in green) have significantly higher costs during the search task than participants assigned to repsond to shape in the categorisation task (shown in grey). Individual response time costs are depicted as dots alongside a boxplot and violin plot to visualise the range and distribution of costs for each group.
+(ref:behavDistInt) Plot showing the response time cost caused by the presence of a coloured distractor during the search task for each group (response time in distractor present trials is subtracted from distractor abesent trials). Participants assigned to respond to colour in the categorisation task (shown in green) have significantly higher costs during the search task than participants assigned to repsond to shape in the categorisation task (shown in grey). Individual response time costs are depicted as dots alongside a boxplot and violin plot to visualise the range and distribution of costs for each group.
 
 ```{r DistIntViolin, fig.cap = "(ref:behavDistInt)"}
 behavData %>%

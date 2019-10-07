@@ -410,15 +410,15 @@ rt.stat <- aov_ez(
 rt.res <- apa_print(rt.stat)
 group.rt <- rt %>%
   group_by(Group) %>%
-  summarise(mean = mean(Accuracy), se = sqrt(sd(Accuracy)/length(unique(Subject))))
+  summarise(mean = mean(RT), se = sqrt(sd(RT)/length(unique(Subject))))
 task.rt <- rt %>%
   group_by(Procedure.Trial.) %>%
-  summarise(mean = mean(Accuracy), se = sqrt(sd(Accuracy)/length(unique(Subject))))
+  summarise(mean = mean(RT), se = sqrt(sd(RT)/length(unique(Subject))))
 ```
 
-A 2x2 ANOVA was also carried out in order to evaluate whether there were effects of group (shape vs colour) and task (categorisation vs search) on participant response times. The results showed no significant effect of group on response times (`r rt.res$full_result$Group`), however there was a significant main effect of task in which participants responded faster to the categorisation task than the search task (`r rt.res$full_result$Procedure_Trial_`). The interaction between group and task was not significant (`r rt.res$full_result$Group_Procedure_Trial_`).
+A 2x2 ANOVA was carried out in order to evaluate whether there were effects of group (shape vs colour) and task (categorisation vs search) on participant response times. The results showed that response times of participants in the shape group (M = `r as.character(round(group.rt$mean[2],2))`, se = `r as.character(round(group.rt$se[2],2))`) were not significantly different from participants in the colour group (`r paste("M = ", as.character(round(group.rt$mean[1],2)), ", se = ", as.character(round(group.rt$se[1],2)), ", " ,rt.res$full_result$Group, sep = "")`). However, participants in both groups perform significantly faster in the categorisation task (M = `r as.character(round(task.rt$mean[1],2))`, se = `r as.character(round(taskrt$se[1],2))`) than they do in the search task (`r paste("M = ", as.character(round(task.rt$mean[2],2)), ", se = ", as.character(round(task.rt$se[2],2)), ", " ,rt.res$full_result$Procedure_Trial_, sep = "")`). We do not observe a significant interaction between group and task (`r rt.res$full_result$Group_Procedure_Trial_`).
 
-A 2x2 ANOVA was carried out in order to evaluate whether there were effects of group and task on participant accuracy. The results did not show significant main effects of either group (`r acc.res$full_result$Group`) or task (`r acc.res$full_result$Procedure_Trial_`) on accuracy, and the interaction between the two was also not statistically significant (`r acc.res$full_result$Group_Procedure_Trial_`).
+A 2x2 ANOVA was also carried out in order to evaluate whether there were effects of group and task on participant accuracy. The results did not show any significant effects of either group (`r acc.res$full_result$Group`) or task (`r acc.res$full_result$Procedure_Trial_`) on accuracy, nor any significant interaction between the two (`r acc.res$full_result$Group_Procedure_Trial_`).
 
 #### Search task distraction
 
@@ -435,6 +435,12 @@ searchAcc.aov <- aov_ez(
   between = "Group"
 )
 searchAcc.res <- apa_print(searchAcc.aov)
+group.sacc <- searchAcc %>%
+  group_by(Group) %>%
+  summarise(mean = mean(Accuracy), se = sqrt(sd(Accuracy)/length(unique(Subject))))
+task.sacc <- searchAcc %>%
+  group_by(Procedure.Trial.) %>%
+  summarise(mean = mean(Accuracy), se = sqrt(sd(Accuracy)/length(unique(Subject))))
 
 searchRT <- behavData %>%
   filter(Procedure.Trial. == "TaskC",switchRate>minSwitchRate, CompSearch.ACC==1, CompSearch.RT < compCutoff) %>%
@@ -449,6 +455,24 @@ searchRT.aov <- aov_ez(
 )
 searchRT.res <- apa_print(searchRT.aov)
 searchRT.fup <- apa_print.emmGrid(pairs(emmeans(searchRT.aov, ~TrialType|Group)))
+group.srt <- searchRT %>%
+  group_by(Group) %>%
+  summarise(mean = mean(RT), se = sqrt(sd(RT)/length(unique(Subject)))) %>%
+  mutate(test = paste("M = ", as.character(round(mean,2)),", se = ", as.character(round(se,2)), sep = ""))
+task.srt <- searchRT %>%
+  group_by(TrialType) %>%
+  summarise(mean = mean(RT), se = sqrt(sd(RT)/length(unique(Subject)))) %>%
+  mutate(test = paste("M = ", as.character(round(mean,2)),", se = ", as.character(round(se,2)), sep = ""))
+intr.srt.mean <- searchRT %>%
+  group_by(Group,TrialType) %>%
+  summarise(mean = mean(RT)) %>%
+  spread(TrialType, mean) %>%
+  mutate(rtDiff = TD-Tonly)
+intr.srt.se <- searchRT %>%
+  spread(TrialType, RT) %>%
+  mutate(seDiff = TD-Tonly) %>%
+  group_by(Group) %>%
+  summarise(se = sqrt(sd(seDiff)/length(unique(Subject))))
 
 distCost <- behavData %>%
   filter(Procedure.Trial. == "TaskC",switchRate>minSwitchRate, CompSearch.ACC==1, CompSearch.RT < compCutoff) %>%
@@ -460,9 +484,15 @@ t.out = t.test(distCost$DistInt[distCost$Group == "Colour"],distCost$DistInt[dis
 intEffectTTest = apa_print(t.out)
 ```
 
-For the search task, we used a mixed 2x2 ANOVA where trial type (target only vs target and distractor) was the within-subjects factor, and group (colour vs. shape) was the between-subjects factor. This was performed once with accuracy as the dependent variable and once with response time as the dependent variable. To follow-up the effect of distractor cost we subtracted response times in the target and distractor trials from the target only trial for each participant and ran an independent samples t test to compare distractor cost between the colour and shape group.
+For the search task, we used a mixed 2x2 ANOVA where trial type (target only vs target and distractor) was the within-subjects factor, and group (colour vs. shape) was the between-subjects factor. This was performed once with response time as the dependent variable and once with accuracy as the dependent variable.
 
-In the search task, our results failed to detect a significant main effect of group (`r searchAcc.res$full_result$Group`) or trial type (`r searchAcc.res$full_result$TrialType`) on accuracy, and there was no significant interaction between group and trial type (`r searchAcc.res$full_result$Group_TrialType`). We also fail to detect a significant main effect of group on response times (`r searchRT.res$full_result$Group`), however we do observe a significant main effect of trial type (`r searchRT.res$full_result$TrialType`), and a significant interaction between group and trial type (`r searchRT.res$full_result$Group_TrialType`). Follow-up tests reveal that participants respond significantly slower when a distractor is present in the search display, and this is true in both the colour group (`r searchRT.fup$full_result$TD_Tonly_Colour`) and the shape group (`r searchRT.fup$full_result$TD_Tonly_Shape`). However, this effect appears to be larger for the colour group and when it is tested directly using an independent samples t-test, the results show that distractor cost is indeed significantly larger for the colour group than the shape group (`r intEffectTTest$full_result`). The effect of group assignment on distractor cost is shown in figure\ \@ref(fig:DistIntViolin).
+When collapsed across trial type, the colour group's response times (`r group.srt$text[1]`) do not differ significantly from participants in the shape group (`r paste(group.srt$test[2], " ", searchRT.res$full_result$Group,sep="")`), however participants in both groups do appear to respond significantly faster in the distractor absent trials (`r task.srt$text[2]`) than in the distractor present trials (`r paste(task.srt$test[1], " ", searchRT.res$full_result$TrialType,sep="")`). An interaction between trial type and group demonstrates that distractor presence has a significantly larger effect on participants in the colour group () than those in the shape group ().
+
+When it comes to search task accuracy we do not observe any differences as a result of either group (`r searchAcc.res$full_result$Group`) or trial type (`r searchAcc.res$full_result$TrialType`), nor any interaction between the two (`r searchAcc.res$full_result$Group_TrialType`).
+
+We also fail to detect a significant main effect of group on response times (`r searchRT.res$full_result$Group`), however we do observe a significant main effect of trial type (`r searchRT.res$full_result$TrialType`), and a significant interaction between group and trial type (`r searchRT.res$full_result$Group_TrialType`). 
+
+Follow-up tests reveal that participants respond significantly slower when a distractor is present in the search display, and this is true in both the colour group (`r searchRT.fup$full_result$TD_Tonly_Colour`) and the shape group (`r searchRT.fup$full_result$TD_Tonly_Shape`). However, this effect appears to be larger for the colour group and when it is tested directly using an independent samples t-test, the results show that distractor cost is indeed significantly larger for the colour group than the shape group (`r intEffectTTest$full_result`). The effect of group assignment on distractor cost is shown in figure\ \@ref(fig:DistIntViolin).
 
 (ref:behavDistInt) Plot showing the response time cost caused by the presence of a coloured distractor during the search task for each group. Participants assigned to respond to colour in the categorisation task (shown in green) have significantly higher costs during the search task than participants assigned to repsond to shape in the categorisation task (shown in grey). Individual response time costs are depicted as dots alongside a boxplot and violin plot to visualise the range and distribution of costs for each group.
 

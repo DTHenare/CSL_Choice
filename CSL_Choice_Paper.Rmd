@@ -278,7 +278,9 @@ For behavioural analyses we removed any participant whose switch rate was below 
 
 #### ERP analyses
 
-For the categorisatoin task, participants were excluded if less than 70% of the trials remained in the categorisation task (equivalent to an average of 202 trials remaining in each condition) or if their switch rate between the tasks was less than 0.2 resulting in 4 exclusions. For the search task, trials without a lateralised stimulus were removed, and participants were excluded if less than 85% of trials remained in the search task after artifact rejection (equivalent to an average of 163 trials remaining in each condition) or if their switch rate between the tasks was less than 0.2 resulting in 5 exclusions. 
+For the categorisatoin task, participants were excluded if less than 70% of the trials remained in the categorisation task (equivalent to an average of 202 trials remaining in each condition) or if their switch rate between the tasks was less than 0.2 resulting in 4 exclusions. Our analyses focused on two components of intereste, the NT and PD. In order to determine the time range for the NT, a grand average ERP of all participants was created for lateralised predictor trials (colour singleton for colour group participants and shape singleton for shape participants). We found the peak negativity that ocurred later than 200ms poststimulus onset, and centred a 50ms time window on this timepoint producing a window from 206 to 256ms. For the PD component, we created a grand average ERP for lateralised non-predictor trials (the shape singleton for the colour group and the colour singleton for the shane group), identified the peak positivity that occurred later than 200ms poststimulus and centred a 50ms window on this timepoint which produced a window from 237 to 287ms.
+
+For the search task, trials without a lateralised stimulus were removed, and participants were excluded if less than 85% of trials remained in the search task after artifact rejection (equivalent to an average of 163 trials remaining in each condition) or if their switch rate between the tasks was less than 0.2 resulting in 5 exclusions. We again focussed our analyses on the NT and PD components. To select the NT time window we created a grand average of all participants for trials with a lateralised target, identified the peak negativity that occurred later than 200ms poststimulus and centred a 50ms window on this time point. This produced a time range of 
 
 ### Voluntary task selection
 
@@ -352,7 +354,7 @@ autoCor %>%
 t.test(autoCor$Cor[autoCor$Group=="Colour"],autoCor$Cor[autoCor$Group=="Shape"], paired = FALSE)
 ```
 
-```{r perfByTaskStats}
+```{r perfByTaskStats, include = FALSE}
 #documenting trial rejection
 alltrials <- behavData %>%
   filter(switchRate>minSwitchRate) %>%
@@ -416,7 +418,7 @@ task.rt <- rt %>%
   summarise(mean = mean(RT), se = sqrt(sd(RT)/length(unique(Subject))))
 ```
 
-A 2x2 ANOVA was carried out in order to evaluate whether there were effects of group (shape vs colour) and task (categorisation vs search) on participant response times. The results showed that response times of participants in the shape group (M = `r as.character(round(group.rt$mean[2],2))`, se = `r as.character(round(group.rt$se[2],2))`) were not significantly different from participants in the colour group (`r paste("M = ", as.character(round(group.rt$mean[1],2)), ", se = ", as.character(round(group.rt$se[1],2)), ", " ,rt.res$full_result$Group, sep = "")`). However, participants in both groups perform significantly faster in the categorisation task (M = `r as.character(round(task.rt$mean[1],2))`, se = `r as.character(round(taskrt$se[1],2))`) than they do in the search task (`r paste("M = ", as.character(round(task.rt$mean[2],2)), ", se = ", as.character(round(task.rt$se[2],2)), ", " ,rt.res$full_result$Procedure_Trial_, sep = "")`). We do not observe a significant interaction between group and task (`r rt.res$full_result$Group_Procedure_Trial_`).
+A 2x2 ANOVA was carried out in order to evaluate whether there were effects of group (shape vs colour) and task (categorisation vs search) on participant response times. The results showed that response times of participants in the shape group (M = `r as.character(round(group.rt$mean[2],2))`ms, se = `r as.character(round(group.rt$se[2],2))`) were not significantly different from participants in the colour group (`r paste("M = ", as.character(round(group.rt$mean[1],2)), "ms, se = ", as.character(round(group.rt$se[1],2)), ", " ,rt.res$full_result$Group, sep = "")`). However, participants in both groups perform significantly faster in the categorisation task (M = `r as.character(round(task.rt$mean[1],2))`ms, se = `r as.character(round(task.rt$se[1],2))`) than they do in the search task (`r paste("M = ", as.character(round(task.rt$mean[2],2)), "ms, se = ", as.character(round(task.rt$se[2],2)), ", " ,rt.res$full_result$Procedure_Trial_, sep = "")`). We do not observe a significant interaction between group and task (`r rt.res$full_result$Group_Procedure_Trial_`).
 
 A 2x2 ANOVA was also carried out in order to evaluate whether there were effects of group and task on participant accuracy. The results did not show any significant effects of either group (`r acc.res$full_result$Group`) or task (`r acc.res$full_result$Procedure_Trial_`) on accuracy, nor any significant interaction between the two (`r acc.res$full_result$Group_Procedure_Trial_`).
 
@@ -439,7 +441,7 @@ group.sacc <- searchAcc %>%
   group_by(Group) %>%
   summarise(mean = mean(Accuracy), se = sqrt(sd(Accuracy)/length(unique(Subject))))
 task.sacc <- searchAcc %>%
-  group_by(Procedure.Trial.) %>%
+  group_by(TrialType) %>%
   summarise(mean = mean(Accuracy), se = sqrt(sd(Accuracy)/length(unique(Subject))))
 
 searchRT <- behavData %>%
@@ -458,11 +460,11 @@ searchRT.fup <- apa_print.emmGrid(pairs(emmeans(searchRT.aov, ~TrialType|Group))
 group.srt <- searchRT %>%
   group_by(Group) %>%
   summarise(mean = mean(RT), se = sqrt(sd(RT)/length(unique(Subject)))) %>%
-  mutate(test = paste("M = ", as.character(round(mean,2)),", se = ", as.character(round(se,2)), sep = ""))
+  mutate(text = paste("M = ", as.character(round(mean,2)),"ms, se = ", as.character(round(se,2)), sep = ""))
 task.srt <- searchRT %>%
   group_by(TrialType) %>%
   summarise(mean = mean(RT), se = sqrt(sd(RT)/length(unique(Subject)))) %>%
-  mutate(test = paste("M = ", as.character(round(mean,2)),", se = ", as.character(round(se,2)), sep = ""))
+  mutate(text = paste("M = ", as.character(round(mean,2)),"ms, se = ", as.character(round(se,2)), sep = ""))
 intr.srt.mean <- searchRT %>%
   group_by(Group,TrialType) %>%
   summarise(mean = mean(RT)) %>%
@@ -473,7 +475,7 @@ intr.srt.se <- searchRT %>%
   mutate(seDiff = TD-Tonly) %>%
   group_by(Group) %>%
   summarise(se = sqrt(sd(seDiff)/length(unique(Subject))))
-intr.srt.text <- paste( intr.srt.mean$text, ", se = ", as.character(round(intr.srt.se$se, 2)),"$", sep ="")
+intr.srt.text <- paste( intr.srt.mean$text, "ms, se = ", as.character(round(intr.srt.se$se, 2)),"$", sep ="")
 
 distCost <- behavData %>%
   filter(Procedure.Trial. == "TaskC",switchRate>minSwitchRate, CompSearch.ACC==1, CompSearch.RT < compCutoff) %>%
@@ -487,9 +489,9 @@ intEffectTTest = apa_print(t.out)
 
 For the search task, we used a mixed 2x2 ANOVA where trial type (target only vs target and distractor) was the within-subjects factor, and group (colour vs. shape) was the between-subjects factor. This was performed once with response time as the dependent variable and once with accuracy as the dependent variable.
 
-Across both trial types, the colour group's response times (`r group.srt$text[1]`) do not differ significantly from participants in the shape group (`r paste(group.srt$test[2], " ", searchRT.res$full_result$Group,sep="")`), however participants in both groups do appear to respond significantly faster in the distractor absent trials (`r task.srt$text[2]`) than in the distractor present trials (`r paste(task.srt$test[1], " ", searchRT.res$full_result$TrialType,sep="")`). An interaction between trial type and group demonstrates that distractor presence has a significantly larger effect on participants in the colour group (`r intr.srt.text[1]`) than those in the shape group (`r paste(intr.srt.text[2], " ", searchRT.res$full_result$Group_TrialType, sep ="")`). This effect of group assignment on distractor cost is shown in figure\ \@ref(fig:DistIntViolin).
+Across both trial types, the colour group's response times (`r group.srt$text[1]`) do not differ significantly from participants in the shape group (`r paste(group.srt$text[2], " ", searchRT.res$full_result$Group,sep="")`), however participants in both groups do appear to respond significantly faster in the distractor absent trials (`r task.srt$text[2]`) than in the distractor present trials (`r paste(task.srt$text[1], " ", searchRT.res$full_result$TrialType,sep="")`). An interaction between trial type and group demonstrates that distractor presence has a significantly larger effect on participants in the colour group (`r intr.srt.text[1]`) than those in the shape group (`r paste(intr.srt.text[2], " ", searchRT.res$full_result$Group_TrialType, sep ="")`). This effect of group assignment on distractor cost is shown in figure\ \@ref(fig:DistIntViolin).
 
-When it comes to search task accuracy we do not observe any differences as a result of either group (`r searchAcc.res$full_result$Group`) or trial type (`r searchAcc.res$full_result$TrialType`), nor any interaction between the two (`r searchAcc.res$full_result$Group_TrialType`).
+When it comes to search task accuracy we do not observe any differences as a result of either group (`r gsub("= .000\\$", "< .001\\$",gsub("= 0.00\\$","< 0.01\\$", searchAcc.res$full_result$Group))`) or trial type (`r gsub("= .000\\$", "< .001\\$",gsub("= 0.00\\$","< 0.01\\$",searchAcc.res$full_result$TrialType))`), nor any interaction between the two (`r searchAcc.res$full_result$Group_TrialType`).
 
 ```{r }
 #Follow-up tests reveal that participants respond significantly slower when a distractor is present in the search display, and this is true in both the colour group (`r searchRT.fup$full_result$TD_Tonly_Colour`) and the shape group (`r searchRT.fup$full_result$TD_Tonly_Shape`). However, this effect appears to be larger for the colour group and when it is tested directly using an independent samples t-test, the results show that distractor cost is indeed significantly larger for the colour group than the shape group (`r intEffectTTest$full_result`). 
@@ -726,6 +728,18 @@ learn.NtCol.aov <- aov_ez(
 learn.NtCol.results <- apa_print(learn.NtCol.aov)
 #Followup
 learn.NtCol.fup <- apa_print.emmGrid(pairs(emmeans(learn.NtCol.aov, ~Contra|Group)))
+group.colnt <- learnNtCol %>%
+  group_by(Group) %>%
+  summarise(mean = mean(mV), se = sqrt(sd(mV)/length(unique(Subject)))) %>%
+  mutate(text = paste("M = ", as.character(round(mean,2)),"\\mu V, se = ", as.character(round(se,2)), sep = ""))
+elecLat.colnt <- learnNtCol %>%
+  group_by(Contra) %>%
+  summarise(mean = mean(mV), se = sqrt(sd(mV)/length(unique(Subject)))) %>%
+  mutate(text = paste("M = ", as.character(round(mean,2)),"\\mu V, se = ", as.character(round(se,2)), sep = ""))
+intr.colnt <- learnNtCol %>%
+  group_by(Contra,Group) %>%
+  summarise(mean = mean(mV), se = sqrt(sd(mV)/length(unique(Subject)))) %>%
+  mutate(text = paste("M = ", as.character(round(mean,2)),"\\mu V, se = ", as.character(round(se,2)), sep = ""))
 diffDirect <- learnNtCol %>%
   spread(Contra,mV) %>%
   mutate(difference = Contralateral-Ipsilateral)
@@ -760,15 +774,17 @@ learn.PdCol.aov <- aov_ez(
 learn.PdCol.results <- apa_print(learn.PdCol.aov)
 ```
 
-In the categorisation task, our ERP analyses focused on the lateralised response to each object (either the shape singleton or the colour singleton). For each ERP there were two time windows of interest, the Nt time window (`r sprintf("%i to %ims", NtStart, NtEnd)`) and the Pd time window (`r sprintf("%i to %ims", PdStart, PdEnd)`). See figure\ \@ref(fig:makeLearnPlots). We performed a set of mixed 2x2 ANOVAS where hemisphere (contralateral vs. ipsilateral) was the within-subject factor and group (colour vs. shape) was the between-subject factor.  This was performed with each of the following as the independent variable: NT amplitude in the lateralised shape trials, PD amplitude in the lateralised shape trials, NT amplitude in the lateralised colour trials, and PD amplitude in the lateralised colour trials.
+In the categorisation task, our ERP analyses focused on the lateralised response to each object (either the shape singleton or the colour singleton). For each ERP there were two time windows of interest, the Nt time window (`r sprintf("%i to %ims", NtStart, NtEnd)`) and the Pd time window (`r sprintf("%i to %ims", PdStart, PdEnd)`). See figure\ \@ref(fig:makeLearnPlots). We performed a set of mixed 2x2 ANOVAS where electrode laterality (contralateral vs. ipsilateral) was the within-subject factor and group (colour vs. shape) was the between-subject factor. This was performed for both components (NT and PD) elicited by each of the lateralised stimuli (colour and shape singletons).
 
 ##### Lateral colour singleton, midline shape
 
-When focussing on the lateralised response to a colour singleton in the NT time range, we see no significant main effects of either group (`r learn.NtCol.results$full$Group`) or hemisphere (`r learn.NtCol.results$full$Contra`), however we do see a significant interaction between group and hemisphere (`r learn.NtCol.results$full$Group_Contra`). Follow-up comparisons reveal that for participants in the colour group, a lateralised colour singleton elicits a significant NT component (`r learn.NtCol.fup$full_result$Contralateral_Ipsilateral_Colour`), whereas for participants in the shape group a significant lateralised positivity is elicited by the colour singleton (`r learn.NtCol.fup$full_result$Contralateral_Ipsilateral_Shape`). When evaluating the PD time range, we observe no main effects of group(`r learn.PdCol.results$full$Group`) or hemisphere (`r learn.PdCol.results$full$Contra`), and no interaction between group and hemisphere (`r learn.PdCol.results$full$Group_Contra`).
+In displays where the colour singleton is lateralised and the shape singleton is on the midline, voltages in the NT time window do not differ between participants in the colour group (`r group.colint$text[1]`) and participants in the shape group (`r group.colint$text[2]`, `r learn.NtCol.results$full$Group` ), nor is there any difference between the contralateral electrode site (`r elecLat.colint$text[1]`) and ipsilateral electrode site (`r elecLat.colint$text[2]`, `r gsub("= .000\\$", "< .001\\$",gsub("= 0.00\\$","< 0.01\\$",learn.NtCol.results$full$Contra))`). We do, however, observe a signicifcant interaction between group and electrode laterality (`r learn.NtCol.results$full$Group_Contra`). For participants performing colour categorisation, a lateralised colour singleton elicits a more negative voltage at contralateral electrode sites (`r intr.colint$text[1]`) than ipsilateral electrode sites (`r intr.colint$text[3]`, `r learn.NtCol.fup$full_result$Contralateral_Ipsilateral_Colour`), whereas for participants performing shape lateralisation, a lateralised colour singleton elicits a more positive voltage at contralateral electrode sites (`r intr.colint$text[2]`) than ipsilateral electrode sites (`r intr.colint$text[4]`, `r learn.NtCol.fup$full_result$Contralateral_Ipsilateral_Shape`).
+
+When evaluating the PD time range, we observe no main effects of group (`r learn.PdCol.results$full$Group`) or electrode laterality (`r learn.PdCol.results$full$Contra`), and no interaction between group and electrode laterality (`r learn.PdCol.results$full$Group_Contra`).
 
 ##### Lateral shape singleton, midline colour
 
-When focussing on the lateralised response to a shape singleton in the NT time range, we again see no significant main effects of either group (`r learn.NtShape.results$full$Group`) or hemisphere (`r learn.NtShape.results$full$Contra`), however we do see a significant interaction between group and hemisphere (`r learn.NtShape.results$full$Group_Contra`). Follow-up comparisons reveal that for participants in the shape group, a lateralised shape singleton elicits a significant NT component (`r learn.NtShape.fup$full_result$Contralateral_Ipsilateral_Shape`), whereas for participants in the colour group a significant lateralised positivity is elicited by the shape singleton (`r learn.NtShape.fup$full_result$Contralateral_Ipsilateral_Colour`).  When evaluating the PD time range, we observe no main effects of group(`r learn.PdShape.results$full$Group`) or hemisphere (`r learn.PdShape.results$full$Contra`), and no interaction between group and hemisphere (`r learn.PdShape.results$full$Group_Contra`).
+When focussing on the lateralised response to a shape singleton in the NT time range, we again see no significant main effects of either group (`r learn.NtShape.results$full$Group`) or electrode laterality (`r learn.NtShape.results$full$Contra`), however we do see a significant interaction between group and electrode laterality (`r learn.NtShape.results$full$Group_Contra`). Follow-up comparisons reveal that for participants in the shape group, a lateralised shape singleton elicits a significant NT component (`r learn.NtShape.fup$full_result$Contralateral_Ipsilateral_Shape`), whereas for participants in the colour group a significant lateralised positivity is elicited by the shape singleton (`r learn.NtShape.fup$full_result$Contralateral_Ipsilateral_Colour`).  When evaluating the PD time range, we observe no main effects of group(`r learn.PdShape.results$full$Group`) or electrode laterality (`r learn.PdShape.results$full$Contra`), and no interaction between group and electrode laterality (`r learn.PdShape.results$full$Group_Contra`).
 
 (ref:learnERPCap) Subtractracted ERPs showing the lateralised response to displays in the categorization task. The top panel depicts the different neural responses elicited by a lateralised colour singleton for participants who are tasked with responding to the colour singleton (shown in green) versus those tasked with responding to the shape singleton (shown in grey). The bottom panel depicts the different neural responses elicited by a lateralised colour singleton, again separated by those in the colour group (green) and those in the shape group (grey).
 
@@ -941,21 +957,21 @@ PdDTdiff <- apa_print(t.test(diffDirect$difference[diffDirect$Group == "Colour"]
 
 ```
 
-Next we focused on the lateralised response to targets and distractors in the search displays as a function of group assignment. Evidence for the effect of selection history would again come from the interaction between group and lateralised ERP activity. We performed a set of mixed 2x2 ANOVAS where hemisphere (contralateral vs. ipsilateral) was the within-subject factor and group (colour vs. shape) was the between-subject factor. This was performed with each of the following as the independent variable: NT amplitude in the target only trials, NT amplitude for the target in the target and distractor trials, ND for the distractor in the target and distractor trials, and PD for the distractor in the target and distractor trials.
+Next we focused on the lateralised response to targets and distractors in the search displays as a function of group assignment. Evidence for the effect of selection history would again come from the interaction between group and lateralised ERP activity. We performed a set of mixed 2x2 ANOVAS where electrode laterality (contralateral vs. ipsilateral) was the within-subject factor and group (colour vs. shape) was the between-subject factor. This was performed with each of the following as the independent variable: NT amplitude in the target only trials, NT amplitude for the target in the target and distractor trials, ND for the distractor in the target and distractor trials, and PD for the distractor in the target and distractor trials. the Nt time window (`r sprintf("%i to %ims", NtStart, NtEnd)`) and the Pd time window (`r sprintf("%i to %ims", PdStart, PdEnd)`)
 
 ##### Target response - Distractor absent trials
 
-In the target only displays there was a significant main effect of hemisphere where the contralateral response is more negative than the ipsilateral response (`r search.NtTO.results$full$Contra`), but no siginificant main effect of group (`r search.NtTO.results$full$Group`), and no interaction between group and hemisphere (`r search.NtTO.results$full$Group_Contra`).
+In the target only displays there was a significant main effect of electrode laterality where the contralateral response is more negative than the ipsilateral response (`r search.NtTO.results$full$Contra`), but no siginificant main effect of group (`r search.NtTO.results$full$Group`), and no interaction between group and electrode laterality (`r search.NtTO.results$full$Group_Contra`).
 
 ##### Target response - Distractor present trials
 
-Results for the lateralised target in the presence of a distractor showed no significant main effect of group (`r search.NtTD.results$full$Group`), however there was a significant main effect of hemisphere (`r search.NtTD.results$full$Contra`), as well as a significant interaction between group and hemisphere (`r search.NtTD.results$full$Group_Contra`). Follow-up comparisons reveal that a significant NT was elicited for participants in both the colour (`r search.NtTD.fup$full_result$Contralateral_Ipsilateral_Colour`) and shape group (`r search.NtTD.fup$full_result$Contralateral_Ipsilateral_Shape`). When NT amplitude is compared directly with an independent samples t test, the results show that the NT is significantly larger for the shape group than the colour group (`r NtTDdiff$full_result`).
+Results for the lateralised target in the presence of a distractor showed no significant main effect of group (`r search.NtTD.results$full$Group`), however there was a significant main effect of electrode laterality (`r search.NtTD.results$full$Contra`), as well as a significant interaction between group and electrode laterality (`r search.NtTD.results$full$Group_Contra`). Follow-up comparisons reveal that a significant NT was elicited for participants in both the colour (`r search.NtTD.fup$full_result$Contralateral_Ipsilateral_Colour`) and shape group (`r search.NtTD.fup$full_result$Contralateral_Ipsilateral_Shape`). When NT amplitude is compared directly with an independent samples t test, the results show that the NT is significantly larger for the shape group than the colour group (`r NtTDdiff$full_result`).
 
 ##### Distractor response - Distractor present trials
 
-For the lateralised distractor response, results of the NT time range showed neither an effect of group(`r search.NtDT.results$full$Group`), nor of hemisphere (`r search.NtDT.results$full$Contra`), nor an interaction between group and hemisphere (`r search.NtDT.results$full$Group_Contra`).
+For the lateralised distractor response, results of the NT time range showed neither an effect of group(`r search.NtDT.results$full$Group`), nor of electrode laterality (`r search.NtDT.results$full$Contra`), nor an interaction between group and electrode laterality (`r search.NtDT.results$full$Group_Contra`).
 
-Results for the lateralised distractor showed no significant main effect of group (`r search.PdDT.results$full$Group`), however there was a significant main effect of hemisphere (`r search.PdDT.results$full$Contra`), as well as a significant interaction between group and hemisphere (`r search.PdDT.results$full$Group_Contra`). Follow-up comparisons reveal that a significant Pd was elicited for participants in the colour group (`r search.PdDT.fup$full_result$Contralateral_Ipsilateral_Colour`), however the difference between the contralateral and ipsilateral electrodes did not reach significance  for the shape group (`r search.PdDT.fup$full_result$Contralateral_Ipsilateral_Shape`). When Pd amplitude is compared directly with an independent samples t test, the results show that the Pd was significantly larger for the colour group than the shape group (`r PdDTdiff$full_result`).
+Results for the lateralised distractor showed no significant main effect of group (`r search.PdDT.results$full$Group`), however there was a significant main effect of electrode laterality (`r search.PdDT.results$full$Contra`), as well as a significant interaction between group and electrode laterality (`r search.PdDT.results$full$Group_Contra`). Follow-up comparisons reveal that a significant Pd was elicited for participants in the colour group (`r search.PdDT.fup$full_result$Contralateral_Ipsilateral_Colour`), however the difference between the contralateral and ipsilateral electrodes did not reach significance  for the shape group (`r search.PdDT.fup$full_result$Contralateral_Ipsilateral_Shape`). When Pd amplitude is compared directly with an independent samples t test, the results show that the Pd was significantly larger for the colour group than the shape group (`r PdDTdiff$full_result`).
 
 (ref:searchERPCap) Subtractracted ERPs showing the lateralised response to a target in the absence of distractors (top, the target in the presence of a distractor (middle), and the distractor (bottom) for each group in the search task. Example displays are shown for each ERP.
 
@@ -1071,9 +1087,9 @@ choiceRT.fup <- apa_print.emmGrid(pairs(emmeans(choiceRT.stat, ~repswitch|Group)
 
 ```
 
-A 2x2 ANOVA was also performed in order to evaluate the effect of decision (repeat vs switch) and group (colour vs shape) on the time taken to make a task choice. Results (depicted in figure\ \@ref(fig:choiceRTPlot)) show no significant main effects of Group (`r choiceRT.res$full_result$Group`) and decision (`r choiceRT.res$full_result$repswitch`), as well as no significant interaction between group and decision (`r choiceRT.res$full_result$Group_repswitch`). 
+A 2x2 ANOVA was also performed in order to evaluate the effect of task transition (repeat vs switch) and group (colour vs shape) on the time taken to make a task choice. Results (depicted in figure\ \@ref(fig:choiceRTPlot)) show no significant main effects of Group (`r choiceRT.res$full_result$Group`) and task transition (`r choiceRT.res$full_result$repswitch`), as well as no significant interaction between group and task transition (`r choiceRT.res$full_result$Group_repswitch`). 
 
-(ref:chRTPlot) Time taken for participants in each group to make their task selection at the start of each trial. This is depicted separately for trials where they chose to switch task versus those where they chose to repeat the previous task. Think lines represent the group averages while thin lines represent individual data.
+(ref:chRTPlot) Time taken for participants in the colour group (green) and the shape group (grey) to make their task selection at the start of each trial. This is depicted separately for trials where they chose to switch task versus those where they chose to repeat the previous task. Thick lines represent the group averages while thin lines represent individual data.
 
 ```{r choiceRTPlot, fig.cap="(ref:chRTPlot)"}
 choiceRTAvg <- behavData %>%
@@ -1092,7 +1108,7 @@ behavData %>%
   facet_grid(.~Group) +
   scale_colour_manual(values=c("green4", "gray42")) +
   scale_y_continuous(name = "Time taken for task choice (ms)",limits = c(0,500)) +
-  scale_x_discrete(labels = c("Repetition", "Switch")) +
+  scale_x_discrete(limits=c("switch", "rep"), labels = c("Switch", "Repetition")) +
   theme(panel.grid.major = element_blank(), 
         panel.grid.minor = element_blank(),
         panel.background = element_blank(),
@@ -1127,7 +1143,7 @@ comparisonSR.res = apa_print(comparisonSR)
 
 Participants in the task were encouraged to try to make their task selections as random as possible which would produce a switch rate of 50%, however average switch rate across all participants was `r as.character(round(switch$mean*100, digits = 2))`%. Analysis of the voluntary task choice shows that while participants in the shape group showed no significant deviation from a switch rate of 50% (`r shapeSR.res$full_result`), participants in the colour group showed a significant repetiton bias (`r colourSR.res$full_result`). When we directly tested whether switch rates in the colour group were lower than the shape group we also see a significant difference (`r comparisonSR.res$full_result`). Switch rates are shown in figure\ \@ref(fig:SwitchRateViolin).
 
-(ref:SRPlot) Voluntary switch rates for each individual separated by group assignment. Dots show each individual's swithc rate alongside a boxplot and violin plot to display the range and distribution of switch rates. A switch rate of 50% is the expected switch rate when participants are randomly selecting the task on each trial as instructed. This point has been marked with a horizontal line for reference.
+(ref:SRPlot) Voluntary switch rates for each individual separated by group assignment. Dots show each individual's switch rate alongside a boxplot and violin plot to display the range and distribution of switch rates. A switch rate of 50% is the expected switch rate when participants are randomly selecting the task on each trial as instructed. This point has been marked with a horizontal line for reference.
 
 ```{r SwitchRateViolin, fig.cap = "(ref:SRPlot)"}
 behavData %>%
@@ -1194,13 +1210,52 @@ learnSC.fup <- apa_print.emmGrid(pairs(emmeans(learnSC.stat, ~SwitchCount|Group)
 learnSC.dat1 <- learnSC.dat %>%
   spread(SwitchCount, RT) %>%
   mutate(sc = Switch-Rep)
+
+SC.dat <- behavData %>%
+filter(switchRate > minSwitchRate,CompSearch.RT < compCutoff | LearnSearch.RT < learnCutoff) %>%
+mutate(respTime = ifelse(!is.na(CompSearch.RT),CompSearch.RT,LearnSearch.RT), SwitchCount = ifelse(SwitchCount == 1, "Switch", "Rep")) %>%
+group_by(Subject, Group, SwitchCount, Procedure.Trial.) %>%
+summarise(RT = mean(respTime))
+learnSC.stat <- aov_ez(
+  data = SC.dat,
+  dv = "RT",
+  id = "Subject", 
+  within = c("SwitchCount", "Procedure.Trial."),
+  between = "Group"
+)
+colourSC.dat <- behavData %>%
+  filter(Group == "Colour")%>%
+  filter(switchRate > minSwitchRate,CompSearch.RT < compCutoff | LearnSearch.RT < learnCutoff) %>%
+  mutate(respTime = ifelse(!is.na(CompSearch.RT),CompSearch.RT,LearnSearch.RT), SwitchCount = ifelse(SwitchCount == 1, "Switch", "Rep")) %>%
+  group_by(Subject, Group, SwitchCount, Procedure.Trial.) %>%
+  summarise(RT = mean(respTime))
+colourSC.stat <- aov_ez(
+  data = colourSC.dat,
+  dv = "RT",
+  id = "Subject", 
+  within = c("SwitchCount", "Procedure.Trial.")
+)
+shapeSC.dat <- behavData %>%
+  filter(Group == "Shape")%>%
+  filter(switchRate > minSwitchRate,CompSearch.RT < compCutoff | LearnSearch.RT < learnCutoff) %>%
+  mutate(respTime = ifelse(!is.na(CompSearch.RT),CompSearch.RT,LearnSearch.RT), SwitchCount = ifelse(SwitchCount == 1, "Switch", "Rep")) %>%
+  group_by(Subject, Group, SwitchCount, Procedure.Trial.) %>%
+  summarise(RT = mean(respTime))
+shapeSC.stat <- aov_ez(
+  data = shapeSC.dat,
+  dv = "RT",
+  id = "Subject", 
+  within = c("SwitchCount", "Procedure.Trial.")
+)
 ```
 
-We performed a 2x2 ANOVA in order to evaluate the effect of decision (repeat vs switch) and Group (shape vs colour) on the response times to the categorisation task displays. The results showed no significant main effect of Group (`r learnSC.res$full_result$Group`) , however there was a significant main effect of decision on response times where switching tasks resulted in a significant slowing of responses to the task display (`r learnSC.res$full_result$SwitchCount`). There was also a significant interaction between group and decision (`r learnSC.res$full_result$SwitchCount_Group`). When we follow up this interaction we see that there are significant switch costs for the colour group (`r learnSC.fup$full_result$Rep_Switch_Colour`) however we do not observe significant switch costs for participants in the shape group (`r learnSC.fup$full_result$Rep_Switch_Shape`). Switch costs for both groups in each task are shown in figure\ \@ref(fig:switchCostPlot).
+We performed a 2x2 ANOVA in order to evaluate the effect of task transition (repeat vs switch) and Group (shape vs colour) on the response times to the categorisation task displays. The results showed no significant main effect of Group (`r learnSC.res$full_result$Group`) , however there was a significant main effect of task transition on response times where switching tasks resulted in a significant slowing of responses to the task display (`r learnSC.res$full_result$SwitchCount`). There was also a significant interaction between group and task transition (`r learnSC.res$full_result$SwitchCount_Group`). When we follow up this interaction we see that there are significant switch costs for the colour group (`r learnSC.fup$full_result$Rep_Switch_Colour`) however we do not observe significant switch costs for participants in the shape group (`r learnSC.fup$full_result$Rep_Switch_Shape`). Switch costs for both groups in each task are shown in figure\ \@ref(fig:switchCostPlot).
 
-We also carried out a 2x2 ANOVA in order to evaluate the effect of decision (repeat vs switch) and Group (shape vs colour) on the response times to the search task displays. The results showed no significant main effect of group(`r searchSC.res$full_result$Group`), however there was a significant main effect of decision on response times where switching tasks resulted in a significant slowing of responses to the task display (`r searchSC.res$full_result$SwitchCount`). There was no significant interaction between group and decision(`r searchSC.res$full_result$Group_SwitchCount`).
+We also carried out a 2x2 ANOVA in order to evaluate the effect of task transition (repeat vs switch) and Group (shape vs colour) on the response times to the search task displays. The results showed no significant main effect of group(`r searchSC.res$full_result$Group`), however there was a significant main effect of task transition on response times where switching tasks resulted in a significant slowing of responses to the task display (`r searchSC.res$full_result$SwitchCount`). There was no significant interaction between group and task transition(`r searchSC.res$full_result$Group_SwitchCount`).
 
-(ref:SCPlot) Response times for switch and repeat trials for both groups in each task. No significant switch costs are observed in the search task however in the categorisation task participants in the colour group show significant costs to response times in switch trials relative to repetition trials.
+We performed a 2x2x2 mixed ANOVA in order to evaluate the effect of task transition, 
+
+(ref:SCPlot) Response times for switch and repeat trials for the colour group (green) and the shape group (grey) in each task. For the serach task (left) we observe a switch cost (faster responses to repetition trials) for both groups of participants. In the categorisation task (right) participants in the colour group show significant switch costs however participants in the shape group show no significant effect.
 
 ```{r switchCostPlot, fig.cap= "(ref:SCPlot)"}
 switchCost.se <- behavData %>%
@@ -1226,7 +1281,7 @@ facet_grid(.~Group) +
 scale_colour_manual(values=c("green4", "gray42")) +
 scale_fill_manual(values=c("green4", "gray42")) +
 scale_y_continuous(limits = c(250,1100), expand = c(0, 0)) +
-scale_x_discrete(labels = c("Rep", "Switch")) +
+scale_x_discrete(limits = c("Rep", "Switch"), labels = c("Switch", "Rep")) +
 labs(y = "Response time (ms)", x = "Search Task") +
 theme(panel.grid.major = element_blank(),
 panel.grid.minor = element_blank(),
@@ -1261,7 +1316,7 @@ facet_grid(.~Group) +
 scale_colour_manual(values=c("green4", "gray42")) +
 scale_fill_manual(values=c("green4", "gray42")) +
 scale_y_continuous(limits = c(250,1100), expand = c(0, 0)) +
-scale_x_discrete(labels = c("Rep", "Switch")) +
+scale_x_discrete(limits = c("Rep", "Switch"), labels = c("Switch", "Rep")) +
 labs(y = "Response time (ms)", x = "Categorisation task") +
 theme(panel.grid.major = element_blank(),
 panel.grid.minor = element_blank(),

@@ -708,6 +708,18 @@ learn.NtShape.aov <- aov_ez(
 learn.NtShape.results <- apa_print(learn.NtShape.aov)
 #Followup
 learn.NtShape.fup <- apa_print.emmGrid(pairs(emmeans(learn.NtShape.aov, ~Contra|Group)))
+group.shpnt <- learnNtShape %>%
+  group_by(Group) %>%
+  summarise(mean = mean(mV), se = sqrt(sd(mV)/length(unique(Subject)))) %>%
+  mutate(text = paste("M = ", as.character(round(mean,2)),"\\mu V, se = ", as.character(round(se,2)), sep = ""))
+elecLat.shpnt <- learnNtShape %>%
+  group_by(Contra) %>%
+  summarise(mean = mean(mV), se = sqrt(sd(mV)/length(unique(Subject)))) %>%
+  mutate(text = paste("M = ", as.character(round(mean,2)),"\\mu V, se = ", as.character(round(se,2)), sep = ""))
+intr.shpnt <- learnNtShape %>%
+  group_by(Contra,Group) %>%
+  summarise(mean = mean(mV), se = sqrt(sd(mV)/length(unique(Subject)))) %>%
+  mutate(text = paste("M = ", as.character(round(mean,2)),"\\mu V, se = ", as.character(round(se,2)), sep = ""))
 diffDirect <- learnNtShape %>%
   spread(Contra,mV) %>%
   mutate(difference = Contralateral-Ipsilateral)
@@ -784,9 +796,11 @@ When evaluating the PD time range, we observe no main effects of group (`r learn
 
 ##### Lateral shape singleton, midline colour
 
-When focussing on the lateralised response to a shape singleton in the NT time range, we again see no significant main effects of either group (`r learn.NtShape.results$full$Group`) or electrode laterality (`r learn.NtShape.results$full$Contra`), however we do see a significant interaction between group and electrode laterality (`r learn.NtShape.results$full$Group_Contra`). Follow-up comparisons reveal that for participants in the shape group, a lateralised shape singleton elicits a significant NT component (`r learn.NtShape.fup$full_result$Contralateral_Ipsilateral_Shape`), whereas for participants in the colour group a significant lateralised positivity is elicited by the shape singleton (`r learn.NtShape.fup$full_result$Contralateral_Ipsilateral_Colour`).  When evaluating the PD time range, we observe no main effects of group(`r learn.PdShape.results$full$Group`) or electrode laterality (`r learn.PdShape.results$full$Contra`), and no interaction between group and electrode laterality (`r learn.PdShape.results$full$Group_Contra`).
+In displays where the shape singleton is lateralised and the colour singleton is on the midline, voltages in the NT time window do not differ between participants in the colour group (`r group.shpint$text[1]`) and participants in the shape group (`r group.shpint$text[2]`, `r learn.NtShape.results$full$Group` ), nor is there any difference between the contralateral electrode site (`r elecLat.shpint$text[1]`) and ipsilateral electrode site (`r elecLat.shpint$text[2]`, `r gsub("= .000\\$", "< .001\\$",gsub("= 0.00\\$","< 0.01\\$",learn.NtShape.results$full$Contra))`). We do, however, observe a signicifcant interaction between group and electrode laterality (`r learn.NtShape.results$full$Group_Contra`). For participants performing shape categorisation, a lateralised shape singleton elicits a more negative voltage at contralateral electrode sites (`r intr.shpint$text[1]`) than ipsilateral electrode sites (`r intr.shpint$text[3]`, `r learn.NtShape.fup$full_result$Contralateral_Ipsilateral_Colour`), whereas for participants performing colour lateralisation, a lateralisedshape singleton elicits a more positive voltage at contralateral electrode sites (`r intr.shpint$text[2]`) than ipsilateral electrode sites (`r intr.shpint$text[4]`, `r learn.NtShape.fup$full_result$Contralateral_Ipsilateral_Shape`).
 
-(ref:learnERPCap) Subtractracted ERPs showing the lateralised response to displays in the categorization task. The top panel depicts the different neural responses elicited by a lateralised colour singleton for participants who are tasked with responding to the colour singleton (shown in green) versus those tasked with responding to the shape singleton (shown in grey). The bottom panel depicts the different neural responses elicited by a lateralised colour singleton, again separated by those in the colour group (green) and those in the shape group (grey).
+When evaluating the PD time range, we observe no main effects of group (`r learn.PdShape.results$full$Group`) or electrode laterality (`r learn.PdShape.results$full$Contra`), and no interaction between group and electrode laterality (`r learn.PdShape.results$full$Group_Contra`).
+
+(ref:learnERPCap) Subtracted ERPs showing the lateralised response to displays in the categorisation task. The top panel depicts the different neural responses elicited by a lateralised colour singleton for participants who are tasked with responding to the colour singleton (shown in green) versus those tasked with responding to the shape singleton (shown in grey). The bottom panel depicts the different neural responses elicited by a lateralised colour singleton, again separated by those in the colour group (green) and those in the shape group (grey).
 
 ```{r makeLearnPlots, fig.cap="(ref:learnERPCap)"}
 imgCol <- readPNG("learnCol.png")
@@ -920,6 +934,12 @@ diffDirect <- searchNtTD %>%
   spread(Contra,mV) %>%
   mutate(difference = Contralateral-Ipsilateral)
 NtTDdiff <- apa_print(t.test(diffDirect$Contralateral[diffDirect$Group == "Shape"], diffDirect$Ipsilateral[diffDirect$Group == "Shape"],paired = TRUE))
+intr.tdnt.se <- searchNtTD %>%
+  spread(Contra, mV) %>%
+  mutate(seDiff = Contralateral-Ipsilateral) %>%
+  group_by(Group) %>%
+  summarise(mean = mean(seDiff),se = sqrt(sd(seDiff)/length(unique(Subject)))) %>%
+  mutate( text = paste("$\\Delta M = ", as.character(round(mean,2)), ", se = ", as.character(round(se,2)), "$", sep=""))
 
 searchNtDT <- allData %>%
   mutate(sample = sample*srateMultiplier-baseline) %>%
@@ -954,24 +974,35 @@ diffDirect <- searchPdDT %>%
   spread(Contra,mV) %>%
   mutate(difference = Contralateral-Ipsilateral)
 PdDTdiff <- apa_print(t.test(diffDirect$difference[diffDirect$Group == "Colour"], diffDirect$difference[diffDirect$Group == "Shape"],paired = FALSE))
+intr.dtpd.se <- searchPdDT %>%
+  spread(Contra, mV) %>%
+  mutate(seDiff = Contralateral-Ipsilateral) %>%
+  group_by(Group) %>%
+  summarise(mean = mean(seDiff),se = sqrt(sd(seDiff)/length(unique(Subject)))) %>%
+  mutate( text = paste("$\\Delta M = ", as.character(round(mean,2)), ", se = ", as.character(round(se,2)), "$", sep=""))
 
 ```
 
-Next we focused on the lateralised response to targets and distractors in the search displays as a function of group assignment. Evidence for the effect of selection history would again come from the interaction between group and lateralised ERP activity. We performed a set of mixed 2x2 ANOVAS where electrode laterality (contralateral vs. ipsilateral) was the within-subject factor and group (colour vs. shape) was the between-subject factor. This was performed with each of the following as the independent variable: NT amplitude in the target only trials, NT amplitude for the target in the target and distractor trials, ND for the distractor in the target and distractor trials, and PD for the distractor in the target and distractor trials. the Nt time window (`r sprintf("%i to %ims", NtStart, NtEnd)`) and the Pd time window (`r sprintf("%i to %ims", PdStart, PdEnd)`)
+Next we focused on the lateralised response to targets and distractors in the search displays as a function of group assignment. Evidence for the effect of selection history would again come from the interaction between group and lateralised ERP activity. We performed a set of mixed 2x2 ANOVAS where electrode laterality (contralateral vs. ipsilateral) was the within-subject factor and group (colour vs. shape) was the between-subject factor. This was performed for NT time window elicited by each of the display types (target lateralised - distractor absent, target lateralised - distractor on the midline, and distractor lateralised - target on the midline), as well as the PD time window in the case of a lateralised distractor.
+`r #the Nt time window (r sprintf("%i to %ims", NtStart, NtEnd)) and the Pd time window (r sprintf("%i to %ims", PdStart, PdEnd))`
 
 ##### Target response - Distractor absent trials
 
-In the target only displays there was a significant main effect of electrode laterality where the contralateral response is more negative than the ipsilateral response (`r search.NtTO.results$full$Contra`), but no siginificant main effect of group (`r search.NtTO.results$full$Group`), and no interaction between group and electrode laterality (`r search.NtTO.results$full$Group_Contra`).
+In the target only displays the contralateral response was more negative than the ipsilateral response, indicating a significant main effect of hemisphere (`r search.NtTO.results$full$Contra`). Neither the main effect of group (`r search.NtTO.results$full$Group`), nor the interaction between group and hemisphere reached significance (`r search.NtTO.results$full$Group_Contra`). 
 
 ##### Target response - Distractor present trials
 
-Results for the lateralised target in the presence of a distractor showed no significant main effect of group (`r search.NtTD.results$full$Group`), however there was a significant main effect of electrode laterality (`r search.NtTD.results$full$Contra`), as well as a significant interaction between group and electrode laterality (`r search.NtTD.results$full$Group_Contra`). Follow-up comparisons reveal that a significant NT was elicited for participants in both the colour (`r search.NtTD.fup$full_result$Contralateral_Ipsilateral_Colour`) and shape group (`r search.NtTD.fup$full_result$Contralateral_Ipsilateral_Shape`). When NT amplitude is compared directly with an independent samples t test, the results show that the NT is significantly larger for the shape group than the colour group (`r NtTDdiff$full_result`).
+When the target was lateralised in the presence of a midline distractor, we observed no significant main effect of group (`r search.NtTD.results$full$Group`), however there was a significant main effect of electrode laterality (`r search.NtTD.results$full$Contra`). This main effect is superceeded by an interaction between group and electrode laterality which shows that this voltage difference between contralateral and ipsilateral electrode sites is is significantly larger for participants in the shape group (`r intr.tdnt.se$text[2]`) than those in the colour group(`r paste(intr.tdnt.se$text[1], ", ", search.NtTD.results$full$Group_Contra, sep = "")`). 
+
+`r #Follow-up comparisons reveal that while a significant NT was elicited for participants in both the colour (r search.NtTD.fup$full_result$Contralateral_Ipsilateral_Colour) and shape group (r search.NtTD.fup$full_result$Contralateral_Ipsilateral_Shape). When NT amplitude is compared directly with an independent samples t test, the results show that the NT is significantly larger for the shape group than the colour group (r NtTDdiff$full_result).`
 
 ##### Distractor response - Distractor present trials
 
 For the lateralised distractor response, results of the NT time range showed neither an effect of group(`r search.NtDT.results$full$Group`), nor of electrode laterality (`r search.NtDT.results$full$Contra`), nor an interaction between group and electrode laterality (`r search.NtDT.results$full$Group_Contra`).
 
-Results for the lateralised distractor showed no significant main effect of group (`r search.PdDT.results$full$Group`), however there was a significant main effect of electrode laterality (`r search.PdDT.results$full$Contra`), as well as a significant interaction between group and electrode laterality (`r search.PdDT.results$full$Group_Contra`). Follow-up comparisons reveal that a significant Pd was elicited for participants in the colour group (`r search.PdDT.fup$full_result$Contralateral_Ipsilateral_Colour`), however the difference between the contralateral and ipsilateral electrodes did not reach significance  for the shape group (`r search.PdDT.fup$full_result$Contralateral_Ipsilateral_Shape`). When Pd amplitude is compared directly with an independent samples t test, the results show that the Pd was significantly larger for the colour group than the shape group (`r PdDTdiff$full_result`).
+Results for the lateralised distractor showed no significant main effect of group (`r search.PdDT.results$full$Group`), however there was a significant main effect of electrode laterality (`r search.PdDT.results$full$Contra`). A significant interaction between group and electrode laterality (`r search.PdDT.results$full$Group_Contra`) revealed that a significant Pd was elicited for participants in the colour group (`r search.PdDT.fup$full_result$Contralateral_Ipsilateral_Colour`), however the difference between the contralateral and ipsilateral electrodes did not reach significance for the shape group (`r search.PdDT.fup$full_result$Contralateral_Ipsilateral_Shape`). 
+
+`r #When Pd amplitude is compared directly with an independent samples t test, the results show that the Pd was significantly larger for the colour group than the shape group (r PdDTdiff$full_result).`
 
 (ref:searchERPCap) Subtractracted ERPs showing the lateralised response to a target in the absence of distractors (top, the target in the presence of a distractor (middle), and the distractor (bottom) for each group in the search task. Example displays are shown for each ERP.
 
@@ -1034,7 +1065,7 @@ rm(list = ls(pattern = "search"))
 rm(list = ls(pattern = "learn"))
 rm(list = ls(pattern = "img"))
 rm(list = ls(pattern = "grand"))
-rm(allData,diffDirect, NtTDdiff, PdDTdiff)
+rm(allData, diffDirect, NtTDdiff, PdDTdiff)
 gc()
 ```
 ## Voluntary Task Selection
@@ -1204,6 +1235,12 @@ learnSC.stat <- aov_ez(
 )
 learnSC.res <- apa_print(learnSC.stat)
 learnSC.fup <- apa_print.emmGrid(pairs(emmeans(learnSC.stat, ~SwitchCount|Group)))
+intr.lrnSC <- learnSC.dat %>%
+  spread(Contra, RT) %>%
+  mutate(seDiff = Contralateral-Ipsilateral) %>%
+  group_by(Group) %>%
+  summarise(mean = mean(seDiff),se = sqrt(sd(seDiff)/length(unique(Subject)))) %>%
+  mutate( text = paste("$\\Delta M = ", as.character(round(mean,2)), ", se = ", as.character(round(se,2)), "$", sep=""))
 
 #Switch costs correlate with distractor interference?
 #Switch costs correlate with PD amplitude?
@@ -1253,7 +1290,7 @@ We performed a 2x2 ANOVA in order to evaluate the effect of task transition (rep
 
 We also carried out a 2x2 ANOVA in order to evaluate the effect of task transition (repeat vs switch) and Group (shape vs colour) on the response times to the search task displays. The results showed no significant main effect of group(`r searchSC.res$full_result$Group`), however there was a significant main effect of task transition on response times where switching tasks resulted in a significant slowing of responses to the task display (`r searchSC.res$full_result$SwitchCount`). There was no significant interaction between group and task transition(`r searchSC.res$full_result$Group_SwitchCount`).
 
-We performed a 2x2x2 mixed ANOVA in order to evaluate the effect of task transition, 
+We performed a 2x2x2 mixed ANOVA in order to evaluate the effect of group (shape vs colour) task transition (repeat vs switch), and task (categorisation vs search) on response times. 
 
 (ref:SCPlot) Response times for switch and repeat trials for the colour group (green) and the shape group (grey) in each task. For the serach task (left) we observe a switch cost (faster responses to repetition trials) for both groups of participants. In the categorisation task (right) participants in the colour group show significant switch costs however participants in the shape group show no significant effect.
 

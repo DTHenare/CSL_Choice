@@ -1253,13 +1253,16 @@ filter(switchRate > minSwitchRate,CompSearch.RT < compCutoff | LearnSearch.RT < 
 mutate(respTime = ifelse(!is.na(CompSearch.RT),CompSearch.RT,LearnSearch.RT), SwitchCount = ifelse(SwitchCount == 1, "Switch", "Rep")) %>%
 group_by(Subject, Group, SwitchCount, Procedure.Trial.) %>%
 summarise(RT = mean(respTime))
-learnSC.stat <- aov_ez(
+SC.stat <- aov_ez(
   data = SC.dat,
   dv = "RT",
   id = "Subject", 
   within = c("SwitchCount", "Procedure.Trial."),
   between = "Group"
 )
+pairs(emmeans(SC.stat, ~SwitchCount|Group*Procedure.Trial.))
+pairs(emmeans(SC.stat, ~SwitchCount|Group))
+pairs(emmeans(SC.stat, ~SwitchCount|Procedure.Trial.))
 colourSC.dat <- behavData %>%
   filter(Group == "Colour")%>%
   filter(switchRate > minSwitchRate,CompSearch.RT < compCutoff | LearnSearch.RT < learnCutoff) %>%
@@ -1284,13 +1287,39 @@ shapeSC.stat <- aov_ez(
   id = "Subject", 
   within = c("SwitchCount", "Procedure.Trial.")
 )
+
+
+
+SCdirect.dat <- behavData %>%
+  filter(switchRate > minSwitchRate,CompSearch.RT < compCutoff | LearnSearch.RT < learnCutoff) %>%
+  mutate(respTime = ifelse(!is.na(CompSearch.RT),CompSearch.RT,LearnSearch.RT), SwitchCount = ifelse(SwitchCount == 1, "Switch", "Rep")) %>%
+  group_by(Subject, Group, SwitchCount, Procedure.Trial.) %>%
+  summarise(RT = mean(respTime)) %>%
+  spread(SwitchCount, RT) %>%
+  mutate(SwitchCosts = Switch-Rep)
+SCdirect.stat <- aov_ez(
+  data = SCdirect.dat,
+  dv = "SwitchCosts",
+  id = "Subject", 
+  within = c("Procedure.Trial."),
+  between = "Group"
+)
+SCdirect.res <- apa_print(SCdirect.stat)
+SCdirect.grp.fup <- apa_print(pairs(emmeans(SCdirect.stat, ~Procedure.Trial.|Group)))
+SCdirect.tsk.fup <- apa_print(pairs(emmeans(SCdirect.stat, ~Group|Procedure.Trial.)))
+colSch.SC <- apa_print(t.test(SCdirect.dat$SwitchCosts[SCdirect.dat$Group == "Colour" & SCdirect.dat$Procedure.Trial. == "TaskC"], mu = 0, alternative = "greater"))
+colCat.SC <- apa_print(t.test(SCdirect.dat$SwitchCosts[SCdirect.dat$Group == "Colour" & SCdirect.dat$Procedure.Trial. == "TaskL"], mu = 0, alternative = "greater"))
+shpSch.SC <- apa_print(t.test(SCdirect.dat$SwitchCosts[SCdirect.dat$Group == "Shape" & SCdirect.dat$Procedure.Trial. == "TaskC"], mu = 0, alternative = "greater"))
+shpCat.SC <- apa_print(t.test(SCdirect.dat$SwitchCosts[SCdirect.dat$Group == "Shape" & SCdirect.dat$Procedure.Trial. == "TaskL"], mu = 0, alternative = "greater"))
 ```
 
-We performed a 2x2 ANOVA in order to evaluate the effect of task transition (repeat vs switch) and Group (shape vs colour) on the response times to the categorisation task displays. The results showed no significant main effect of Group (`r learnSC.res$full_result$Group`) , however there was a significant main effect of task transition on response times where switching tasks resulted in a significant slowing of responses to the task display (`r learnSC.res$full_result$SwitchCount`). There was also a significant interaction between group and task transition (`r learnSC.res$full_result$SwitchCount_Group`). When we follow up this interaction we see that there are significant switch costs for the colour group (`r learnSC.fup$full_result$Rep_Switch_Colour`) however we do not observe significant switch costs for participants in the shape group (`r learnSC.fup$full_result$Rep_Switch_Shape`). Switch costs for both groups in each task are shown in figure\ \@ref(fig:switchCostPlot).
+```{r}
+#We performed a 2x2 ANOVA in order to evaluate the effect of task transition (repeat vs switch) and Group (shape vs colour) on the response times to the categorisation task displays. The results showed no significant main effect of Group (`r learnSC.res$full_result$Group`) , however there was a significant main effect of task transition on response times where switching tasks resulted in a significant slowing of responses to the task display (`r learnSC.res$full_result$SwitchCount`). There was also a significant interaction between group and task transition (`r learnSC.res$full_result$SwitchCount_Group`). When we follow up this interaction we see that there are significant switch costs for the colour group (`r learnSC.fup$full_result$Rep_Switch_Colour`) however we do not observe significant switch costs for participants in the shape group (`r learnSC.fup$full_result$Rep_Switch_Shape`). Switch costs for both groups in each task are shown in figure\ \@ref(fig:switchCostPlot).
 
-We also carried out a 2x2 ANOVA in order to evaluate the effect of task transition (repeat vs switch) and Group (shape vs colour) on the response times to the search task displays. The results showed no significant main effect of group(`r searchSC.res$full_result$Group`), however there was a significant main effect of task transition on response times where switching tasks resulted in a significant slowing of responses to the task display (`r searchSC.res$full_result$SwitchCount`). There was no significant interaction between group and task transition(`r searchSC.res$full_result$Group_SwitchCount`).
+#We also carried out a 2x2 ANOVA in order to evaluate the effect of task transition (repeat vs switch) and Group (shape vs colour) on the response times to the search task displays. The results showed no significant main effect of group(`r searchSC.res$full_result$Group`), however there was a significant main effect of task transition on response times where switching tasks resulted in a significant slowing of responses to the task display (`r searchSC.res$full_result$SwitchCount`). There was no significant interaction between group and task transition(`r searchSC.res$full_result$Group_SwitchCount`).
+```
 
-We performed a 2x2x2 mixed ANOVA in order to evaluate the effect of group (shape vs colour) task transition (repeat vs switch), and task (categorisation vs search) on response times. 
+Switch costs were calculated by subtracting repsonse times to switch trials from response times to repetition trials. First, one sample t tests were used to show that participants in the colour group incur significant switch costs in the both the categorisation task (`r colCat.SC$full_result`) and the search task (`r colSch.SC$full_result`). Similarly, participants in the shape group show significant switch costs during both categorisation (`r shpCat.SC$full_result`) and search (`r shpSch.SC$full_result`). We then performed a 2x2 ANOVA in order to evaluate the effect of task (categorisation vs search) and group (colour vs shape) on the size of these switch costs. Our results show a significant effect of task (`r SCdirect.res$full_reuslt$Procedure_Trial_`), but not group (`r SCdirect.res$full_reuslt$Group`), however these effects are superceded by a significant interaction between taks and group (`r SCdirect.res$full_reuslt$Group_Procedure_Trial_`). Follow-up comparisons demonstrate that participants in the colour group have significantly larger switch costs when switching to the categorisation task than to the search task (`r SCdirect.grp.fup$statistic$TaskC_TaskL_Colour`), whereas participants in the shape group show no difference between tasks (`r SCdirect.grp.fup$statistic$TaskC_TaskL_Shape`). In the categorisation task, participants in the colour group have significantly larger switch costs than participants in the colour group (`r SCdirect.tsk.fup$statistic$Colour_Shape_TaskL`) however there is no difference between the two groups for the search task (`r SCdirect.tsk.fup$statistic$Colour_Shape_TaskC`).
 
 (ref:SCPlot) Response times for switch and repeat trials for the colour group (green) and the shape group (grey) in each task. For the serach task (left) we observe a switch cost (faster responses to repetition trials) for both groups of participants. In the categorisation task (right) participants in the colour group show significant switch costs however participants in the shape group show no significant effect.
 

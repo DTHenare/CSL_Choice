@@ -790,13 +790,13 @@ In the categorisation task, our ERP analyses focused on the lateralised response
 
 ##### Lateral colour singleton, midline shape
 
-In displays where the colour singleton is lateralised and the shape singleton is on the midline, voltages in the NT time window do not differ between participants in the colour group (`r group.colint$text[1]`) and participants in the shape group (`r group.colint$text[2]`, `r learn.NtCol.results$full$Group` ), nor is there any difference between the contralateral electrode site (`r elecLat.colint$text[1]`) and ipsilateral electrode site (`r elecLat.colint$text[2]`, `r gsub("= .000\\$", "< .001\\$",gsub("= 0.00\\$","< 0.01\\$",learn.NtCol.results$full$Contra))`). We do, however, observe a signicifcant interaction between group and electrode laterality (`r learn.NtCol.results$full$Group_Contra`). For participants performing colour categorisation, a lateralised colour singleton elicits a more negative voltage at contralateral electrode sites (`r intr.colint$text[1]`) than ipsilateral electrode sites (`r intr.colint$text[3]`, `r learn.NtCol.fup$full_result$Contralateral_Ipsilateral_Colour`), whereas for participants performing shape lateralisation, a lateralised colour singleton elicits a more positive voltage at contralateral electrode sites (`r intr.colint$text[2]`) than ipsilateral electrode sites (`r intr.colint$text[4]`, `r learn.NtCol.fup$full_result$Contralateral_Ipsilateral_Shape`).
+In displays where the colour singleton is lateralised and the shape singleton is on the midline, voltages in the NT time window do not differ between participants in the colour group (`r group.colnt$text[1]`) and participants in the shape group (`r group.colnt$text[2]`, `r learn.NtCol.results$full$Group` ), nor is there any difference between the contralateral electrode site (`r elecLat.colnt$text[1]`) and ipsilateral electrode site (`r elecLat.colnt$text[2]`, `r gsub("= .000\\$", "< .001\\$",gsub("= 0.00\\$","< 0.01\\$",learn.NtCol.results$full$Contra))`). We do, however, observe a signicifcant interaction between group and electrode laterality (`r learn.NtCol.results$full$Group_Contra`). For participants performing colour categorisation, a lateralised colour singleton elicits a more negative voltage at contralateral electrode sites (`r intr.colnt$text[1]`) than ipsilateral electrode sites (`r intr.colnt$text[3]`, `r learn.NtCol.fup$full_result$Contralateral_Ipsilateral_Colour`), whereas for participants performing shape lateralisation, a lateralised colour singleton elicits a more positive voltage at contralateral electrode sites (`r intr.colnt$text[2]`) than ipsilateral electrode sites (`r intr.colnt$text[4]`, `r learn.NtCol.fup$full_result$Contralateral_Ipsilateral_Shape`).
 
 When evaluating the PD time range, we observe no main effects of group (`r learn.PdCol.results$full$Group`) or electrode laterality (`r learn.PdCol.results$full$Contra`), and no interaction between group and electrode laterality (`r learn.PdCol.results$full$Group_Contra`).
 
 ##### Lateral shape singleton, midline colour
 
-In displays where the shape singleton is lateralised and the colour singleton is on the midline, voltages in the NT time window do not differ between participants in the colour group (`r group.shpint$text[1]`) and participants in the shape group (`r group.shpint$text[2]`, `r learn.NtShape.results$full$Group` ), nor is there any difference between the contralateral electrode site (`r elecLat.shpint$text[1]`) and ipsilateral electrode site (`r elecLat.shpint$text[2]`, `r gsub("= .000\\$", "< .001\\$",gsub("= 0.00\\$","< 0.01\\$",learn.NtShape.results$full$Contra))`). We do, however, observe a signicifcant interaction between group and electrode laterality (`r learn.NtShape.results$full$Group_Contra`). For participants performing shape categorisation, a lateralised shape singleton elicits a more negative voltage at contralateral electrode sites (`r intr.shpint$text[1]`) than ipsilateral electrode sites (`r intr.shpint$text[3]`, `r learn.NtShape.fup$full_result$Contralateral_Ipsilateral_Colour`), whereas for participants performing colour lateralisation, a lateralisedshape singleton elicits a more positive voltage at contralateral electrode sites (`r intr.shpint$text[2]`) than ipsilateral electrode sites (`r intr.shpint$text[4]`, `r learn.NtShape.fup$full_result$Contralateral_Ipsilateral_Shape`).
+In displays where the shape singleton is lateralised and the colour singleton is on the midline, voltages in the NT time window do not differ between participants in the colour group (`r group.shpnt$text[1]`) and participants in the shape group (`r group.shpnt$text[2]`, `r learn.NtShape.results$full$Group` ), nor is there any difference between the contralateral electrode site (`r elecLat.shpnt$text[1]`) and ipsilateral electrode site (`r elecLat.shpnt$text[2]`, `r gsub("= .000\\$", "< .001\\$",gsub("= 0.00\\$","< 0.01\\$",learn.NtShape.results$full$Contra))`). We do, however, observe a signicifcant interaction between group and electrode laterality (`r learn.NtShape.results$full$Group_Contra`). For participants performing shape categorisation, a lateralised shape singleton elicits a more negative voltage at contralateral electrode sites (`r intr.shpnt$text[1]`) than ipsilateral electrode sites (`r intr.shpnt$text[3]`, `r learn.NtShape.fup$full_result$Contralateral_Ipsilateral_Colour`), whereas for participants performing colour lateralisation, a lateralisedshape singleton elicits a more positive voltage at contralateral electrode sites (`r intr.shpnt$text[2]`) than ipsilateral electrode sites (`r intr.shpnt$text[4]`, `r learn.NtShape.fup$full_result$Contralateral_Ipsilateral_Shape`).
 
 When evaluating the PD time range, we observe no main effects of group (`r learn.PdShape.results$full$Group`) or electrode laterality (`r learn.PdShape.results$full$Contra`), and no interaction between group and electrode laterality (`r learn.PdShape.results$full$Group_Contra`).
 
@@ -1204,7 +1204,7 @@ behavData %>%
 
 ### Switch Costs
 
-```{r switchCostStats}
+```{r switchCostStats, include = FALSE}
 searchSC.dat <- behavData %>%
 filter(Procedure.Trial. == "TaskC") %>%
 filter(switchRate > minSwitchRate,CompSearch.RT < compCutoff | LearnSearch.RT < learnCutoff) %>%
@@ -1235,12 +1235,12 @@ learnSC.stat <- aov_ez(
 )
 learnSC.res <- apa_print(learnSC.stat)
 learnSC.fup <- apa_print.emmGrid(pairs(emmeans(learnSC.stat, ~SwitchCount|Group)))
-intr.lrnSC <- learnSC.dat %>%
-  spread(Contra, RT) %>%
-  mutate(seDiff = Contralateral-Ipsilateral) %>%
-  group_by(Group) %>%
-  summarise(mean = mean(seDiff),se = sqrt(sd(seDiff)/length(unique(Subject)))) %>%
-  mutate( text = paste("$\\Delta M = ", as.character(round(mean,2)), ", se = ", as.character(round(se,2)), "$", sep=""))
+#intr.lrnSC <- learnSC.dat %>%
+#  spread(Contra, RT) %>%
+#  mutate(seDiff = Contralateral-Ipsilateral) %>%
+#  group_by(Group) %>%
+#  summarise(mean = mean(seDiff),se = sqrt(sd(seDiff)/length(unique(Subject)))) %>%
+#  mutate( text = paste("$\\Delta M = ", as.character(round(mean,2)), ", se = ", as.character(round(se,2)), "$", sep=""))
 
 #Switch costs correlate with distractor interference?
 #Switch costs correlate with PD amplitude?

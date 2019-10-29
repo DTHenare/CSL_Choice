@@ -711,15 +711,15 @@ learn.NtShape.fup <- apa_print.emmGrid(pairs(emmeans(learn.NtShape.aov, ~Contra|
 group.shpnt <- learnNtShape %>%
   group_by(Group) %>%
   summarise(mean = mean(mV), se = sqrt(sd(mV)/length(unique(Subject)))) %>%
-  mutate(text = paste("M = ", as.character(round(mean,2)),"\\mu V, se = ", as.character(round(se,2)), sep = ""))
+  mutate(text = paste("M = ", as.character(round(mean,2)),"$\\mu$V, se = ", as.character(round(se,2)), sep = ""))
 elecLat.shpnt <- learnNtShape %>%
   group_by(Contra) %>%
   summarise(mean = mean(mV), se = sqrt(sd(mV)/length(unique(Subject)))) %>%
-  mutate(text = paste("M = ", as.character(round(mean,2)),"\\mu V, se = ", as.character(round(se,2)), sep = ""))
+  mutate(text = paste("M = ", as.character(round(mean,2)),"$\\mu$V, se = ", as.character(round(se,2)), sep = ""))
 intr.shpnt <- learnNtShape %>%
   group_by(Contra,Group) %>%
   summarise(mean = mean(mV), se = sqrt(sd(mV)/length(unique(Subject)))) %>%
-  mutate(text = paste("M = ", as.character(round(mean,2)),"\\\mu V, se = ", as.character(round(se,2)), sep = ""))
+  mutate(text = paste("M = ", as.character(round(mean,2)),"$\\mu$V, se = ", as.character(round(se,2)), sep = ""))
 diffDirect <- learnNtShape %>%
   spread(Contra,mV) %>%
   mutate(difference = Contralateral-Ipsilateral)
@@ -743,15 +743,15 @@ learn.NtCol.fup <- apa_print.emmGrid(pairs(emmeans(learn.NtCol.aov, ~Contra|Grou
 group.colnt <- learnNtCol %>%
   group_by(Group) %>%
   summarise(mean = mean(mV), se = sqrt(sd(mV)/length(unique(Subject)))) %>%
-  mutate(text = paste("M = ", as.character(round(mean,2)),"\\mu V, se = ", as.character(round(se,2)), sep = ""))
+  mutate(text = paste("M = ", as.character(round(mean,2)),"$\\mu$V, se = ", as.character(round(se,2)), sep = ""))
 elecLat.colnt <- learnNtCol %>%
   group_by(Contra) %>%
   summarise(mean = mean(mV), se = sqrt(sd(mV)/length(unique(Subject)))) %>%
-  mutate(text = paste("M = ", as.character(round(mean,2)),"\\mu V, se = ", as.character(round(se,2)), sep = ""))
+  mutate(text = paste("M = ", as.character(round(mean,2)),"$\\mu$V, se = ", as.character(round(se,2)), sep = ""))
 intr.colnt <- learnNtCol %>%
   group_by(Contra,Group) %>%
   summarise(mean = mean(mV), se = sqrt(sd(mV)/length(unique(Subject)))) %>%
-  mutate(text = paste("M = ", as.character(round(mean,2)),"\\mu V, se = ", as.character(round(se,2)), sep = ""))
+  mutate(text = paste("M = ", as.character(round(mean,2)),"$\\mu$V, se = ", as.character(round(se,2)), sep = ""))
 diffDirect <- learnNtCol %>%
   spread(Contra,mV) %>%
   mutate(difference = Contralateral-Ipsilateral)
@@ -817,6 +817,7 @@ allData %>%
     geom_rect(aes(xmin = NtStart, xmax = NtEnd, ymin = -Inf, ymax = 0), fill = "lemonchiffon") +
     geom_rect(aes(xmin = PdStart, xmax = PdEnd, ymin = 0, ymax = Inf), fill = "lemonchiffon") +
     geom_line(aes(colour = Group),size=1) +
+    geom_text(x=NtStart+winSize/2, y=1.5, label="NT") +
     scale_colour_manual(values=c("green4", "gray42"))+
     scale_x_continuous(name ="Latency (ms)", expand = c(0, 0)) +
     scale_y_reverse(name =expression(paste("Amplitude (",mu,"v)")), expand = c(0, 0)) +

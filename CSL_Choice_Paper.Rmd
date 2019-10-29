@@ -332,28 +332,6 @@ switchRates <- behavData %>% group_by(Subject) %>%summarise(SR = mean(switchRate
 ParticipantsRejected <- unique(behavData %>% filter(switchRate < minSwitchRate) %>% group_by(Subject) %>% summarise(new = mean(Subject)))$new
 ```
 
-```{r, include = FALSE}
-autoCor <- data.frame(matrix(ncol = 3, nrow = 0))
-colnames(autoCor) <- c("Cor", "Subject", "Group")
-
-for (subj in unique(behavData$Subject)) {
-sData <- behavData %>% filter(Subject == subj)
-Cor <- acf(sData$SwitchCount,lag.max = 576,plot = TRUE)$acf
-Cor = data.frame(Cor)
-Cor$Subject = subj
-Cor$Group = behavData$Group[behavData$Subject==subj][1]
-autoCor <- rbind(autoCor,Cor[])
-}
-
-autoCor$Cor <- sqrt(autoCor$Cor^2)
-
-autoCor %>%
-  filter(Cor < 1) %>%
-  group_by(Subject,Group) %>%
-  summarise(Cor = mean(Cor))
-t.test(autoCor$Cor[autoCor$Group=="Colour"],autoCor$Cor[autoCor$Group=="Shape"], paired = FALSE)
-```
-
 ```{r perfByTaskStats, include = FALSE}
 #documenting trial rejection
 alltrials <- behavData %>%

@@ -504,7 +504,7 @@ behavData %>%
 
 
 ```{r, echo = FALSE, include = FALSE}
-rm( groupInfo,intEffectTTest, acc, acc.res, acc.stat, autoCor, Cor, distCost, rt, rt.res, rt.stat, sData, searchAcc, searchAcc.aov, searchAcc.res, searchRT, searchRT.aov, searchRT.fup, searchRT.res, t.out, sub, subj, survabrej, survallrej, survTrials, alltrials)
+rm( groupInfo,intEffectTTest, acc, acc.res, acc.stat, autoCor, Cor, distCost, rt, rt.res, rt.stat, sData, searchAcc, searchAcc.aov, searchAcc.res, searchRT, searchRT.aov, searchRT.fup, searchRT.res, t.out, sub, subj, survabrej, survallrej, survTrials, alltrials, group.acc, group.rt, group.sacc, group.srt, intr.srt.mean, intr.srt.se, task.acc, task.rt, task.sacc, task.srt, intr.srt.text)
 gc()
 ```
 

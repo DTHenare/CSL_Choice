@@ -795,7 +795,9 @@ allData %>%
     geom_rect(aes(xmin = NtStart, xmax = NtEnd, ymin = -Inf, ymax = 0), fill = "lemonchiffon") +
     geom_rect(aes(xmin = PdStart, xmax = PdEnd, ymin = 0, ymax = Inf), fill = "lemonchiffon") +
     geom_line(aes(colour = Group),size=1) +
-    geom_text(x=NtStart+winSize/2, y=1.5, label="NT") +
+    ggtitle("Categorisation task") +
+    geom_text(x=NtStart+winSize/2, y=2, label="NT") +
+    geom_text(x=PdStart+winSize/2, y=-1.8, label="PD") +
     scale_colour_manual(values=c("green4", "gray42"))+
     scale_x_continuous(name ="Latency (ms)", expand = c(0, 0)) +
     scale_y_reverse(name =expression(paste("Amplitude (",mu,"v)")), expand = c(0, 0)) +
@@ -822,7 +824,8 @@ allData %>%
           legend.title = element_text( size = fontSize*1.1),
           legend.text = element_text( size = fontSize*0.93),
           legend.position = "bottom",
-          plot.margin = unit(c(2,2,0,2),"cm")
+          plot.margin = unit(c(2,2,0,2),"cm"),
+          plot.title = element_text(family = "sans", size = 18, margin=margin(0,0,30,0))
           )
 ggsave("LearnSubtracted.pdf", dpi = 300, width = 30, height = 20, units = c("cm"))
 ```
@@ -1001,6 +1004,9 @@ allData %>%
     geom_rect(aes(xmin = NtStart, xmax = NtEnd, ymin = -Inf, ymax = 0), fill = "lemonchiffon") +
     geom_rect(data = . %>% filter(Stimulus  == "Distractor"),aes(xmin = PdStart, xmax = PdEnd, ymin = 0, ymax = Inf), fill = "lemonchiffon") +
     geom_line(aes(colour = Group),size=1) +
+    ggtitle("Search task") +
+    geom_text(x=NtStart+winSize/2, y=3, label="NT") +
+    geom_text(data = . %>% filter(Stimulus  == "Distractor"),x=PdStart+winSize/2, y=-2, label="PD") +
     scale_colour_manual(values=c("green4", "gray42"))+
     #scale_colour_brewer(palette = "Set1") +
     scale_x_continuous(name ="Latency (ms)", expand = c(0, 0)) +
@@ -1034,7 +1040,8 @@ allData %>%
           legend.title = element_text( size = fontSize*1.1),
           legend.text = element_text( size = fontSize*0.93),
           legend.position = "bottom",
-          plot.margin = unit(c(2,2,0,2),"cm")
+          plot.margin = unit(c(2,2,0,2),"cm"),
+          plot.title = element_text(family = "sans", size = 18, margin=margin(0,0,30,0))
           )
 ggsave("SearchSubtracted.pdf", dpi = 300, width = 30, height = 40, units = c("cm"))
 ```

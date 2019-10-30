@@ -774,11 +774,11 @@ When evaluating the PD time range, we observe no main effects of group (`r learn
 
 ##### Lateral shape singleton, midline colour
 
-In displays where the shape singleton is lateralised and the colour singleton is on the midline, voltages in the NT time window do not differ between participants in the colour group (`r group.shpnt$text[1]`) and participants in the shape group (`r group.shpnt$text[2]`, `r learn.NtShape.results$full$Group` ), nor is there any difference between the contralateral electrode site (`r elecLat.shpnt$text[1]`) and ipsilateral electrode site (`r elecLat.shpnt$text[2]`, `r gsub("= .000\\$", "< .001\\$",gsub("= 0.00\\$","< 0.01\\$",learn.NtShape.results$full$Contra))`). We do, however, observe a signicifcant interaction between group and electrode laterality (`r learn.NtShape.results$full$Group_Contra`). For participants performing shape categorisation, a lateralised shape singleton elicits a more negative voltage at contralateral electrode sites (`r intr.shpnt$text[1]`) than ipsilateral electrode sites (`r intr.shpnt$text[3]`, `r learn.NtShape.fup$full_result$Contralateral_Ipsilateral_Colour`), whereas for participants performing colour lateralisation, a lateralisedshape singleton elicits a more positive voltage at contralateral electrode sites (`r intr.shpnt$text[2]`) than ipsilateral electrode sites (`r intr.shpnt$text[4]`, `r learn.NtShape.fup$full_result$Contralateral_Ipsilateral_Shape`).
+In displays where the shape singleton is lateralised and the colour singleton is on the midline, voltages in the NT time window do not differ between participants in the colour group (`r group.shpnt$text[1]`) and participants in the shape group (`r group.shpnt$text[2]`, `r learn.NtShape.results$full$Group` ), nor is there any difference between the contralateral electrode site (`r elecLat.shpnt$text[1]`) and ipsilateral electrode site (`r elecLat.shpnt$text[2]`, `r gsub("= .000\\$", "< .001\\$",gsub("= 0.00\\$","< 0.01\\$",learn.NtShape.results$full$Contra))`). We do, however, observe a signicifcant interaction between group and electrode laterality (`r learn.NtShape.results$full$Group_Contra`). For participants performing shape categorisation, a lateralised shape singleton elicits a more negative voltage at contralateral electrode sites (`r intr.shpnt$text[1]`) than ipsilateral electrode sites (`r intr.shpnt$text[3]`, `r learn.NtShape.fup$full_result$Contralateral_Ipsilateral_Colour`), whereas for participants performing colour lateralisation, a lateralised shape singleton elicits a more positive voltage at contralateral electrode sites (`r intr.shpnt$text[2]`) than ipsilateral electrode sites (`r intr.shpnt$text[4]`, `r learn.NtShape.fup$full_result$Contralateral_Ipsilateral_Shape`).
 
 When evaluating the PD time range, we observe no main effects of group (`r learn.PdShape.results$full$Group`) or electrode laterality (`r learn.PdShape.results$full$Contra`), and no interaction between group and electrode laterality (`r learn.PdShape.results$full$Group_Contra`).
 
-(ref:learnERPCap) Subtracted ERPs showing the lateralised response to displays in the categorisation task. The top panel depicts the different neural responses elicited by a lateralised colour singleton for participants who are tasked with responding to the colour singleton (shown in green) versus those tasked with responding to the shape singleton (shown in grey). The bottom panel depicts the different neural responses elicited by a lateralised colour singleton, again separated by those in the colour group (green) and those in the shape group (grey).
+(ref:learnERPCap) Subtracted ERPs showing the lateralised response to displays in the categorisation task. The top panel depicts the different neural responses elicited by a lateralised colour singleton for participants who are tasked with responding to the colour singleton (shown in green) versus those tasked with responding to the shape singleton (shown in grey). The bottom panel depicts the different neural responses elicited by a lateralised colour singleton, again separated by those in the colour group (green) and those in the shape group (grey). We see an NT (`r as.character(round(NtStart))`ms to `r as.character(round(NtEnd))`ms) elicited by whichever stimulus is the target (lateralised colour singleton for the colour group, lateralised shape singleton for the shape group) but not otherwise.
 
 ```{r makeLearnPlots, fig.cap="(ref:learnERPCap)"}
 imgCol <- readPNG("learnCol.png")
@@ -796,8 +796,8 @@ allData %>%
     geom_rect(aes(xmin = PdStart, xmax = PdEnd, ymin = 0, ymax = Inf), fill = "lemonchiffon") +
     geom_line(aes(colour = Group),size=1) +
     ggtitle("Categorisation task") +
-    geom_text(x=NtStart+winSize/2, y=2, label="NT") +
-    geom_text(x=PdStart+winSize/2, y=-1.8, label="PD") +
+    geom_text(x=NtStart+winSize/2, y=2, label="NT",size=fontSize/(14/5)*0.85) +
+    geom_text(x=PdStart+winSize/2, y=-1.8, label="PD",size=fontSize/(14/5)*0.85) +
     scale_colour_manual(values=c("green4", "gray42"))+
     scale_x_continuous(name ="Latency (ms)", expand = c(0, 0)) +
     scale_y_reverse(name =expression(paste("Amplitude (",mu,"v)")), expand = c(0, 0)) +
@@ -824,10 +824,10 @@ allData %>%
           legend.title = element_text( size = fontSize*1.1),
           legend.text = element_text( size = fontSize*0.93),
           legend.position = "bottom",
-          plot.margin = unit(c(2,2,0,2),"cm"),
-          plot.title = element_text(family = "sans", size = 18, margin=margin(0,0,30,0))
+          plot.margin = unit(c(0,0,0,0),"cm"),
+          plot.title = element_text(family = "sans", size =fontSize*1.5, margin=margin(0,0,30,0))
           )
-ggsave("LearnSubtracted.pdf", dpi = 300, width = 30, height = 20, units = c("cm"))
+ggsave("LearnSubtracted.pdf", dpi = 300, width = 8.89, height = 8.89*1, units = c("cm"))
 ```
 
 #### Search task
@@ -986,7 +986,7 @@ Results for the lateralised distractor showed no significant main effect of grou
 
 `r #When Pd amplitude is compared directly with an independent samples t test, the results show that the Pd was significantly larger for the colour group than the shape group (r PdDTdiff$full_result).`
 
-(ref:searchERPCap) Subtractracted ERPs showing the lateralised response to a target in the absence of distractors (top, the target in the presence of a distractor (middle), and the distractor (bottom) for each group in the search task. Example displays are shown for each ERP.
+(ref:searchERPCap) Subtracted ERPs showing the lateralised response for each group across the three different search display conditions. The top panel shows equivalent NT components (`r as.character(round(NtStart))`ms to `r as.character(round(NtEnd))`ms) elicited by both groups when a target is presented without distraction. The middle panel shows the attenuated NT for participants in the colour group when a target is presented alongside a colour distractor. The bottom panel shows the PD component (`r as.character(round(PdStart))`ms to `r as.character(round(PdEnd))`ms) elicited by lateralised colour distractors for participants in the colour group but not the shape group.
 
 ```{r makeSearchPlots, fig.cap="(ref:searchERPCap)", fig.height = 5.25,  fig.align = "center"}
 
@@ -1005,8 +1005,8 @@ allData %>%
     geom_rect(data = . %>% filter(Stimulus  == "Distractor"),aes(xmin = PdStart, xmax = PdEnd, ymin = 0, ymax = Inf), fill = "lemonchiffon") +
     geom_line(aes(colour = Group),size=1) +
     ggtitle("Search task") +
-    geom_text(x=NtStart+winSize/2, y=3, label="NT") +
-    geom_text(data = . %>% filter(Stimulus  == "Distractor"),x=PdStart+winSize/2, y=-2, label="PD") +
+    geom_text(x=NtStart+winSize/2, y=3, label="NT",size=fontSize/(14/5)*0.85) +
+    geom_text(data = . %>% filter(Stimulus  == "Distractor"),x=PdStart+winSize/2, y=-2, label="PD",size=fontSize/(14/5)*0.85) +
     scale_colour_manual(values=c("green4", "gray42"))+
     #scale_colour_brewer(palette = "Set1") +
     scale_x_continuous(name ="Latency (ms)", expand = c(0, 0)) +
@@ -1040,10 +1040,10 @@ allData %>%
           legend.title = element_text( size = fontSize*1.1),
           legend.text = element_text( size = fontSize*0.93),
           legend.position = "bottom",
-          plot.margin = unit(c(2,2,0,2),"cm"),
+          plot.margin = unit(c(0,0,0,0),"cm"),
           plot.title = element_text(family = "sans", size = 18, margin=margin(0,0,30,0))
           )
-ggsave("SearchSubtracted.pdf", dpi = 300, width = 30, height = 40, units = c("cm"))
+ggsave("SearchSubtracted.pdf", dpi = 300, width = 8.89, height = 8.89*1.3, units = c("cm"))
 ```
 
 ```{r clearData, include = FALSE}

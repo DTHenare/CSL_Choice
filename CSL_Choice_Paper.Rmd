@@ -29,8 +29,7 @@ affiliation:
     institution   : "Philipps-University of Marburg, Germany"
 
 author_note: |
-  Dion Henare and Anna Schuboe, Cognitive NEuroscience of Perception and Action, Department of Psychology, Philipps-University Marburg, Germany
-  This research was supported by the Deutsche Forschungsgemeinschaft (DFG, German Research Foundation) – SFB/TRR 135, project number 222641018, TP B3.
+  Dion Henare and Anna Schuboe, Cognitive Neuroscience of Perception and Action, Department of Psychology, Philipps-University Marburg, Germany. \newline This research was supported by the Deutsche Forschungsgemeinschaft (DFG, German Research Foundation) – SFB/TRR 135, project number 222641018, TP B3.
 
 abstract: |
   A typical visual scene contains vast amounts of information, and only a fraction of this can be fully processed by the human visual system. To understand how our attention is directed to one object over another, research has historically focussed on the interaction between bottom-up stimulus features, and an individual's top-down goals. In this study we evaluated how a third factor, an individual's selection history, interacts with top-down control mechanisms during visual search. Participants in our task were assigned to one of two groups in which they develop a history of shape selection or colour selection in one task, while performing visual search in a second task. A voluntary task selection procedure allowed participants the choice of which task they would perform on any given trial thereby maximising their opportunity for top-down preparation. We recorded EEG while participants performed these tasks and extracted lateralised ERP components as indices of target selection and distractor suppression. Our results showed that selection history continued to guide attention during visual search, even when top-down control mechanisms were maximised with a voluntary task selection procedure. 
@@ -237,10 +236,10 @@ Participants came in for two separate sessions and performed two different tasks
 
 Each stimulus presented during the categorisation and search trials was presented on a dark grey background (RGB: 60,60,60) and subtended 2.3$^\circ$ of visual angle. A fixation cross (0.6$^\circ$) was located in the centre of the screen throughout the experiment in order to help participants maintain central fixation. The physical luminance of the grey (RGB: 110,110,110), green (RGB: 48,171,48), blue (RGB: 48,48,171), and red (RGB: 171,48,48) stimulus colours was balanced using a luminance meter (Konica Minolta LS-100).
 
-(ref:stimDispFig). Example stimulus displays for the categorisation (A) and search tasks (B). In each display, one singleton is lateralised and the other is on the midline in order to allow for the calculation of EEG activity elicited by the lateral stimulus. Participants performed 1152 trials in total, 50% of these were required to be categorisation trials (half of each display type) and 50% were required to be search trials (one third of each display type).
+(ref:stimDispFig) Example stimulus displays for the categorisation (A) and search tasks (B). In each display, one singleton is lateralised and the other is on the midline in order to allow for the calculation of EEG activity elicited by the lateral stimulus. Participants performed 1152 trials in total, 50% of these were required to be categorisation trials (half of each display type) and 50% were required to be search trials (one third of each display type).
 
 ```{r stimDisplays, fig.cap = "(ref:stimDispFig)"}
-include_graphics("Figures/CSL-Choice trial displays.jpg")
+include_graphics("Figures/CSL-Choice trial displays.pdf", auto_pdf = TRUE)
 ```
 
 ### Categorisation trials
@@ -255,10 +254,10 @@ Search trials began with a 500 ms fixation cross in the center of the screen. Ne
 
 In session two, every trial began with a task selection screen where participants had to indicate using either their left or right thumb, whether they would like to perform a categorisation or search trial. This screen stayed on until the participant's response. Participants were asked to try to ensure that they distributed their choices evenly between the two options, and to try and make their choice random and unpredictable. Participants were required to perform 576 of each trial type and after every block of 32 trials, tey were shown a pictoral display indicating how many of each trial type was left for them to perform as well as some feedback about response times and accuracy. Examples of the full trial procedure and a between block feedback display are shown in figure\ \@ref(fig:trialProc).
 
-(ref:trialProcFig). Trial procedure (A). Participants started each trial by selecting which of two tasks they would perform next. After a 500ms delay, their chosen task display was presented. In the case of a categorisation display, they would categorise either the shape or colour singleton (depending on group assignment) whereas in the search task all participants would respond to the orientation of the line within the shape singleton. An example of the feedback display (B) shown to participants between blocks which provides information about the percentage of trials left for each task, as well as the number of blocks completed, average accuracy for each task, and average response time for each task.
+(ref:trialProcFig) Trial procedure (A). Participants started each trial by selecting which of two tasks they would perform next. After a 500ms delay, their chosen task display was presented. In the case of a categorisation display, they would categorise either the shape or colour singleton (depending on group assignment) whereas in the search task all participants would respond to the orientation of the line within the shape singleton. An example of the feedback display (B) shown to participants between blocks which provides information about the percentage of trials left for each task, as well as the number of blocks completed, average accuracy for each task, and average response time for each task.
 
 ```{r trialProc, fig.cap = "(ref:trialProcFig)"}
-include_graphics("Figures/CSLChoice Trial Proc and interblock feedback.jpg")
+include_graphics("Figures/CSLChoice Trial Proc and interblock feedback.pdf", auto_pdf = TRUE)
 ```
 
 ## EEG recording
@@ -478,7 +477,7 @@ When it comes to search task accuracy we did not observe any differences between
 #Follow-up tests reveal that participants respond significantly slower when a distractor is present in the search display, and this is true in both the colour group (`r searchRT.fup$full_result$TD_Tonly_Colour`) and the shape group (`r searchRT.fup$full_result$TD_Tonly_Shape`). However, this effect appears to be larger for the colour group and when it is tested directly using an independent samples t-test, the results show that distractor cost is indeed significantly larger for the colour group than the shape group (`r intEffectTTest$full_result`). 
 ```
 
-(ref:behavDistInt). Response time cost (response time in distractor present trials minus RT in distractor absent trials) caused by the presence of a coloured distractor in the search task. Participants assigned to respond to colour in the categorisation task (shown in green) had significantly higher costs during the search task than participants assigned to repsond to shape in the categorisation task (shown in grey). Individual response time costs are depicted as dots alongside a boxplot and violin plot to visualise the range and distribution of costs for each group.
+(ref:behavDistInt) Response time cost (response time in distractor present trials minus RT in distractor absent trials) caused by the presence of a coloured distractor in the search task. Participants assigned to respond to colour in the categorisation task (shown in green) had significantly higher costs during the search task than participants assigned to repsond to shape in the categorisation task (shown in grey). Individual response time costs are depicted as dots alongside a boxplot and violin plot to visualise the range and distribution of costs for each group.
 
 ```{r DistIntViolin, fig.cap = "(ref:behavDistInt)"}
 behavData %>%
@@ -781,7 +780,7 @@ In displays with the shape singleton lateralised and the colour singleton on the
 
 When evaluating the P$_{\text{D}}$ time range, we observed no main effects of group (`r learn.PdShape.results$full$Group`) nor electrode laterality (`r learn.PdShape.results$full$Contra`), and no interaction between group and electrode laterality (`r learn.PdShape.results$full$Group_Contra`).
 
-(ref:learnERPCap). ERP difference waves showing the lateralised response to displays in the categorisation task. The top panel depicts the different neural responses elicited by a lateralised colour singleton for participants responding to the colour singleton (shown in green) versus those tasked with responding to the shape singleton (shown in grey). The bottom panel depicts the different neural responses elicited by a lateralised colour singleton, again separated by those in the colour group (green) and those in the shape group (grey). We see an N$_{\text{T}}$ (`r as.character(round(NtStart))`ms to `r as.character(round(NtEnd))`ms) elicited by whichever stimulus was the target (lateralised colour singleton for the colour group, lateralised shape singleton for the shape group) but not otherwise. The non-target stimulus elicited a lateraliesd positivity in the N$_{\text{T}}$ time window and no significant differences in the P$_{\text{D}}$ time window.
+(ref:learnERPCap) ERP difference waves showing the lateralised response to displays in the categorisation task. The top panel depicts the different neural responses elicited by a lateralised colour singleton for participants responding to the colour singleton (shown in green) versus those tasked with responding to the shape singleton (shown in grey). The bottom panel depicts the different neural responses elicited by a lateralised colour singleton, again separated by those in the colour group (green) and those in the shape group (grey). We see an N$_{\text{T}}$ (`r as.character(round(NtStart))`ms to `r as.character(round(NtEnd))`ms) elicited by whichever stimulus was the target (lateralised colour singleton for the colour group, lateralised shape singleton for the shape group) but not otherwise. The non-target stimulus elicited a lateraliesd positivity in the N$_{\text{T}}$ time window and no significant differences in the P$_{\text{D}}$ time window.
 
 ```{r makeLearnPlots, fig.cap="(ref:learnERPCap)"}
 imgCol <- readPNG("learnCol.png")
@@ -998,7 +997,7 @@ Results of the P$_{\text{D}}$ time window showed no significant main effect of g
 
 `r #When Pd amplitude is compared directly with an independent samples t test, the results show that the Pd was significantly larger for the colour group than the shape group (r PdDTdiff$full_result).`
 
-(ref:searchERPCap). Subtracted ERPs showing the lateralised response for each group across the three different search display conditions. The top panel shows equivalent N$_{\text{T}}$ components (`r as.character(round(NtStart))`ms to `r as.character(round(NtEnd))`ms) elicited by both groups when a target is presented without distraction. The middle panel shows an attenuated N$_{\text{T}}$ for participants in the colour group when a target was presented alongside a colour distractor. The bottom panel shows the P$_{\text{D}}$ component (`r as.character(round(PdStart))`ms to `r as.character(round(PdEnd))`ms) elicited by lateralised colour distractors for participants in the colour group but not the shape group.
+(ref:searchERPCap) Subtracted ERPs showing the lateralised response for each group across the three different search display conditions. The top panel shows equivalent N$_{\text{T}}$ components (`r as.character(round(NtStart))`ms to `r as.character(round(NtEnd))`ms) elicited by both groups when a target is presented without distraction. The middle panel shows an attenuated N$_{\text{T}}$ for participants in the colour group when a target was presented alongside a colour distractor. The bottom panel shows the P$_{\text{D}}$ component (`r as.character(round(PdStart))`ms to `r as.character(round(PdEnd))`ms) elicited by lateralised colour distractors for participants in the colour group but not the shape group.
 
 ```{r makeSearchPlots, fig.cap="(ref:searchERPCap)", fig.height = 5.25,  fig.align = "center"}
 
@@ -1084,7 +1083,7 @@ bias.stat <- t.test(bias.dat$bias, mu = 0)
 
 Participants were asked to keep the task selection balanced at around 50% search and 50% choice trials throughout the experiment. In order to measure this we calculated task choice across the task and show that participants typically succeeded in maintaining approximately 50% of each trial across the task (see Figure\ \@ref(fig:choseSearch)A).
 
-(ref:choseSearchPlot). (A) Proportion of search trials chosen by each individual across blocks throughout the experiment. Colour differentiates subjects in the shape and colour group. (lines have been smoothed with a loess function for visualisation). (B) Time taken for participants in the colour group (green) and the shape group (grey) to make their task selection at the start of each trial. This is depicted separately for trials where they chose to switch task versus those where they chose to repeat the previous task. Thick lines represent the group averages while thin lines represent individual data.
+(ref:choseSearchPlot) (A) Proportion of search trials chosen by each individual across blocks throughout the experiment. Colour differentiates subjects in the shape and colour group. (lines have been smoothed with a loess function for visualisation). (B) Time taken for participants in the colour group (green) and the shape group (grey) to make their task selection at the start of each trial. This is depicted separately for trials where they chose to switch task versus those where they chose to repeat the previous task. Thick lines represent the group averages while thin lines represent individual data.
 
 ```{r choseSearch, fig.cap = "(ref:choseSearchPlot)"}
 choicePercent <- behavData %>%
@@ -1126,7 +1125,7 @@ choiceRTPlot <- behavData %>%
         legend.position = "none",
         text= element_text(size=18)
         )
-grid.arrange(choicePercent,choiceRTPlot, ncol = 1, nrow = 2)
+grid.arrange(choicePercent,choiceRTPlot, ncol = 2, nrow = 1)
 ```
 
 ```{r choiceRT}
@@ -1168,7 +1167,7 @@ comparisonSR.res = apa_print(comparisonSR)
 
 Participants were encouraged to make their task selections as random as possible, which would produce a switch rate of 50%, however average switch rate across all participants was `r as.character(round(switch$mean*100, digits = 2))`%. Analysis of the voluntary task choice showed that while participants in the shape group showed no significant deviation from a switch rate of 50% (`r shapeSR.res$full_result`), participants in the colour group showed a significant repetiton bias (`r colourSR.res$full_result`). When we directly tested whether switch rates in the colour group were lower than the shape group we also saw a significant difference (`r comparisonSR.res$full_result`). Switch rates are shown in Figure\ \@ref(fig:SwitchRateViolin).
 
-(ref:SRPlot). Voluntary switch rates for each individual separated by group assignment. Dots show each individual's switch rate alongside a boxplot and violin plot to display the range and distribution of switch rates. A switch rate of 50% is expected when participants are randomly selecting the task on each trial as instructed.
+(ref:SRPlot) Voluntary switch rates for each individual separated by group assignment. Dots show each individual's switch rate alongside a boxplot and violin plot to display the range and distribution of switch rates. A switch rate of 50% is expected when participants are randomly selecting the task on each trial as instructed.
 
 ```{r SwitchRateViolin, fig.cap = "(ref:SRPlot)"}
 behavData %>%
@@ -1324,7 +1323,7 @@ shpCat.SC <- apa_print(t.test(SCdirect.dat$SwitchCosts[SCdirect.dat$Group == "Sh
 
 Switch costs were calculated by subtracting repsonse times to repetition trials from response times to switch trials. First, one sample t tests were used to show that participants in the colour group incurred significant switch costs in the both the categorisation task (`r colCat.SC$full_result`) and the search task (`r colSch.SC$full_result`). Similarly, participants in the shape group showed significant switch costs during both categorisation (`r shpCat.SC$full_result`) and search (`r shpSch.SC$full_result`). We then performed a 2x2 ANOVA in order to evaluate the effect of task (categorisation vs search) and group (colour vs shape) on the size of these switch costs. Our results showed a significant effect of task (`r SCdirect.res$full_result$Procedure_Trial_`), but not group (`r SCdirect.res$full_result$Group`), however these effects were superceded by a significant interaction between task and group (`r SCdirect.res$full_result$Group_Procedure_Trial_`). Follow-up comparisons demonstrated that participants in the colour group had significantly larger switch costs when switching to the categorisation task (`r intr.group.sc$text[2]`) than to the search task (`r paste(intr.group.sc$text[1], ", ", SCdirect.grp.fup$statistic$TaskC_TaskL_Colour, sep = "")`), whereas participants in the shape group showed no difference between the categorisation (`r intr.group.sc$text[4]`) and search tasks (`r paste(intr.group.sc$text[3], ", ", SCdirect.grp.fup$statistic$TaskC_TaskL_Shape, sep = "")`). In the categorisation task, participants in the colour group had significantly larger switch costs than participants in the shape group (`r SCdirect.tsk.fup$statistic$Colour_Shape_TaskL`) however there was no difference between the two groups in the search task (`r SCdirect.tsk.fup$statistic$Colour_Shape_TaskC`).
 
-(ref:SCPlot). Response times for switch and repeat trials for the colour group (green) and the shape group (grey) in each task. For the search task (left) we observed a switch cost (faster responses to repetition trials) for both groups of participants. In the categorisation task (right) participants in the colour group (green) showed significant switch costs however participants in the shape group (grey) showed comparatively small differences.
+(ref:SCPlot) Response times for switch and repeat trials for the colour group (green) and the shape group (grey) in each task. For the search task (left) we observed a switch cost (faster responses to repetition trials) for both groups of participants. In the categorisation task (right) participants in the colour group (green) showed significant switch costs however participants in the shape group (grey) showed comparatively small differences.
 
 ```{r switchCostPlot, fig.cap= "(ref:SCPlot)"}
 switchCost.se <- behavData %>%

@@ -239,7 +239,7 @@ Each stimulus presented during the categorisation and search trials was presente
 (ref:stimDispFig) Example stimulus displays for the categorisation (A) and search tasks (B). In each display, one singleton is lateralised and the other is on the midline in order to allow for the calculation of EEG activity elicited by the lateral stimulus. Participants performed 1152 trials in total, 50% of these were required to be categorisation trials (half of each display type) and 50% were required to be search trials (one third of each display type).
 
 ```{r stimDisplays, fig.cap = "(ref:stimDispFig)"}
-include_graphics("Figures/CSL-Choice trial displays.pdf", auto_pdf = TRUE)
+include_graphics("Figures/CSL-Choice trial displays.jpg", auto_pdf = TRUE)
 ```
 
 ### Categorisation trials
@@ -257,7 +257,7 @@ In session two, every trial began with a task selection screen where participant
 (ref:trialProcFig) Trial procedure (A). Participants started each trial by selecting which of two tasks they would perform next. After a 500ms delay, their chosen task display was presented. In the case of a categorisation display, they would categorise either the shape or colour singleton (depending on group assignment) whereas in the search task all participants would respond to the orientation of the line within the shape singleton. An example of the feedback display (B) shown to participants between blocks which provides information about the percentage of trials left for each task, as well as the number of blocks completed, average accuracy for each task, and average response time for each task.
 
 ```{r trialProc, fig.cap = "(ref:trialProcFig)"}
-include_graphics("Figures/CSLChoice Trial Proc and interblock feedback.pdf", auto_pdf = TRUE)
+include_graphics("Figures/CSLChoice Trial Proc and interblock feedback.jpg", auto_pdf = TRUE)
 ```
 
 ## EEG recording

@@ -219,7 +219,7 @@ Specific measures of attentional selection and suppression have provided increas
 
 An open question remains as to whether increased top-down control can be used to attenuate, or eliminate the effects of selection history on attention. Previously, dual task investigations of the effect have attempted to enhance top-down control processes by providing cues to participants which inform them of which task they’re about to perform [@kadel2017selection]. While this allows participants to switch task sets in preparation for the upcoming trial, the effect of selection history on attention has remained suggesting that top-down control cannot be used to override the effects of selection history. However, recent work has suggested that these cues are insufficient for allowing participants to optimally engage top-down control before the trial begins [@kiesel2010control]. A novel approach to increasing top-down attentional control in dual tasks is the voluntary task-switching paradigm developed by @arrington2004cost. In this version of the task, participants are not cued as to what trial type will be performed next, but rather they are given the choice of which trial type they would like to perform next. Evidence suggests that the voluntary task switching paradigm allows for stronger proactive control over performance of each task [@arrington2005voluntary;@kang2014electrophysiological].
 
-Another advantage of voluntary task selection procedures is that they allow us to measure choice processes and could therefore provide insight into how choice is affected by selection history. In previous use of voluntary task selection, research has shown systematic patterns in task selection when participants are instructed to perform the two tasks in a random order. Participants typically show a repetition bias in their task choices [@arrington2004cost] which is exacerbated by shorter intertrial intervals [@arrington2005voluntary;@vandierendonck2010task], and typically involves a preference for performing the difficult task more frequently [@millington2013between;@yeung2010bottom]. A number of previous studies have also shown that the availability of a stimulus to the cognitive system can impact task choice [@mayr2006unpredictable;@yeung2010bottom;@arrington2010stimulus]. For example, when participants choose to perform either size or animacy judgements about words, their choice is affected by the judgement they performed on that word in an earlier phase of the experiment [@arrington2010stimulus]. Similarly, there are consistent biases in judgement choice across participants. Particular words, for instance "asprin", are more likely to elicit a size judgement, whereas other words are more likely to elicit an animacy judgement [@arrington2010stimulus]. In other voluntary selection tasks, repetition of a target's location has increased the likelihood of a participant repeating their previous choice [@mayr2006unpredictable;@yeung2010bottom], and individual switch rates correlated strongly with the cost of a task switch [@mayr2006unpredictable]. These findings suggest that previous history influences the ease with which a particular task is performed and therefore in turn, impacts task choice in a voluntary selection paradigm. 
+Another advantage of voluntary task selection procedures is that they allow us to measure choice processes and could therefore provide insight into how choice is affected by selection history. In previous use of voluntary task selection, research has shown systematic patterns in task selection when participants are instructed to perform the two tasks in a random order. Participants typically show a repetition bias in their task choices [@arrington2004cost] which is exacerbated by shorter intertrial intervals [@arrington2005voluntary;@vandierendonck2010task], and typically involves a preference for performing the difficult task more frequently [@millington2013between;@yeung2010bottom]. A number of previous studies have also shown that the availability of a stimulus to the cognitive system can impact task choice [@mayr2006unpredictable;@yeung2010bottom;@arrington2010stimulus]. For example, when participants choose to perform either size or animacy judgements about words, they were more likely to choose the size judgement if they had performed a size judgement on that word previously and more likely to choose the animacy judgement if they had performed an animacy judgement on that word previously [@arrington2010stimulus]. Similarly, there are consistent biases in judgement choice across participants. Particular words, for instance "asprin", are more likely to elicit a size judgement, whereas other words are more likely to elicit an animacy judgement [@arrington2010stimulus]. In other voluntary selection tasks, repetition of a target's location has increased the likelihood of a participant repeating their previous choice [@mayr2006unpredictable;@yeung2010bottom], and individual switch rates correlated strongly with the cost of a task switch [@mayr2006unpredictable]. These findings suggest that previous history influences the ease with which a particular task is performed and therefore in turn, impacts task choice in a voluntary selection paradigm. 
 
 In the present study, we adapted the design of @feldmann2015you to a voluntary task switching paradigm in order to investigate the relationship between top-down control and selection history. By allowing participants to determine whether they would perform search or categorisation on the next trial, participants would be able to proactively engage the task set for the upcoming trial and exercise maximal top-down control. We also recorded EEG during their performance of the task and leveraged the procedure of @hickey2009electrophysiological to allow for the isolation of target and distractor activity. This approach provides specific measures of target selection, distractor capture, and distractor suppression during the task, and therefore provides a fine grained understanding of how top-down control interacts with selection history during attentional orienting. If increased top-down control is able to eliminate the effects of selection history, then we would expect to see distractor costs in the search task to be similar regardless of whether participants were assigned to the shape or colour group in the categorisation task. We would also expect that group assignment would not have differential effects on the lateralised ERP components elicited by stimuli in the search task. On the other hand, if top-down control cannot be used to override selection history effects then the effect of categorisation group assignment on distractor costs and ERP component amplitudes during search should remain.
 
@@ -235,7 +235,7 @@ Participants came in for two separate sessions and performed two different tasks
 
 ### Stimuli
 
-Each stimulus presented during the categorisation and search trials was presented on a dark grey background and subtended 2.3$^\circ$ of visual angle. A fixation cross (0.6$^\circ$) was located in the centre of the screen throughout the experiment in order to help participants maintain central fixation. The physical luminance of the grey, green, blue, and red stimulus colours was balanced using a luminance meter (Konica Minolta LS-100).
+Each stimulus presented during the categorisation and search trials was presented on a dark grey background (RGB: 60,60,60) and subtended 2.3$^\circ$ of visual angle. A fixation cross (0.6$^\circ$) was located in the centre of the screen throughout the experiment in order to help participants maintain central fixation. The physical luminance of the grey (RGB: 110,110,110), green (RGB: 48,171,48), blue (RGB: 48,48,171), and red (RGB: 171,48,48) stimulus colours was balanced using a luminance meter (Konica Minolta LS-100).
 
 (ref:stimDispFig). Example stimulus displays for the categorisation (A) and search tasks (B). In each display, one singleton is lateralised and the other is on the midline in order to allow for the calculation of EEG activity elicited by the lateral stimulus. Participants performed 1152 trials in total, 50% of these were required to be categorisation trials (half of each display type) and 50% were required to be search trials (one third of each display type).
 
@@ -907,7 +907,7 @@ laterality.NTO  <- allData %>%
   summarise(mV = mean(voltage)) %>%
   group_by(Contra) %>%
   summarise(se = sqrt(sd(mV)/length(unique(Subject))),mV = mean(mV)) %>%
-  mutate( text = paste("$\\Delta M = ", as.character(round(mV,2)), ", SE = ", as.character(round(se,2)), "$", sep=""))
+  mutate( text = paste("$\\Delta M = ", as.character(round(mV,2)), "muV, SE = ", as.character(round(se,2)), "$", sep=""))
 
 
 searchNtTD <- allData %>%
@@ -933,7 +933,7 @@ intr.tdnt.se <- searchNtTD %>%
   mutate(seDiff = Contralateral-Ipsilateral) %>%
   group_by(Group) %>%
   summarise(mean = mean(seDiff),se = sqrt(sd(seDiff)/length(unique(Subject)))) %>%
-  mutate( text = paste("$\\Delta M = ", as.character(round(mean,2)), ", SE = ", as.character(round(se,2)), "$", sep=""))
+  mutate( text = paste("$\\Delta M = ", as.character(round(mean,2)), "muV, SE = ", as.character(round(se,2)), "$", sep=""))
 
 searchNtDT <- allData %>%
   mutate(sample = sample*srateMultiplier-baseline) %>%
@@ -973,11 +973,11 @@ intr.dtpd.se <- searchPdDT %>%
   mutate(seDiff = Contralateral-Ipsilateral) %>%
   group_by(Group) %>%
   summarise(mean = mean(seDiff),se = sqrt(sd(seDiff)/length(unique(Subject)))) %>%
-  mutate( text = paste("$\\Delta M = ", as.character(round(mean,2)), ", SE = ", as.character(round(se,2)), "$", sep=""))
+  mutate( text = paste("$\\Delta M = ", as.character(round(mean,2)), "muV, SE = ", as.character(round(se,2)), "$", sep=""))
 
 ```
 
-Next we focused on the lateralised response to targets and distractors in the search displays as a function of group assignment. Evidence for the effect of selection history would come from the interaction between group and lateralised ERP activity. We performed a set of mixed 2x2 ANOVAs with electrode laterality (contralateral vs. ipsilateral) as the within-subject factor and group (colour vs. shape) as the between-subject factor. This was performed for mean amplitudes in the N$_{\text{T}}$ time window elicited by each of the display types (target lateralised - distractor absent, target lateralised - distractor on the midline, and distractor lateralised - target on the midline), as well as the P$_{\text{D}}$ time window in the case of a lateralised distractor.
+Next we focused on the lateralised response to targets and distractors in the search displays as a function of group assignment. Evidence for the effect of selection history would come from the interaction between group and lateralised ERP activity. We performed a set of mixed 2x2 ANOVAs with electrode laterality (contralateral vs. ipsilateral) as the within-subject factor and group (colour vs. shape) as the between-subject factor. This was performed for mean amplitudes in the N$_{\text{T}}$ time window elicited by each of the display types (target lateralised - distractor absent, target lateralised - distractor on the midline, and distractor lateralised - target on the midline), as well as the P$_{\text{D}}$ time window in the case of a lateralised distractor (see Figure\ \@ref(fig:makeSearchPlots)).
 `r #the Nt time window (r sprintf("%i to %ims", NtStart, NtEnd)) and the Pd time window (r sprintf("%i to %ims", PdStart, PdEnd))`
 
 ##### Target response - Distractor absent trials
@@ -994,7 +994,7 @@ When the target was lateralised in the presence of a midline distractor, we obse
 
 For the lateralised distractor response, results of the N$_{\text{T}}$ time range showed neither an effect of group (`r search.NtDT.results$full$Group`), nor of electrode laterality (`r search.NtDT.results$full$Contra`), nor an interaction between group and electrode laterality (`r search.NtDT.results$full$Group_Contra`).
 
-Results for the lateralised distractor showed no significant main effect of group (`r search.PdDT.results$full$Group`), however there was a significant main effect of electrode laterality (`r search.PdDT.results$full$Contra`), indicating the presence of a P$_{\text{D}}$. A significant interaction between group and electrode laterality (`r search.PdDT.results$full$Group_Contra`) revealed that a significant P$_{\text{D}}$ was elicited for participants in the colour group (`r search.PdDT.fup$full_result$Contralateral_Ipsilateral_Colour`), however the difference between the contralateral and ipsilateral electrodes did not reach significance for the shape group (`r search.PdDT.fup$full_result$Contralateral_Ipsilateral_Shape`). 
+Results of the P$_{\text{D}}$ time window showed no significant main effect of group (`r search.PdDT.results$full$Group`), however there was a significant main effect of electrode laterality (`r search.PdDT.results$full$Contra`), indicating the presence of a P$_{\text{D}}$. A significant interaction between group and electrode laterality (`r search.PdDT.results$full$Group_Contra`) revealed that a significant P$_{\text{D}}$ was elicited for participants in the colour group (`r search.PdDT.fup$full_result$Contralateral_Ipsilateral_Colour`), however the difference between the contralateral and ipsilateral electrodes did not reach significance for the shape group (`r search.PdDT.fup$full_result$Contralateral_Ipsilateral_Shape`). 
 
 `r #When Pd amplitude is compared directly with an independent samples t test, the results show that the Pd was significantly larger for the colour group than the shape group (r PdDTdiff$full_result).`
 
@@ -1082,12 +1082,12 @@ bias.dat <- behavData %>%
 bias.stat <- t.test(bias.dat$bias, mu = 0)
 ```
 
-Participants were asked to keep the task selection balanced at around 50% search and 50% choice trials throughout the experiment. In order to measure this we calculated task choice across the task and show that participants typically succeeded in maintaining approximately 50% of each trial across the task (see Figure\ \@ref(fig:choseSearch)).
+Participants were asked to keep the task selection balanced at around 50% search and 50% choice trials throughout the experiment. In order to measure this we calculated task choice across the task and show that participants typically succeeded in maintaining approximately 50% of each trial across the task (see Figure\ \@ref(fig:choseSearch)A).
 
-(ref:choseSearchPlot). Proportion of search trials chosen by each individual across blocks throughout the experiment. Colour differentiates subjects in the shape and colour group. (lines have been smoothed with a loess function for visualisation).
+(ref:choseSearchPlot). (A) Proportion of search trials chosen by each individual across blocks throughout the experiment. Colour differentiates subjects in the shape and colour group. (lines have been smoothed with a loess function for visualisation). (B) Time taken for participants in the colour group (green) and the shape group (grey) to make their task selection at the start of each trial. This is depicted separately for trials where they chose to switch task versus those where they chose to repeat the previous task. Thick lines represent the group averages while thin lines represent individual data.
 
 ```{r choseSearch, fig.cap = "(ref:choseSearchPlot)"}
-behavData %>%
+choicePercent <- behavData %>%
   filter(switchRate > minSwitchRate) %>%
   group_by(Block, Subject, Group) %>%
   mutate(choseSearch = ifelse(is.na(Compound),0,1)) %>%
@@ -1097,35 +1097,11 @@ behavData %>%
   scale_colour_manual(values=c("green4", "gray42")) +
   labs(y = "Percentage of search trials chosen") +
   lims(y=c(0,100))
-```
-
-```{r choiceRT}
-choiceRT.dat <- behavData %>%
-  filter(switchRate > minSwitchRate,CompSearch.RT < compCutoff | LearnSearch.RT < learnCutoff, Choice1.RT>0) %>%
-  group_by(Subject,Group, repswitch) %>%
-  summarise(mean = mean(Choice1.RT))
-choiceRT.stat <- aov_ez(
-  data = choiceRT.dat,
-  dv = "mean",
-  id = "Subject", 
-  within = c("repswitch"),
-  between = "Group"
-)
-choiceRT.res <- apa_print(choiceRT.stat)
-choiceRT.fup <- apa_print.emmGrid(pairs(emmeans(choiceRT.stat, ~repswitch|Group)))
-
-```
-
-In addition, a 2x2 ANOVA was performed in order to evaluate the effect of task transition (repeat vs switch) and group (colour vs shape) on the time taken to make a task choice. The results (depicted in Figure\ \@ref(fig:choiceRTPlot)) showed no significant main effects of Group (`r choiceRT.res$full_result$Group`) and task transition (`r choiceRT.res$full_result$repswitch`), as well as no significant interaction between group and task transition (`r choiceRT.res$full_result$Group_repswitch`). 
-
-(ref:chRTPlot). Time taken for participants in the colour group (green) and the shape group (grey) to make their task selection at the start of each trial. This is depicted separately for trials where they chose to switch task versus those where they chose to repeat the previous task. Thick lines represent the group averages while thin lines represent individual data.
-
-```{r choiceRTPlot, fig.cap="(ref:chRTPlot)"}
 choiceRTAvg <- behavData %>%
   filter(switchRate > minSwitchRate, Choice1.RT>0) %>%
   group_by(Group, repswitch) %>%
   summarise(mean = mean(Choice1.RT))
-behavData %>%
+choiceRTPlot <- behavData %>%
   filter(switchRate > minSwitchRate, Choice1.RT>0) %>%
   group_by(Subject,Group, repswitch) %>%
   summarise(mean = mean(Choice1.RT)) %>%
@@ -1150,7 +1126,27 @@ behavData %>%
         legend.position = "none",
         text= element_text(size=18)
         )
+grid.arrange(choicePercent,choiceRTPlot, ncol = 1, nrow = 2)
 ```
+
+```{r choiceRT}
+choiceRT.dat <- behavData %>%
+  filter(switchRate > minSwitchRate,CompSearch.RT < compCutoff | LearnSearch.RT < learnCutoff, Choice1.RT>0) %>%
+  group_by(Subject,Group, repswitch) %>%
+  summarise(mean = mean(Choice1.RT))
+choiceRT.stat <- aov_ez(
+  data = choiceRT.dat,
+  dv = "mean",
+  id = "Subject", 
+  within = c("repswitch"),
+  between = "Group"
+)
+choiceRT.res <- apa_print(choiceRT.stat)
+choiceRT.fup <- apa_print.emmGrid(pairs(emmeans(choiceRT.stat, ~repswitch|Group)))
+
+```
+
+In addition, a 2x2 ANOVA was performed in order to evaluate the effect of task transition (repeat vs switch) and group (colour vs shape) on the time taken to make a task choice. The results (depicted in Figure\ \@ref(fig:choseSearch)B) showed no significant main effects of Group (`r choiceRT.res$full_result$Group`) and task transition (`r choiceRT.res$full_result$repswitch`), as well as no significant interaction between group and task transition (`r choiceRT.res$full_result$Group_repswitch`). 
 
 ### Switch Rates
 
@@ -1312,7 +1308,7 @@ intr.group.sc <- behavData %>%
   mutate(SwitchCosts = Switch-Rep) %>%
   group_by(Group, Procedure.Trial.) %>%
   summarise(se = sqrt(sd(SwitchCosts)/length(unique(Subject))), mean = mean(SwitchCosts)) %>%
-  mutate( text = paste("$\\Delta M = ", as.character(round(mean,2)), ", SE = ", as.character(round(se,2)), "$", sep=""))
+  mutate( text = paste("$\\Delta M = ", as.character(round(mean,2)), "ms, SE = ", as.character(round(se,2)), "$", sep=""))
   
 colSch.SC <- apa_print(t.test(SCdirect.dat$SwitchCosts[SCdirect.dat$Group == "Colour" & SCdirect.dat$Procedure.Trial. == "TaskC"], mu = 0, alternative = "greater"))
 colCat.SC <- apa_print(t.test(SCdirect.dat$SwitchCosts[SCdirect.dat$Group == "Colour" & SCdirect.dat$Procedure.Trial. == "TaskL"], mu = 0, alternative = "greater"))

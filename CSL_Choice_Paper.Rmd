@@ -906,7 +906,7 @@ laterality.NTO  <- allData %>%
   summarise(mV = mean(voltage)) %>%
   group_by(Contra) %>%
   summarise(se = sqrt(sd(mV)/length(unique(Subject))),mV = mean(mV)) %>%
-  mutate( text = paste("$\\Delta M = ", as.character(round(mV,2)), "muV, SE = ", as.character(round(se,2)), "$", sep=""))
+  mutate( text = paste("$\\Delta M$ = ", as.character(round(mV,2)), "$\\mu$V, $SE$ = ", as.character(round(se,2)), sep=""))
 
 
 searchNtTD <- allData %>%
@@ -932,7 +932,7 @@ intr.tdnt.se <- searchNtTD %>%
   mutate(seDiff = Contralateral-Ipsilateral) %>%
   group_by(Group) %>%
   summarise(mean = mean(seDiff),se = sqrt(sd(seDiff)/length(unique(Subject)))) %>%
-  mutate( text = paste("$\\Delta M = ", as.character(round(mean,2)), "muV, SE = ", as.character(round(se,2)), "$", sep=""))
+  mutate( text = paste("$\\Delta M$ = ", as.character(round(mean,2)), "$\\mu$V, $SE$ = ", as.character(round(se,2)), sep=""))
 
 searchNtDT <- allData %>%
   mutate(sample = sample*srateMultiplier-baseline) %>%
@@ -972,7 +972,7 @@ intr.dtpd.se <- searchPdDT %>%
   mutate(seDiff = Contralateral-Ipsilateral) %>%
   group_by(Group) %>%
   summarise(mean = mean(seDiff),se = sqrt(sd(seDiff)/length(unique(Subject)))) %>%
-  mutate( text = paste("$\\Delta M = ", as.character(round(mean,2)), "muV, SE = ", as.character(round(se,2)), "$", sep=""))
+  mutate( text = paste("$\\Delta M$ = ", as.character(round(mean,2)), "$\\mu$V, $SE$ = ", as.character(round(se,2)), sep=""))
 
 ```
 
@@ -1092,10 +1092,12 @@ choicePercent <- behavData %>%
   mutate(choseSearch = ifelse(is.na(Compound),0,1)) %>%
   summarise(percentSearch = mean(choseSearch)*100) %>%
   ggplot(aes(x=Block, y=percentSearch, colour = Group, group = Subject)) +
-  geom_smooth(se = FALSE, alpha = 0.75) +
+  geom_smooth(se = FALSE, alpha = 0.3) +
   scale_colour_manual(values=c("green4", "gray42")) +
   labs(y = "Percentage of search trials chosen") +
-  lims(y=c(0,100))
+  lims(y=c(0,100)) +
+  theme(legend.justification = c(18.5,0),
+        legend.position = c(18.5,0))
 choiceRTAvg <- behavData %>%
   filter(switchRate > minSwitchRate, Choice1.RT>0) %>%
   group_by(Group, repswitch) %>%
@@ -1125,7 +1127,8 @@ choiceRTPlot <- behavData %>%
         legend.position = "none",
         text= element_text(size=18)
         )
-grid.arrange(choicePercent,choiceRTPlot, ncol = 2, nrow = 1)
+final <- grid.arrange(choicePercent,choiceRTPlot, ncol = 2, nrow = 1)
+ggsave("taskChoice.jpg", plot = final, dpi = 600, width = 16, height = 12, units = "cm")
 ```
 
 ```{r choiceRT}

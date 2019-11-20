@@ -1094,12 +1094,16 @@ choicePercent <- behavData %>%
   mutate(choseSearch = ifelse(is.na(Compound),0,1)) %>%
   summarise(percentSearch = mean(choseSearch)*100) %>%
   ggplot(aes(x=Block, y=percentSearch, colour = Group, group = Subject)) +
-  geom_smooth(se = FALSE, alpha = 0.3, size=1) +
+  geom_smooth(se = FALSE, alpha = 0.3, size=.5) +
   scale_colour_manual(values=c("green4", "gray42")) +
   labs(y = "Chose search (%)") +
   lims(y=c(0,100)) +
   theme(#legend.position = "None"#,
         #axis.title.x = element_blank())
+    legend.position = c(0, 1), 
+       legend.justification = c(0, 1),
+    legend.text=element_text(size=8),
+    legend.title=element_blank()
   )
 choiceRTAvg <- behavData %>%
   filter(switchRate > minSwitchRate, Choice1.RT>0) %>%

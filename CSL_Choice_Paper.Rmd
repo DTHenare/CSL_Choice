@@ -10,8 +10,8 @@ header-includes:
   - \captionsetup[figure]{font={stretch=1.5}}
   - \usepackage{booktabs}
 
-title             : "Selection history guides attention even when top-down control is maximised"
-shorttitle        : "Selection history under top-down control"
+title             : "Voluntary control of task selection does not eliminate the impact of selection history on attention"
+shorttitle        : "Voluntary control and selection history"
 
 author: 
   - name          : "Dion T. Henare"
@@ -32,7 +32,7 @@ author_note: |
   Dion Henare and Anna Schuboe, Cognitive Neuroscience of Perception and Action, Department of Psychology, Philipps-University Marburg, Germany. \newline This research was supported by the Deutsche Forschungsgemeinschaft (DFG, German Research Foundation) – SFB/TRR 135, project number 222641018, TP B3.
 
 abstract: |
-  A typical visual scene contains vast amounts of information, and only a fraction of this can be fully processed by the human visual system. To understand how our attention is directed to one object over another, research has historically focussed on the interaction between bottom-up stimulus features, and an individual's top-down goals. In this study we evaluated how a third factor, an individual's selection history, interacts with top-down control mechanisms during visual search. Participants in our task were assigned to one of two groups in which they develop a history of shape selection or colour selection in one task, while performing visual search in a second task. A voluntary task selection procedure allowed participants the choice of which task they would perform on any given trial thereby maximising their opportunity for top-down preparation. We recorded EEG while participants performed these tasks and extracted lateralised ERP components as indices of target selection and distractor suppression. Our results showed that selection history continued to guide attention during visual search, even when top-down control mechanisms were maximised with a voluntary task selection procedure. 
+  A typical visual scene contains vast amounts of information, and only a fraction of this can be fully processed by the human visual system. To understand how our attention is directed to one object over another, research has historically focussed on the interaction between bottom-up stimulus features, and an individual's top-down goals. In this study we evaluated how a third factor, an individual's selection history, interacts with top-down control mechanisms during visual search. Participants in our task were assigned to one of two groups in which they develop a history of shape selection or colour selection in one task, while performing visual search for a shape singleton in a second task. A voluntary task selection procedure allowed participants the choice of which task they would perform on any given trial thereby maximising their opportunity for top-down preparation. We recorded EEG while participants performed these tasks and extracted lateralised ERP components as indices of target selection (NT) and distractor suppression (PD). Our results showed that selection history continued to guide attention during visual search, even when top-down control mechanisms were maximised with a voluntary task selection procedure. For participants with a history of colour selection, the NT component elicited by a shape target is attenuated if it is accompanied by a colour distractor, and the distractor itself elicits a larger PD component. Additionally, task switching results reveal that participants in the colour group have larger, asymmetric switch costs which implies increased competition between the two task sets. Our results support the notion that selection history is a significant factor in attention guidance, orienting the visual system reflexively to objects that contradict an individual's current goals - even when these goals are intrinsically selected and prepared ahead of time.
 
 bibliography      : ["cslChoice_references.bib"]
 
@@ -927,6 +927,7 @@ diffDirect <- searchNtTD %>%
   spread(Contra,mV) %>%
   mutate(difference = Contralateral-Ipsilateral)
 main.TDnt <- as.character(round(mean(diffDirect$difference),2))
+main.TDnt <- paste("$\\Delta M$ = ", main.TDnt, sep = "")
 NtTDdiff <- apa_print(t.test(diffDirect$Contralateral[diffDirect$Group == "Shape"], diffDirect$Ipsilateral[diffDirect$Group == "Shape"],paired = TRUE))
 intr.tdnt.se <- searchNtTD %>%
   spread(Contra, mV) %>%
@@ -968,6 +969,7 @@ diffDirect <- searchPdDT %>%
   spread(Contra,mV) %>%
   mutate(difference = Contralateral-Ipsilateral)
 main.DTpd <- as.character(round(mean(diffDirect$difference),2))
+main.DTpd <- paste("$\\Delta M$ = ", main.DTpd, sep = "")
 PdDTdiff <- apa_print(t.test(diffDirect$difference[diffDirect$Group == "Colour"], diffDirect$difference[diffDirect$Group == "Shape"],paired = FALSE))
 intr.dtpd.se <- searchPdDT %>%
   spread(Contra, mV) %>%
@@ -987,7 +989,7 @@ In the target only displays the contralateral response (`r laterality.NTO$text[1
 
 ##### Target response - Distractor present trials
 
-When the target was lateralised in the presence of a midline distractor, we observed no significant main effect of group (`r search.NtTD.results$full$Group`), however there was a significant main effect of electrode laterality (`r search.NtTD.results$full$Contra`), indicating the presence of an N$_{\text{T}}$ ($\\Delta M = $ `r main.TDnt`). This main effect was superceeded by an interaction between group and electrode laterality which showed that the voltage difference between contralateral and ipsilateral electrode sites was significantly larger for participants in the shape group (`r intr.tdnt.se$text[2]`) than those in the colour group (`r paste(intr.tdnt.se$text[1], ", ", search.NtTD.results$full$Group_Contra, sep = "")`). 
+When the target was lateralised in the presence of a midline distractor, we observed no significant main effect of group (`r search.NtTD.results$full$Group`), however there was a significant main effect of electrode laterality (`r search.NtTD.results$full$Contra`), indicating the presence of an N$_{\text{T}}$ (`r main.TDnt`). This main effect was superceeded by an interaction between group and electrode laterality which showed that the voltage difference between contralateral and ipsilateral electrode sites was significantly larger for participants in the shape group (`r intr.tdnt.se$text[2]`) than those in the colour group (`r paste(intr.tdnt.se$text[1], ", ", search.NtTD.results$full$Group_Contra, sep = "")`). 
 
 `r #Follow-up comparisons reveal that while a significant N$_{\text{T}}$ was elicited for participants in both the colour (r search.NtTD.fup$full_result$Contralateral_Ipsilateral_Colour) and shape group (r search.NtTD.fup$full_result$Contralateral_Ipsilateral_Shape). When N$_{\text{T}}$ amplitude is compared directly with an independent samples t test, the results show that the N$_{\text{T}}$ is significantly larger for the shape group than the colour group (r NtTDdiff$full_result).`
 
@@ -995,7 +997,7 @@ When the target was lateralised in the presence of a midline distractor, we obse
 
 For the lateralised distractor response, results of the N$_{\text{T}}$ time range showed neither an effect of group (`r search.NtDT.results$full$Group`), nor of electrode laterality (`r search.NtDT.results$full$Contra`), nor an interaction between group and electrode laterality (`r search.NtDT.results$full$Group_Contra`).
 
-Results of the P$_{\text{D}}$ time window showed no significant main effect of group (`r search.PdDT.results$full$Group`), however there was a significant main effect of electrode laterality (`r search.PdDT.results$full$Contra`), indicating the presence of a P$_{\text{D}}$ ($\\Delta M = $ `r main.DTpd`). A significant interaction between group and electrode laterality (`r search.PdDT.results$full$Group_Contra`) revealed that a significant P$_{\text{D}}$ was elicited for participants in the colour group (`r search.PdDT.fup$full_result$Contralateral_Ipsilateral_Colour`), however the difference between the contralateral and ipsilateral electrodes did not reach significance for the shape group (`r search.PdDT.fup$full_result$Contralateral_Ipsilateral_Shape`). 
+Results of the P$_{\text{D}}$ time window showed no significant main effect of group (`r search.PdDT.results$full$Group`), however there was a significant main effect of electrode laterality (`r search.PdDT.results$full$Contra`), indicating the presence of a P$_{\text{D}}$ (`r main.DTpd`). A significant interaction between group and electrode laterality (`r search.PdDT.results$full$Group_Contra`) revealed that a significant P$_{\text{D}}$ was elicited for participants in the colour group (`r search.PdDT.fup$full_result$Contralateral_Ipsilateral_Colour`), however the difference between the contralateral and ipsilateral electrodes did not reach significance for the shape group (`r search.PdDT.fup$full_result$Contralateral_Ipsilateral_Shape`). 
 
 `r #When Pd amplitude is compared directly with an independent samples t test, the results show that the Pd was significantly larger for the colour group than the shape group (r PdDTdiff$full_result).`
 
@@ -1087,7 +1089,7 @@ Participants were asked to keep the task selection balanced at around 50% search
 
 (ref:choseSearchPlot) (A) Proportion of search trials chosen by each individual across blocks throughout the experiment for participants in the shape group (grey) and colour group (green). Lines have been smoothed with a loess function for visualisation. (B) Time taken for participants in the colour group (green) and the shape group (grey) to make their task selection at the start of each trial. This is depicted separately for trials where they chose to switch task versus those where they chose to repeat the previous task. Thick lines represent the group averages while thin lines represent individual data.
 
-```{r choseSearch, fig.cap = "(ref:choseSearchPlot)"}
+```{r createChoseSearch}
 choicePercent <- behavData %>%
   filter(switchRate > minSwitchRate) %>%
   group_by(Block, Subject, Group) %>%
@@ -1098,6 +1100,7 @@ choicePercent <- behavData %>%
   scale_colour_manual(values=c("green4", "gray42")) +
   labs(y = "Chose search (%)") +
   lims(y=c(0,100)) +
+  annotate_custom(grob = textGrob(label = "A"), xmin = -5, xmax = 0, ymin = 110, ymax=135) +
   theme(#legend.position = "None"#,
         #axis.title.x = element_blank())
     legend.position = c(0, 1), 
@@ -1136,7 +1139,11 @@ choiceRTPlot <- behavData %>%
         #text= element_text(size=18)
         )
 final <- grid.arrange(choicePercent,choiceRTPlot, ncol = 2, nrow = 2,  widths = c(2,1), layout_matrix = rbind(c(1,1),c(2,2)))
-ggsave("taskChoice.jpg", plot = final, dpi = 600, width = 8, height = 12, units = "cm")
+ggsave("Figures/taskChoice.jpg", plot = final, dpi = 600, width = 8, height = 12, units = "cm")
+```
+
+```{r choseSearch, fig.cap = "(ref:choseSearchPlot)"}
+include_graphics("Figures/taskChoice.jpg", auto_pdf = TRUE)
 ```
 
 ```{r choiceRT}
@@ -1335,7 +1342,7 @@ shpCat.SC <- apa_print(t.test(SCdirect.dat$SwitchCosts[SCdirect.dat$Group == "Sh
 #First, one sample t tests were used to show that participants in the colour group incurred significant switch costs in the both the categorisation task (`r colCat.SC$full_result`) and the search task (`r colSch.SC$full_result`). Similarly, participants in the shape group showed significant switch costs during both categorisation (`r shpCat.SC$full_result`) and search (`r shpSch.SC$full_result`).
 ```
 
-Switch costs were calculated by subtracting repsonse times to repetition trials from response times to switch trials.  We then performed a 2x2 ANOVA in order to evaluate the effect of task (categorisation vs search) and group (colour vs shape) on the size of these switch costs. Our results showed a significant effect of task (`r SCdirect.res$full_result$Procedure_Trial_`), but not group (`r SCdirect.res$full_result$Group`), however these effects were superceded by a significant interaction between task and group (`r SCdirect.res$full_result$Group_Procedure_Trial_`). Follow-up comparisons demonstrated that participants in the colour group had significantly larger switch costs when switching to the categorisation task (`r intr.group.sc$text[2]`) than to the search task (`r paste(intr.group.sc$text[1], ", ", SCdirect.grp.fup$statistic$TaskC_TaskL_Colour, sep = "")`), whereas participants in the shape group showed no difference between the categorisation (`r intr.group.sc$text[4]`) and search tasks (`r paste(intr.group.sc$text[3], ", ", SCdirect.grp.fup$statistic$TaskC_TaskL_Shape, sep = "")`). In the categorisation task, participants in the colour group had significantly larger switch costs than participants in the shape group (`r SCdirect.tsk.fup$statistic$Colour_Shape_TaskL`) however there was no difference between the two groups in the search task (`r SCdirect.tsk.fup$statistic$Colour_Shape_TaskC`). A set of one sampled t tests confirm that switch costs differ from 0 for both groups in all conditions (all p values <0.001).
+Switch costs were calculated by subtracting repsonse times to repetition trials from response times to switch trials. We performed a 2x2 ANOVA in order to evaluate the effect of task (categorisation vs search) and group (colour vs shape) on the size of these switch costs. Our results showed a significant effect of task (`r SCdirect.res$full_result$Procedure_Trial_`), but not group (`r SCdirect.res$full_result$Group`), however these effects were superceded by a significant interaction between task and group (`r SCdirect.res$full_result$Group_Procedure_Trial_`). Follow-up comparisons (visualised in Figure\ \@ref(fig:SCPlot)) demonstrated that participants in the colour group had significantly larger switch costs in the categorisation task (`r intr.group.sc$text[2]`) than the search task (`r paste(intr.group.sc$text[1], ", ", SCdirect.grp.fup$statistic$TaskC_TaskL_Colour, sep = "")`), whereas participants in the shape group showed no difference between the categorisation (`r intr.group.sc$text[4]`) and search tasks (`r paste(intr.group.sc$text[3], ", ", SCdirect.grp.fup$statistic$TaskC_TaskL_Shape, sep = "")`). In the categorisation task, participants in the colour group had significantly larger switch costs than participants in the shape group (`r SCdirect.tsk.fup$statistic$Colour_Shape_TaskL`) however there was no difference between the two groups in the search task (`r SCdirect.tsk.fup$statistic$Colour_Shape_TaskC`). A set of one sampled t tests confirm that switch costs differ from 0 for both groups in all conditions (all p values <0.001).
 
 (ref:SCPlot) Response times for switch and repeat trials for the colour group (green) and the shape group (grey) in each task. For the search task (left) we observed a switch cost (faster responses to repetition trials) for both groups of participants. In the categorisation task (right) participants in the colour group (green) showed significant switch costs however participants in the shape group (grey) showed comparatively small differences.
 

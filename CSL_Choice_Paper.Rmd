@@ -1100,13 +1100,14 @@ choicePercent <- behavData %>%
   scale_colour_manual(values=c("green4", "gray42")) +
   labs(y = "Chose search (%)") +
   lims(y=c(0,100)) +
-  annotation_custom(grob = textGrob(label = "A"), xmin = -5, xmax = 0, ymin = 110, ymax=135) +
+  ggtitle("A") +
   theme(#legend.position = "None"#,
         #axis.title.x = element_blank())
     legend.position = c(0, 1), 
        legend.justification = c(0, 1),
     legend.text=element_text(size=8),
-    legend.title=element_blank()
+    legend.title=element_blank(),
+    plot.title = element_text(hjust = 0)
   )
 choiceRTAvg <- behavData %>%
   filter(switchRate > minSwitchRate, Choice1.RT>0) %>%
@@ -1121,6 +1122,7 @@ choiceRTPlot <- behavData %>%
   geom_line(aes(colour = Group, group = Subject), alpha = 0.3) +
   geom_point(data = choiceRTAvg, aes(colour = Group),size = 5) +
   geom_line(data = choiceRTAvg, aes(group = Group, colour = Group), size=2) +
+  ggtitle("B") +
   facet_grid(.~Group) +
   scale_colour_manual(values=c("green4", "gray42")) +
   scale_y_continuous(name = "Task choice time (ms)",limits = c(0,500)) +
@@ -1131,15 +1133,16 @@ choiceRTPlot <- behavData %>%
         #strip.text.x = element_blank(),
         axis.line = element_line(colour = "black"),
         #axis.text.x = element_blank(),
-        axis.title.x = element_blank(),
+        axis.title.x = element_text(color = "white"),
         #axis.ticks = element_blank(),
         #strip.text.x = element_blank(),
         strip.background = element_rect(fill = "white"),
+        plot.title = element_text(hjust = 0),
         legend.position = "none"#,
         #text= element_text(size=18)
         )
-final <- grid.arrange(choicePercent,choiceRTPlot, ncol = 2, nrow = 2,  widths = c(2,1), layout_matrix = rbind(c(1,1),c(2,2)))
-ggsave("Figures/taskChoice.jpg", plot = final, dpi = 600, width = 8, height = 12, units = "cm")
+final <- grid.arrange(choicePercent,choiceRTPlot, ncol = 2, nrow = 1,  widths = c(1,1), layout_matrix = rbind(c(1,2)))
+ggsave("Figures/taskChoice.jpg", plot = final, dpi = 600, width = 16, height = 8, units = "cm")
 ```
 
 ```{r choseSearch, fig.cap = "(ref:choseSearchPlot)"}
@@ -1444,7 +1447,7 @@ An interesting feature of the switch costs described above is the asymmetry obse
 
 The main explanation given by previous research for the observation that switch costs are reduced when switching to a difficult task is related to between-task competition [@arrington2014voluntary]. In a task switching procedure, participants have two task sets competing for representation while they perform any given trial. By default this competition is weighted in favour of the easier task, and performance of the difficult task requires active enhancement of its weaker task set. As a consequence of enhancing the strength of the difficult task set across the experiment, participants find it easier to switch to this task and therefore take reduced switch costs [@arrington2014voluntary]. Previous investigations of this effect in voluntary task designs have shown that participants also choose to perform the difficult task more often [@yeung2010bottom;@millington2013between], and that this depends on the degree of response overlap between the two tasks [@yeung2010bottom], as well as the amount of time taken to make a selection [@millington2013between]. 
 
-Notably in our case, participants in the shape group were not displaying a similar switch cost asymmetry. This suggests that the between-task competition present in previous task switching experiments, and present in the colour group of our task, was reduced for participants in the shape group. Importantly this is not because of a change in task difficulty between the groups - the shape group's response times show that they also find the search task more difficult than the categorisation task. Instead, while task difficulty remains the same for both groups, the switch cost asymmetry is absent for the shape group whose target is a shape singleton in both tasks. This may suggest that between-task competition is modulated not only by response compatibility (as described by @yeung2010bottom), but by modulating the congruency between the attentional templates used in each task. A thorough understanding of the factors that modulate between-task competition will require further investigation, however, our results suggest that such work may find utility in expanding on the paradigm used here to control for task difficulty while manipulting between-task competition.
+Notably in our case, participants in the shape group were not displaying a similar switch cost asymmetry. This suggests that the between-task competition was reduced for participants in the shape group. Importantly this is not due to a change in task difficulty between the groups - the shape group's response times show that they also find the search task more difficult than the categorisation task. While task difficulty remains the same for both groups, the switch cost asymmetry is absent for the shape group whose target is a shape singleton in both tasks. This suggests that between-task competition is modulated not only by response compatibility (as described by @yeung2010bottom), but also by the congruency between the attentional templates used in each task. A thorough understanding of the factors that modulate between-task competition will require further investigation. Our results, however, suggest that such work may find utility in expanding on the paradigm used here to control for task difficulty while manipulting between-task competition.
 
 ```{r }
 #The group differences that we observe in switch rates and switch costs may appear to provide an alternate explanation for the effects of selection history that were described earlier. Participants in the shape group seem to be having an easier time switching between task sets for the categorisation and the search task, presumably because of the increased overlap in task requirements. In the search task both groups must locate a shape singleton, and in the categorisation task the shape group continue to locate a shape singleton whereas the colour group must switch to locating a colour singleton. Impaired selection of the search target and increased distractor suppression by those in the colour group may therefore be attributed to an impaired activation of the current task set, rather than the accumulation of a colour-focused selection history. It is important to note however that the effect of selection history that we observe in both behaviour and ERP components is measured in response to search trials, where switch costs are equivalent for both groups of participants. Previous work has also shown that these effects persist when the two tasks are performed in separate sessions and therefore task switching is completely absent [@kadel2017selection]. Therefore, our results here are unlikely to be the product of group differences in the ease of task switching, and are instead attributable to the role of an individual's selection history in shifting their attention.
@@ -1452,7 +1455,7 @@ Notably in our case, participants in the shape group were not displaying a simil
 
 # Conclusion
 
-Previous work has managed to establish that a person's selection history can influence their deployment of attention during the performance of a visual search task. Our study used a voluntary task selection paradigm to maximise participants' top-down control. The results showed that top-down control could not eliminate the effects of selection history on attention even when maximised. This was evident in both the distractor costs measured from behaviour, as well as lateralised ERP components which dissociated target selection and distractor suppression. Group assignment also affected choice processes and switch costs in voluntary task switching. Switch costs in our task were significantly larger for the categorisation task in the colour group than in any other condition, which, along with the presence of a repetition bias only in the colour group, implies the presence of increased between-task competition for those participants. These results support the suggestion by @awh2012top that selection history represents a third distinct mechanism of attention control, and future research into visual attention would benefit from clarifying the mechanism by which this information is accrued.
+Previous work has managed to establish that a person's selection history can influence their deployment of attention during the performance of a visual search task. Our study used a voluntary task selection paradigm to maximise participants' top-down control. The results showed that top-down control could not eliminate the effects of selection history on attention even when maximised. This was evident in both the distractor costs measured from behaviour, as well as in the lateralised ERP components which dissociated target selection and distractor suppression. Group assignment also affected choice processes and switch costs in voluntary task switching. Switch costs in our task were significantly larger for the categorisation task in the colour group than in any other condition, which, along with the presence of a repetition bias only in the colour group, implies the presence of increased between-task competition for those participants. These results support the suggestion by @awh2012top that selection history represents a third distinct mechanism of attention control, and future research into visual attention would benefit from clarifying the mechanism by which this information is accrued.
 
 ```{r}
 #First half task choice vs second half? MNaybe in the first half we see something more like free choice and therefore get a difficult task bias as expected by Yeung 2010 and millington, poljac, Yeung 2013

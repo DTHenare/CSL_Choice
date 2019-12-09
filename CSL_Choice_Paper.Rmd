@@ -32,7 +32,7 @@ author_note: |
   Dion Henare and Anna Schuboe, Cognitive Neuroscience of Perception and Action, Department of Psychology, Philipps-University Marburg, Germany. \newline This research was supported by the Deutsche Forschungsgemeinschaft (DFG, German Research Foundation) – SFB/TRR 135, project number 222641018, TP B3.
 
 abstract: |
-  A typical visual scene contains vast amounts of information, and only a fraction of this can be fully processed by the human visual system. To understand how our attention is directed to one object over another, research has historically focussed on the interaction between bottom-up stimulus features, and an individual's top-down goals. In this study we evaluated how a third factor, an individual's selection history, interacts with top-down control mechanisms during visual search. Participants in our task were assigned to one of two groups in which they develop a history of shape selection or colour selection in one task, while performing visual search for a shape singleton in a second task. A voluntary task selection procedure allowed participants the choice of which task they would perform on any given trial thereby maximising their opportunity for top-down preparation. We recorded EEG while participants performed these tasks and extracted lateralised ERP components as indices of target selection (NT) and distractor suppression (PD). Our results showed that selection history continued to guide attention during visual search, even when top-down control mechanisms were maximised with a voluntary task selection procedure. For participants with a history of colour selection, the NT component elicited by a shape target is attenuated if it is accompanied by a colour distractor, and the distractor itself elicits a larger PD component. Additionally, task switching results reveal that participants in the colour group have larger, asymmetric switch costs which implies increased competition between the two task sets. Our results support the notion that selection history is a significant factor in attention guidance, orienting the visual system reflexively to objects that contradict an individual's current goals - even when these goals are intrinsically selected and prepared ahead of time.
+  The human visual system can only process a fraction of the information present in a typical visual scene, and selection is historically framed as the outcome of bottom-up and top-down control processes. In this study we evaluated how a third factor, an individual’s selection history, interacts with top-down control mechanisms during visual search. Participants in our task were assigned to one of two groups in which they developed a history of either shape or colour selection in one task, while searching for a shape singleton in a second task. A voluntary task selection procedure allowed participants to choose which task they would perform on each trial thereby maximising their top- down preparation. We recorded EEG throughout and extracted lateralised ERP components that index target selection (NT) and distractor suppression (PD). Our results showed that selection history continued to guide attention during visual search, even when top-down control mechanisms were maximised with voluntary task selection. For participants with a history of colour selection, the NT component elicited by a shape target was attenuated when accompanied by a colour distractor, and the distractor itself elicited a larger PD component. Additionally, task switching results revealed that participants in the colour group had larger, asymmetric switch costs implying increased competition between task sets. Our results support the notion that selection history is a significant factor in attention guidance, orienting the visual system reflexively to objects that contradict an individual’s current goals - even when these goals are intrinsically selected and prepared ahead of time.
 
 bibliography      : ["cslChoice_references.bib"]
 
@@ -476,10 +476,7 @@ When it comes to search task accuracy we did not observe any differences between
 ```{r }
 #Follow-up tests reveal that participants respond significantly slower when a distractor is present in the search display, and this is true in both the colour group (`r searchRT.fup$full_result$TD_Tonly_Colour`) and the shape group (`r searchRT.fup$full_result$TD_Tonly_Shape`). However, this effect appears to be larger for the colour group and when it is tested directly using an independent samples t-test, the results show that distractor cost is indeed significantly larger for the colour group than the shape group (`r intEffectTTest$full_result`). 
 ```
-
-(ref:behavDistInt) Response time cost (response time in distractor present trials minus RT in distractor absent trials) caused by the presence of a coloured distractor in the search task. Participants assigned to respond to colour in the categorisation task (shown in green) had significantly higher costs during the search task than participants assigned to repsond to shape in the categorisation task (shown in grey). Individual response time costs are depicted as dots alongside a boxplot and violin plot to visualise the range and distribution of costs for each group.
-
-```{r DistIntViolin, fig.cap = "(ref:behavDistInt)"}
+```{r createandsaveDistIntPlot, include = FALSE}
 behavData %>%
   filter(Procedure.Trial. == "TaskC",switchRate>minSwitchRate, CompSearch.ACC==1, CompSearch.RT < compCutoff) %>%
   group_by(Subject, TrialType, Group) %>%
@@ -502,6 +499,13 @@ behavData %>%
         axis.ticks = element_blank(),
         text= element_text(size=18)
         )
+ggsave('Figures/DistIntViolin.jpg',width=5, height=4, units="in", dpi = 300)
+```
+
+(ref:behavDistInt) Response time cost (response time in distractor present trials minus RT in distractor absent trials) caused by the presence of a coloured distractor in the search task. Participants assigned to respond to colour in the categorisation task (shown in green) had significantly higher costs during the search task than participants assigned to repsond to shape in the categorisation task (shown in grey). Individual response time costs are depicted as dots alongside a boxplot and violin plot to visualise the range and distribution of costs for each group.
+
+```{r DistIntViolin, fig.cap = "(ref:behavDistInt)"}
+include_graphics("Figures/DistIntViolin.jpg", auto_pdf = TRUE)
 ```
 
 
@@ -782,11 +786,11 @@ When evaluating the P$_{\text{D}}$ time range, we observed no main effects of gr
 
 (ref:learnERPCap) ERP difference waves showing the lateralised response to displays in the categorisation task. The top panel depicts the different neural responses elicited by a lateralised colour singleton for participants responding to the colour singleton (shown in green) versus those tasked with responding to the shape singleton (shown in grey). The bottom panel depicts the different neural responses elicited by a lateralised colour singleton, again separated by those in the colour group (green) and those in the shape group (grey). We see an N$_{\text{T}}$ (`r as.character(round(NtStart))`ms to `r as.character(round(NtEnd))`ms) elicited by whichever stimulus was the target (lateralised colour singleton for the colour group, lateralised shape singleton for the shape group) but not otherwise. The non-target stimulus elicited a lateraliesd positivity in the N$_{\text{T}}$ time window and no significant differences in the P$_{\text{D}}$ time window.
 
-```{r makeLearnPlots, fig.cap="(ref:learnERPCap)"}
+```{r makeLearnPlotAndSave, include = FALSE}
 imgCol <- readPNG("learnCol.png")
 imgShape <- readPNG("learnShape.png")
 #Subtracted
-allData %>%
+pp <- allData %>%
   filter(Event == "Learn", learnRej == 0) %>%
   mutate(sample = sample*srateMultiplier-baseline) %>%
   group_by(Object,sample,Contra,Group) %>%
@@ -829,7 +833,18 @@ allData %>%
           plot.margin = unit(c(0,0,0,0),"cm"),
           plot.title = element_text(family = "sans", size =fontSize*1.5, margin=margin(0,0,30,0))
           )
-ggsave("LearnSubtracted.pdf", dpi = 300, width = 8.89, height = 8.89*1, units = c("cm"))
+pg <- ggplotGrob(pp)
+
+for(i in which(grepl("strip-r", pg$layout$name))){
+  pg$grobs[[i]]$layout$clip <- "off"
+}
+
+grid::grid.draw(pg)
+ggsave("Figures/LearnSubtracted.jpg", pg, dpi = 300, width = 5, height = 4, units = "in")
+```
+
+```{r makeLearnPlots, fig.cap="(ref:learnERPCap)"}
+include_graphics("Figures/LearnSubtracted.jpg", auto_pdf = TRUE)
 ```
 
 #### Search task
@@ -1003,12 +1018,12 @@ Results of the P$_{\text{D}}$ time window showed no significant main effect of g
 
 (ref:searchERPCap) Subtracted ERPs showing the lateralised response for each group across the three different search display conditions. The top panel shows equivalent N$_{\text{T}}$ components (`r as.character(round(NtStart))`ms to `r as.character(round(NtEnd))`ms) elicited by both groups when a target is presented without distraction. The middle panel shows an attenuated N$_{\text{T}}$ for participants in the colour group when a target was presented alongside a colour distractor. The bottom panel shows the P$_{\text{D}}$ component (`r as.character(round(PdStart))`ms to `r as.character(round(PdEnd))`ms) elicited by lateralised colour distractors for participants in the colour group but not the shape group.
 
-```{r makeSearchPlots, fig.cap="(ref:searchERPCap)", fig.height = 5.25,  fig.align = "center"}
+```{r makeSearchPlotsandSave, include = FALSE}
 
 imgTO = readPNG("searchTO.png")
 imgTD = readPNG("searchTD.png")
 imgDT = readPNG("searchDT.png")
-allData %>%
+pp <- allData %>%
   filter( Event == "Search" & LatStim != "None" & searchRej == 0) %>%
   mutate(sample = sample*srateMultiplier-baseline) %>%
   group_by(Stimulus,sample,Contra,Group) %>%
@@ -1058,8 +1073,20 @@ allData %>%
           plot.margin = unit(c(0,0,0,0),"cm"),
           plot.title = element_text(family = "sans", size = 18, margin=margin(0,0,30,0))
           )
-ggsave("SearchSubtracted.pdf", dpi = 300, width = 8.89, height = 8.89*1.3, units = c("cm"))
+pg <- ggplotGrob(pp)
+
+for(i in which(grepl("strip-r", pg$layout$name))){
+  pg$grobs[[i]]$layout$clip <- "off"
+}
+
+grid::grid.draw(pg)
+ggsave("Figures/SearchSubtracted.jpg", pg, dpi = 300, width = 5, height = 5.3, units = c("in"))
 ```
+
+```{r makeSearchPlots, fig.cap="(ref:searchERPCap)"}
+include_graphics("Figures/SearchSubtracted.jpg", auto_pdf = TRUE)
+```
+
 
 ```{r clearData, include = FALSE}
 rm(list = ls(pattern = "search"))
@@ -1190,7 +1217,7 @@ Participants were encouraged to make their task selections as random as possible
 
 (ref:SRPlot) Voluntary switch rates for each individual separated by group assignment. Dots show each individual's switch rate alongside a boxplot and violin plot to display the range and distribution of switch rates. A switch rate of 50% is expected when participants are randomly selecting the task on each trial as instructed.
 
-```{r SwitchRateViolin, fig.cap = "(ref:SRPlot)"}
+```{r SwitchRateViolinandSave, include = FALSE}
 behavData %>%
   filter(switchRate > minSwitchRate,CompSearch.RT < compCutoff | LearnSearch.RT < learnCutoff) %>%
   mutate(GroupNum = as.integer(Group)) %>%
@@ -1214,6 +1241,11 @@ behavData %>%
         axis.ticks = element_blank(),
         text= element_text(size=18)
         )
+ggsave('Figures/SRviolin.jpg',width=5, height=4, units="in", dpi = 300)
+```
+
+```{r SwitchRateViolin, fig.cap = "(ref:SRPlot)"}
+include_graphics("Figures/SRviolin.jpg", auto_pdf = TRUE)
 ```
 
 ### Switch Costs
@@ -1345,11 +1377,11 @@ shpCat.SC <- apa_print(t.test(SCdirect.dat$SwitchCosts[SCdirect.dat$Group == "Sh
 #First, one sample t tests were used to show that participants in the colour group incurred significant switch costs in the both the categorisation task (`r colCat.SC$full_result`) and the search task (`r colSch.SC$full_result`). Similarly, participants in the shape group showed significant switch costs during both categorisation (`r shpCat.SC$full_result`) and search (`r shpSch.SC$full_result`).
 ```
 
-Switch costs were calculated by subtracting repsonse times to repetition trials from response times to switch trials. We performed a 2x2 ANOVA in order to evaluate the effect of task (categorisation vs search) and group (colour vs shape) on the size of these switch costs. Our results showed a significant effect of task (`r SCdirect.res$full_result$Procedure_Trial_`), but not group (`r SCdirect.res$full_result$Group`), however these effects were superceded by a significant interaction between task and group (`r SCdirect.res$full_result$Group_Procedure_Trial_`). Follow-up comparisons (visualised in Figure\ \@ref(fig:SCPlot)) demonstrated that participants in the colour group had significantly larger switch costs in the categorisation task (`r intr.group.sc$text[2]`) than the search task (`r paste(intr.group.sc$text[1], ", ", SCdirect.grp.fup$statistic$TaskC_TaskL_Colour, sep = "")`), whereas participants in the shape group showed no difference between the categorisation (`r intr.group.sc$text[4]`) and search tasks (`r paste(intr.group.sc$text[3], ", ", SCdirect.grp.fup$statistic$TaskC_TaskL_Shape, sep = "")`). In the categorisation task, participants in the colour group had significantly larger switch costs than participants in the shape group (`r SCdirect.tsk.fup$statistic$Colour_Shape_TaskL`) however there was no difference between the two groups in the search task (`r SCdirect.tsk.fup$statistic$Colour_Shape_TaskC`). A set of one sampled t tests confirm that switch costs differ from 0 for both groups in all conditions (all p values <0.001).
+Switch costs were calculated by subtracting repsonse times to repetition trials from response times to switch trials. We performed a 2x2 ANOVA in order to evaluate the effect of task (categorisation vs search) and group (colour vs shape) on the size of these switch costs. Our results showed a significant effect of task (`r SCdirect.res$full_result$Procedure_Trial_`), but not group (`r SCdirect.res$full_result$Group`), however these effects were superceded by a significant interaction between task and group (`r SCdirect.res$full_result$Group_Procedure_Trial_`). Follow-up comparisons (visualised in Figure\ \@ref(fig:switchCostPlot)) demonstrated that participants in the colour group had significantly larger switch costs in the categorisation task (`r intr.group.sc$text[2]`) than the search task (`r paste(intr.group.sc$text[1], ", ", SCdirect.grp.fup$statistic$TaskC_TaskL_Colour, sep = "")`), whereas participants in the shape group showed no difference between the categorisation (`r intr.group.sc$text[4]`) and search tasks (`r paste(intr.group.sc$text[3], ", ", SCdirect.grp.fup$statistic$TaskC_TaskL_Shape, sep = "")`). In the categorisation task, participants in the colour group had significantly larger switch costs than participants in the shape group (`r SCdirect.tsk.fup$statistic$Colour_Shape_TaskL`) however there was no difference between the two groups in the search task (`r SCdirect.tsk.fup$statistic$Colour_Shape_TaskC`). A set of one sampled t tests confirm that switch costs differ from 0 for both groups in all conditions (all p values <0.001).
 
 (ref:SCPlot) Response times for switch and repeat trials for the colour group (green) and the shape group (grey) in each task. For the search task (left) we observed a switch cost (faster responses to repetition trials) for both groups of participants. In the categorisation task (right) participants in the colour group (green) showed significant switch costs however participants in the shape group (grey) showed comparatively small differences.
 
-```{r switchCostPlot, fig.cap= "(ref:SCPlot)"}
+```{r make_switchCostPlot, include=FALSE}
 switchCost.se <- behavData %>%
 filter(Procedure.Trial. == "TaskC") %>%
 filter(switchRate > minSwitchRate,CompSearch.RT < compCutoff | LearnSearch.RT < learnCutoff) %>%
@@ -1420,7 +1452,12 @@ text= element_text(size=18),
 strip.background = element_blank(),
 legend.position = "none"
 )
-grid.arrange(plot1,plot2, ncol = 2, nrow = 1)
+pg <- grid.arrange(plot1,plot2, ncol = 2, nrow = 1)
+ggsave("Figures/switchcost.jpg", pg, width = 16, height = 8, units = "cm")
+```
+
+```{r switchCostPlot, fig.cap= "(ref:SCPlot)"}
+include_graphics("Figures/switchcost.jpg", auto_pdf = TRUE)
 ```
 
 # Discussion

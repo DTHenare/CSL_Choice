@@ -116,20 +116,10 @@ plotData <- allData %>%
   group_by(TaskChoice,RepSwitch, sample, Chan) %>%
   summarise(mean = mean(voltage))
 save(plotData, file = paste(dPath,"plotData_TaskChoiceXrepswitch.RData",sep=""))
-}
 
-plotData %>%
-  ggplot(., aes(sample, mean)) +
-  geom_line(aes(colour = TaskChoice),size=3) +
-  scale_color_manual(values=c("#000000", "#CC0000")) +
-  scale_x_continuous(name ="Latency (ms)", expand = c(0, 0)) +
-  scale_y_reverse(name =expression(paste("Amplitude (",mu,"v)")), expand = c(0, 0)) +
-  facet_grid(Chan~.,scales = "free_y") +
-  geom_vline(xintercept = 0,linetype = "dashed" )+
-  geom_hline(yintercept = 0,linetype = "dashed") +
-  theme_minimal() +
-  theme(panel.spacing.y = unit(2, "lines"),text= element_text(size=60))
-ggsave(paste(dPath,"CNVERPs_byGroup.pdf",sep=""),width = plotWidth, height = plotHeight*2)
+rm(allData)
+gc()
+}
 
 load('CNV_StimOnsetWide/plotData_TaskChoice.RData')
 choicePlot <- plotData
@@ -139,10 +129,24 @@ plotData$Exp = "Cued"
 plotData <- rbind(choicePlot,plotData)
 
 plotData %>%
-  group_by(colnames(select(plotData, -Task))) %>%
+  group_by(sample, Chan, Exp) %>%
+  summarise(mean = mean(mean)) %>%
+  ggplot(., aes(sample, mean, colour = Exp)) +
+  geom_line(size=3) +
+  #scale_color_manual(values=c("#000000", "#CC0000")) +
+  scale_x_continuous(name ="Latency (ms)", expand = c(0, 0)) +
+  scale_y_reverse(name =expression(paste("Amplitude (",mu,"v)")), expand = c(0, 0)) +
+  facet_grid(Chan~.,scales = "free_y") +
+  geom_vline(xintercept = 0,linetype = "dashed" )+
+  geom_hline(yintercept = 0,linetype = "dashed") +
+  theme_minimal() +
+  theme(panel.spacing.y = unit(2, "lines"),text= element_text(size=60))
+ggsave(paste(dPath,"CNVERPs_Average.pdf",sep=""),width = plotWidth, height = plotHeight*2)
+
+plotData %>%
   ggplot(., aes(sample, mean)) +
   geom_rect(xmin = -700, xmax=-500, ymin = -2, ymax = 2, size = 0, fill = "gray70", alpha = 0.05) +
-  geom_line(aes( colour = Exp, linetype = RepSwitch), size = 1.5) +
+  geom_line(aes( colour = Exp, linetype = TaskChoice), size = 1.5) +
   #scale_color_manual(values=c("#000000", "#CC0000")) +
   scale_x_continuous(name ="Latency (ms)", expand = c(0, 0)) +
   scale_y_reverse(name =expression(paste("Amplitude (",mu,"v)")), expand = c(0, 0)) +
@@ -151,8 +155,16 @@ plotData %>%
   geom_vline(xintercept = 0,linetype = "dashed" )+
   geom_vline(xintercept = -500,linetype = "dashed" )+
   geom_hline(yintercept = 0,linetype = "dashed") +
-  theme_minimal() 
+  theme_minimal() +
 theme(panel.spacing.y = unit(2, "lines"),text= element_text(size=60))
+ggsave(paste(dPath,"CNVERPs_TaskChoice.pdf",sep=""),width = plotWidth, height = plotHeight*2)
+
+load('CNV_StimOnsetWide/plotData_RepSwitch.RData')
+choicePlot <- plotData
+choicePlot$Exp = "Voluntary"
+load('CNV_HannaStimOnsetWide/plotData_RepSwitch.RData')
+plotData$Exp = "Cued"
+plotData <- rbind(choicePlot,plotData)
 
 plotData %>%
   ggplot(., aes(sample, mean)) +
@@ -166,6 +178,29 @@ plotData %>%
   geom_vline(xintercept = 0,linetype = "dashed" )+
   geom_vline(xintercept = -500,linetype = "dashed" )+
   geom_hline(yintercept = 0,linetype = "dashed") +
-  theme_minimal() 
+  theme_minimal() +
   theme(panel.spacing.y = unit(2, "lines"),text= element_text(size=60))
-ggsave(paste(dPath,"CNVERPs.pdf",sep=""),width = plotWidth, height = plotHeight*2)
+ggsave(paste(dPath,"CNVERPs_RepSwitch.pdf",sep=""),width = plotWidth, height = plotHeight*2)
+
+load('CNV_StimOnsetWide/plotData_TaskChoiceXrepswitch.RData')
+choicePlot <- plotData
+choicePlot$Exp = "Voluntary"
+load('CNV_HannaStimOnsetWide/plotData_TaskChoiceXrepswitch.RData')
+plotData$Exp = "Cued"
+plotData <- rbind(choicePlot,plotData)
+
+plotData %>%
+  ggplot(., aes(sample, mean)) +
+  geom_rect(xmin = -700, xmax=-500, ymin = -2, ymax = 2, size = 0, fill = "gray70", alpha = 0.05) +
+  geom_line(aes( colour = TaskChoice, linetype = RepSwitch), size = 1.5) +
+  #scale_color_manual(values=c("#000000", "#CC0000")) +
+  scale_x_continuous(name ="Latency (ms)", expand = c(0, 0)) +
+  scale_y_reverse(name =expression(paste("Amplitude (",mu,"v)")), expand = c(0, 0)) +
+  facet_grid(Chan~Exp) +
+  #geom_rect(xmin = -700, xmax=-500, ymin = -Inf, ymax = Inf, size = 0, fill = "gray40", alpha = 0.1) +
+  geom_vline(xintercept = 0,linetype = "dashed" )+
+  geom_vline(xintercept = -500,linetype = "dashed" )+
+  geom_hline(yintercept = 0,linetype = "dashed") +
+  theme_minimal() +
+  theme(panel.spacing.y = unit(2, "lines"),text= element_text(size=60))
+ggsave(paste(dPath,"CNVERPs_TaskChoiceXrepswitch.pdf",sep=""),width = plotWidth, height = plotHeight*2)

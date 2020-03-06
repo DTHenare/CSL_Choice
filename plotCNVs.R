@@ -17,11 +17,9 @@ groupdata$Reject = as.factor(groupdata$Reject)
 #Creates aggregate of all participant data (needs dPath and fPrefix)
 eFilePattern = paste(fPrefix,"*_epochs.csv", sep="")
 fFilePattern = paste(fPrefix,"*_Fz.csv", sep="")
-cFilePattern = paste(fPrefix,"*_Cz.csv", sep="")
 pFilePattern = paste(fPrefix,"*_Pz.csv", sep="")
 eFileList = list.files(dPath, pattern=glob2rx(eFilePattern))
 fFileList = list.files(dPath, pattern=glob2rx(fFilePattern))
-cFileList = list.files(dPath, pattern=glob2rx(cFilePattern))
 pFileList = list.files(dPath, pattern=glob2rx(pFilePattern))
 
 #create variables using first dataset
@@ -30,7 +28,6 @@ epochInfo$Subject = 1
 epochInfo$Group = groupdata$Group[1]
 epochInfo$Reject = groupdata$Reject[1]
 FzData = read.csv(file = paste(dPath,fFileList[1], sep=""), header = FALSE)
-CzData = read.csv(file = paste(dPath,cFileList[1], sep=""), header = FALSE)
 PzData = read.csv(file = paste(dPath,pFileList[1], sep=""), header = FALSE)
 #append the other datasets to the above variables
 for (subj in 2:length(eFileList)) {
@@ -39,12 +36,10 @@ for (subj in 2:length(eFileList)) {
   curEpochInfo$Group = groupdata$Group[subj]
   curEpochInfo$Reject = groupdata$Reject[subj]
   curFzData = read.csv(file = paste(dPath,fFileList[subj], sep=""), header = FALSE)
-  curCzData = read.csv(file = paste(dPath,cFileList[subj], sep=""), header = FALSE)
   curPzData = read.csv(file = paste(dPath,pFileList[subj], sep=""), header = FALSE)
   
   epochInfo = rbind(epochInfo, curEpochInfo)
   FzData = rbind(FzData, curFzData)
-  CzData = rbind(CzData, curCzData)
   PzData = rbind(PzData, curPzData)
 }
 #Tidy the variables, remove unnecessary and convert to factors
@@ -61,19 +56,18 @@ epochInfo$Timepoint=NULL
 epochInfo$Hemifield=NULL
 
 #clear stuff that I don't need
-rm(curEpochInfo,curFzData,curCzData,curPzData, fPrefix, eFileList, eFilePattern, fFileList, fFilePattern, cFileList, cFilePattern, pFileList, pFilePattern, subj, groupdata)
+rm(curEpochInfo,curFzData,curPzData, fPrefix, eFileList, eFilePattern, fFileList, fFilePattern, pFileList, pFilePattern, subj, groupdata)
 gc()
 #####
 #combine all the data together into one long table
 gathercols = colnames(FzData)
 FzData$Chan = "Fz"
-CzData$Chan = "Cz"
 PzData$Chan = "Pz"
-scalpData = rbind(FzData,CzData,PzData)
-epochInfo = rbind(epochInfo,epochInfo,epochInfo)
+scalpData = rbind(FzData,PzData)
+epochInfo = rbind(epochInfo,epochInfo)
 
 allData <- cbind(epochInfo, scalpData)
-rm(epochInfo,FzData,CzData,PzData,scalpData)
+rm(epochInfo,FzData,PzData,scalpData)
 gc()
 allData <- gather(allData, "sample", "voltage", gathercols, factor_key = TRUE)
 
@@ -82,7 +76,7 @@ allData$sample <- as.integer(substring(allData$sample,2))
 allData <- allData %>% mutate(RepSwitch = substring(allData$Event,15))
 allData <- allData %>% mutate(RepSwitch = ifelse((RepSwitch == "p" | RepSwitch == "ep"),"Repetition","Switch"))
 allData <- allData %>% mutate(TaskChoice = substring(Event,1,5)) %>% mutate(TaskChoice = ifelse(TaskChoice=="Searc","Search","Learn"))
-allData$Chan <- factor(allData$Chan, levels=c('Fz','Cz','Pz'))
+allData$Chan <- factor(allData$Chan, levels=c('Fz', 'Pz'))
 
 #clear stuff that I don't need
 rm(gathercols)

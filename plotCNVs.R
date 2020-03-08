@@ -3,9 +3,9 @@ library(dplyr)
 library(ggplot2)
 
 paths = c('CNV_StimOnsetWide/','CNV_HannaStimOnsetWide/')
-groupInfos = c('SophiaGroupAssignment_provisional.csv','HannaGroupAssignment_provisional.csv')
+groupInfos = c('SophiaGroupAssignment_provisional.csv','HannaaGroupAssignment_provisional.csv')
 
-for (ind in 1:2) {
+for (ind in 1:length(paths)) {
 dPath = paths[ind]
 baseline = 800
 groupdata = read.csv(file=groupInfos[ind])
@@ -13,6 +13,9 @@ rejCrit = 700
 
 fPrefix = 'CNV'
 
+
+rm(allData)
+gc()
 #Organisevgroup data
 groupdata = groupdata %>% mutate(Group = ifelse(Group == 1, "Colour", "Shape"))
 groupdata$Reject = as.factor(groupdata$Reject)
@@ -99,32 +102,16 @@ plotHeight = 9
 plotData <- allData %>%
   filter(Subject %in% Keepers) %>%
   mutate(sample = sample-baseline) %>%
-  group_by(TaskChoice, sample, Chan) %>%
-  summarise(mean = mean(voltage))
-save(plotData, file = paste(dPath,"plotData_TaskChoice.RData",sep=""))
-
-plotData <- allData %>%
-  filter(Subject %in% Keepers) %>%
-  mutate(sample = sample-baseline) %>%
-  group_by(RepSwitch, sample, Chan) %>%
-  summarise(mean = mean(voltage))
-save(plotData, file = paste(dPath,"plotData_RepSwitch.RData",sep=""))
-
-plotData <- allData %>%
-  filter(Subject %in% Keepers) %>%
-  mutate(sample = sample-baseline) %>%
   group_by(TaskChoice,RepSwitch, sample, Chan) %>%
   summarise(mean = mean(voltage))
 save(plotData, file = paste(dPath,"plotData_TaskChoiceXrepswitch.RData",sep=""))
 
-rm(allData)
-gc()
 }
 
-load('CNV_StimOnsetWide/plotData_TaskChoice.RData')
+load('CNV_StimOnsetWide/plotData_TaskChoiceXrepswitch.RData')
 choicePlot <- plotData
 choicePlot$Exp = "Voluntary"
-load('CNV_HannaStimOnsetWide/plotData_TaskChoice.RData')
+load('CNV_HannaStimOnsetWide/plotData_TaskChoiceXrepswitch.RData')
 plotData$Exp = "Cued"
 plotData <- rbind(choicePlot,plotData)
 
@@ -144,6 +131,8 @@ plotData %>%
 ggsave(paste(dPath,"CNVERPs_Average.pdf",sep=""),width = plotWidth, height = plotHeight*2)
 
 plotData %>%
+  group_by(sample, Chan, Exp, TaskChoice) %>%
+  summarise(mean = mean(mean)) %>%
   ggplot(., aes(sample, mean)) +
   geom_rect(xmin = -700, xmax=-500, ymin = -2, ymax = 2, size = 0, fill = "gray70", alpha = 0.05) +
   geom_line(aes( colour = Exp, linetype = TaskChoice), size = 1.5) +
@@ -159,14 +148,9 @@ plotData %>%
 theme(panel.spacing.y = unit(2, "lines"),text= element_text(size=60))
 ggsave(paste(dPath,"CNVERPs_TaskChoice.pdf",sep=""),width = plotWidth, height = plotHeight*2)
 
-load('CNV_StimOnsetWide/plotData_RepSwitch.RData')
-choicePlot <- plotData
-choicePlot$Exp = "Voluntary"
-load('CNV_HannaStimOnsetWide/plotData_RepSwitch.RData')
-plotData$Exp = "Cued"
-plotData <- rbind(choicePlot,plotData)
-
 plotData %>%
+  group_by(sample, Chan, Exp, RepSwitch) %>%
+  summarise(mean = mean(mean)) %>%
   ggplot(., aes(sample, mean)) +
   geom_rect(xmin = -700, xmax=-500, ymin = -2, ymax = 2, size = 0, fill = "gray70", alpha = 0.05) +
   geom_line(aes( colour = Exp, linetype = RepSwitch), size = 1.5) +
@@ -181,13 +165,6 @@ plotData %>%
   theme_minimal() +
   theme(panel.spacing.y = unit(2, "lines"),text= element_text(size=60))
 ggsave(paste(dPath,"CNVERPs_RepSwitch.pdf",sep=""),width = plotWidth, height = plotHeight*2)
-
-load('CNV_StimOnsetWide/plotData_TaskChoiceXrepswitch.RData')
-choicePlot <- plotData
-choicePlot$Exp = "Voluntary"
-load('CNV_HannaStimOnsetWide/plotData_TaskChoiceXrepswitch.RData')
-plotData$Exp = "Cued"
-plotData <- rbind(choicePlot,plotData)
 
 plotData %>%
   ggplot(., aes(sample, mean)) +

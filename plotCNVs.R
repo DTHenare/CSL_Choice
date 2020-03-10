@@ -120,7 +120,7 @@ plotData$Exp = "Cued"
 plotData= plotData %>% mutate(Subject = paste("cue",as.character(Subject),sep =""))
 plotData <- rbind(choicePlot,plotData)
 
-save(plotData, file = paste(dPath,"plotData_readyforplotsandstats.RData",sep=""))
+save(plotData, file = "CNV/plotData_readyforplotsandstats.RData")
 
 x = c(-800,-500)
 y=c(0,0)

@@ -94,45 +94,76 @@ Keepers <- as.character(Keepers$Subject)
 plotWidth = 24
 plotHeight = 9
 
-my_palette <- brewer.pal(name="Spectral",n=11)[c(1,2,3,6,9,10,11)]
 allData <- allData %>% filter(RT<1000)
 allData$deciles = ntile(allData$RT,10)
+allData <- allData %>% mutate(sample = sample-baseline)
 rtLines <- allData %>%
-  group_by(Chan,deciles) %>%
+  group_by(Group,Chan,deciles) %>%
   summarise(RT = mean(RT))
 hmData <- allData %>%
   filter(Subject %in% Keepers) %>%
-  mutate(sample = sample-baseline) %>%
-  group_by(sample, Chan, deciles) %>%
+  group_by(Group,sample, Chan, deciles) %>%
   summarise(mean = mean(voltage))
 ggplot() +
   geom_tile(data = hmData, aes(sample,deciles,fill = mean)) +
   geom_line(data = rtLines,aes(RT,deciles),size = 1.5) +
-  #scale_fill_distiller(palette = "Spectral",limits = c(-2.5,2.5),oob=squish) + 
   scale_fill_gradient2(low = "blue", mid ="white", high = "red",limits = c(-2.5,2.5),oob=squish) + 
-  facet_grid(Chan~.)
+  facet_grid(Chan~Group) +
+  scale_y_continuous(breaks = seq(1, 10, by = 1),name ="RT decile (1 = fastest, 10 = slowest)", expand = c(0, 0)) +
+  scale_x_continuous(breaks = seq(-200, 1000, by = 200),name ="Latency (ms)", expand = c(0, 0)) +
+  theme_minimal()
 
 plotData <- allData %>%
   filter(Subject %in% Keepers, RT<1000) %>%
-  mutate(sample = sample-baseline) %>%
-  group_by(TaskChoice, sample, Chan) %>%
-  summarise(mean = mean(voltage))
-save(plotData, file = paste(dPath,"plotData_TaskChoice.RData",sep=""))
-
-plotData <- allData %>%
-  filter(Subject %in% Keepers) %>%
-  mutate(sample = sample-baseline) %>%
-  group_by(RepSwitch, sample, Chan) %>%
-  summarise(mean = mean(voltage))
-save(plotData, file = paste(dPath,"plotData_RepSwitch.RData",sep=""))
-
-plotData <- allData %>%
-  filter(Subject %in% Keepers, RT<1000) %>%
-  mutate(sample = sample-baseline) %>%
   group_by(TaskChoice,RepSwitch, sample, Chan) %>%
   summarise(mean = mean(voltage))
 save(plotData, file = paste(dPath,"plotData_TaskChoiceXrepswitch.RData",sep=""))
 
-allData %>%
-  filter(Subject %in% Keepers, RT<1000) %>%
-  mutate(sample = sample-baseline) %>%
+load(paste(dPath,"plotData_TaskChoiceXrepswitch.RData",sep=""))
+plotData %>%
+  group_by(sample, Chan) %>%
+  summarise(mean = mean(mean)) %>%
+  ggplot() +
+  geom_line(aes(sample,mean)) +
+  scale_x_continuous(name ="Latency (ms)", expand = c(0, 0)) +
+  scale_y_reverse(name =expression(paste("Amplitude (",mu,"v)")), expand = c(0, 0)) +
+  facet_grid(Chan~.) +
+  geom_vline(xintercept = 0)+
+  geom_hline(yintercept = 0) +
+  theme_minimal()
+ggsave(paste(dPath,"CNVERPs_Average.png",sep=""),width = 10, height = 6.49)
+
+plotData %>%
+  group_by(sample, Chan, TaskChoice) %>%
+  summarise(mean = mean(mean)) %>%
+  ggplot() +
+  geom_line(aes(sample,mean, linetype = TaskChoice)) +
+  scale_x_continuous(name ="Latency (ms)", expand = c(0, 0)) +
+  scale_y_reverse(name =expression(paste("Amplitude (",mu,"v)")), expand = c(0, 0)) +
+  facet_grid(Chan~.) +
+  geom_vline(xintercept = 0)+
+  geom_hline(yintercept = 0) +
+  theme_minimal()
+
+plotData %>%
+  group_by(sample, Chan, RepSwitch) %>%
+  summarise(mean = mean(mean)) %>%
+  ggplot() +
+  geom_line(aes(sample,mean, colour = RepSwitch)) +scale_x_continuous(name ="Latency (ms)", expand = c(0, 0)) +
+  scale_y_reverse(name =expression(paste("Amplitude (",mu,"v)")), expand = c(0, 0)) +
+  facet_grid(Chan~.) +
+  geom_vline(xintercept = 0)+
+  geom_hline(yintercept = 0) +
+  theme_minimal()
+
+plotData %>%
+  group_by(sample, Chan,TaskChoice,RepSwitch) %>%
+  summarise(mean = mean(mean)) %>%
+  ggplot() +
+  geom_line(aes(sample,mean,linetype = TaskChoice,colour = RepSwitch)) +scale_x_continuous(name ="Latency (ms)", expand = c(0, 0)) +
+  scale_y_reverse(name =expression(paste("Amplitude (",mu,"v)")), expand = c(0, 0)) +
+  facet_grid(Chan~.) +
+  geom_vline(xintercept = 0)+
+  geom_hline(yintercept = 0) +
+  theme_minimal()
+ggsave(paste(dPath,"CNVERPs_TaskChoiceXRepSwtich.png",sep=""),width = 10, height = 6.49)

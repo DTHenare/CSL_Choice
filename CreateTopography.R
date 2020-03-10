@@ -7,7 +7,7 @@ library(png)
 library(grid)
 
 #Set path to topoData
-dPath = "G:/My Drive/createToposData/"
+dPath = "G:/My Drive/createToposData/Hanna/"
 #Create list of topoData files (one per person)
 fileList = list.files(dPath, pattern= "*_topoData.csv")
 winMin = -300
@@ -184,27 +184,3 @@ v4plot <- ggplot(interpV4[interpV4$incircle,],aes(x = x, y = y, fill = amplitude
   coord_equal()
 
 v4plot
-
-##### ERPs
-volData = allData %>%
-  filter(electrode %in% frontal) %>%
-  group_by(Times) %>%
-  summarise(amplitude = mean(amplitude))
-volData %>%
-  ggplot(., aes(Times,amplitude)) +
-  geom_line(size = 1.5) +
-  scale_y_reverse(name =expression(paste("Amplitude (",mu,"v)")), expand = c(0, 0)) +
-  geom_vline(xintercept = 0,linetype = "dashed" )+
-  geom_hline(yintercept = 0,linetype = "dashed") +
-  theme_minimal()
-
-volData$Task = "voluntary"
-cuedData$Task = "Cued"
-plotData = rbind(volData,cuedData)
-plotData %>%
-  ggplot(., aes(Times,amplitude, colour = Task)) +
-  geom_line(size = 1.5) +
-  scale_y_reverse(name =expression(paste("Amplitude (",mu,"v)")), expand = c(0, 0)) +
-  geom_vline(xintercept = 0,linetype = "dashed" )+
-  geom_hline(yintercept = 0,linetype = "dashed") +
-  theme_minimal()

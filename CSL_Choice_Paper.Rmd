@@ -218,6 +218,8 @@ Specific measures of attentional selection and suppression have provided increas
 
 An open question remains as to whether increased top-down control can be used to attenuate, or eliminate the effects of selection history on attention. Previously, dual task investigations of the effect have attempted to enhance top-down control processes by providing cues to participants which inform them of which task they’re about to perform [@kadel2017selection]. While this allows participants to switch task sets in preparation for the upcoming trial, the effect of selection history on attention has remained suggesting that top-down control cannot be used to override the effects of selection history. However, recent work has suggested that these cues are insufficient for allowing participants to optimally engage top-down control before the trial begins [@kiesel2010control]. A novel approach to increasing top-down attentional control in dual tasks is the voluntary task-switching paradigm developed by @arrington2004cost. In this version of the task, participants are not cued as to what trial type will be performed next, but rather they are given the choice of which trial type they would like to perform next. Evidence suggests that the voluntary task switching paradigm allows for stronger proactive control over performance of each task [@arrington2005voluntary;@kang2014electrophysiological].
 
+Evidence that voluntary task switching procedures enable greater top-dwon control compared to cued task swithing procedures comes from both behavioural and electrophysiological results. 
+
 Another advantage of voluntary task selection procedures is that they allow us to measure choice processes and could therefore provide insight into how choice is affected by selection history. In previous use of voluntary task selection, research has shown systematic patterns in task selection when participants are instructed to perform the two tasks in a random order. Participants typically show a repetition bias in their task choices [@arrington2004cost] which is exacerbated by shorter intertrial intervals [@arrington2005voluntary;@vandierendonck2010task], and typically involves a preference for performing the difficult task more frequently [@millington2013between;@yeung2010bottom]. A number of previous studies have also shown that the availability of a stimulus to the cognitive system can impact task choice [@mayr2006unpredictable;@yeung2010bottom;@arrington2010stimulus]. For example, when participants choose to perform either size or animacy judgements about words, they were more likely to choose the size judgement if they had performed a size judgement on that word previously and more likely to choose the animacy judgement if they had performed an animacy judgement on that word previously [@arrington2010stimulus]. Similarly, there are consistent biases in judgement choice across participants. Particular words, for instance "asprin", are more likely to elicit a size judgement, whereas other words are more likely to elicit an animacy judgement [@arrington2010stimulus]. In other voluntary selection tasks, repetition of a target's location has increased the likelihood of a participant repeating their previous choice [@mayr2006unpredictable;@yeung2010bottom], and individual switch rates correlated strongly with the cost of a task switch [@mayr2006unpredictable]. These findings suggest that previous history influences the ease with which a particular task is performed and therefore in turn, impacts task choice in a voluntary selection paradigm. 
 
 In the present study, we adapted the design of @feldmann2015you to a voluntary task switching paradigm in order to investigate the relationship between top-down control and selection history. By allowing participants to determine whether they would perform search or categorisation on the next trial, participants would be able to proactively engage the task set for the upcoming trial and exercise maximal top-down control. We also recorded EEG during their performance of the task and leveraged the procedure of @hickey2009electrophysiological to allow for the isolation of target and distractor activity. This approach provides specific measures of target selection, distractor capture, and distractor suppression during the task, and therefore provides a fine grained understanding of how top-down control interacts with selection history during attentional orienting. If increased top-down control is able to eliminate the effects of selection history, then we would expect to see distractor costs in the search task to be similar regardless of whether participants were assigned to the shape or colour group in the categorisation task. We would also expect that group assignment would not have differential effects on the lateralised ERP components elicited by stimuli in the search task. On the other hand, if top-down control cannot be used to override selection history effects then the effect of categorisation group assignment on distractor costs and ERP component amplitudes during search should remain.
@@ -266,7 +268,15 @@ EEG activity was recorded continuously at 1000Hz using Brain Products 64 channel
 
 ## EEG processing
 
-EEG data were processed using the EEGLAB toolbox in MATLAB. First, data were segmented into 700ms epochs (-200 to 500ms around each search or categorisation display) and baselined so that the average of the pre-stimulus period was set to zero for each event. For artifact rejection a HEOG channel was created by taking the voltage difference between the electrodes on the outer canthi of each eye, and a VEOG was created by taking the voltage difference between the electrodes above and below the left eye. These channels were filtered using a lowpass value of 35Hz in order to reduce false positives, and then trials containing either +/- 35mV in the HEOG channel (within 300ms post stimulus presentation) or +/- 80mV in the VEOG channel were removed. Trials containing +/- 80mv in the channels of interest (PO3, PO7, PO4, and PO8) were also removed and the data were referenced to the average of all channels. Left hemisphere channels (PO3, PO7) were averaged together, and right hemisphere channels (PO4, PO8) were averaged together so that contralateral and ipsilateral ERPs could be calculated for each condition.
+EEG data were processed using the EEGLAB toolbox in MATLAB. For the extraction of lateralised components (Nt and Pd) data were first segmented into 700ms epochs (-200 to 500ms around each search or categorisation display) and baselined so that the average of the pre-stimulus period was set to zero for each event. For artifact rejection a HEOG channel was created by taking the voltage difference between the electrodes on the outer canthi of each eye, and a VEOG was created by taking the voltage difference between the electrodes above and below the left eye. These channels were filtered using a lowpass value of 35Hz in order to reduce false positives, and then trials containing either +/- 35mV in the HEOG channel (within 300ms post stimulus presentation) or +/- 80mV in the VEOG channel were removed. Trials containing +/- 80mv in the channels of interest (PO3, PO7, PO4, and PO8) were also removed and the data were referenced to the average of all channels. Left hemisphere channels (PO3, PO7) were averaged together, and right hemisphere channels (PO4, PO8) were averaged together so that contralateral and ipsilateral ERPs could be calculated for each condition.
+
+## Comparison to @kadel2017selection
+
+A central premise in the logic of this study is that the voluntary task switching paradigm affords participants greater top-down control than cued task switching procedures. As described above, evidence supporting this claim has come primarily from analysis of the preparatory activity in the task switching literature. This work has shown that task cues result in a smaller frontal negativity (CNV) and a larger posterior positivity during the preparatory phase when compared to voluntary task selection. However, there are some differences in the tasks used in that literature when compared to the search tasks used here. In order to confirm that the voluntary task design is similarly effective at improving top-down control in our context, we sought to compare the preparatory activity in our task to the preparatory activity in a cued version of our task. In experiment 1 of their paper, @kadel2017selection perform exactly this task however their analyses focused exclusively on post-stimulus activity. We acquired the data of @kadel2017selection in order to extract the CNV and posterior positivity elicited by task cues in order to compare them to the CNV and posterior positivity elicited by voluntary task choices in our experiment.
+
+Details of the procedure used by @kadel2017selection can be found in their methods section however we provide a brief description of the most relevant points here. In their experiment, participants perform either a learn or search task on each trial (the details of which are identical to the tasks used in our experiment). Trials begin with a fixation cross, presented for 500ms, which indicates whether the upcoming display will be a learn or search trial. Participants then perform the task and after their response, the next trial begins. This allows for a direct comparison of the 500ms preparatory period following a cue, to the 500ms fixation period following a voluntary choice in our experiment.
+
+For the analysis of preparatory activity, we followed the EEG processing procedures used by previous investigations of cued and voluntary task switching. Data were rereferenced to the average of the mastoids and segmented into 1200ms epochs around the onset of the fixation cross in each trial. The epochs start with a 200ms baseline period prior to the onset of the fixation, and extend 1000ms post fixation corresponding to the entire preparatory period and extending 500ms into the poststimulus period. Data were then filtered using a lowpass value of 35Hz, and epochs were rejected if they contained activity exceeding +/-200mv in any channel, +/-75mv in EOG channels, or improbable data (based on EEGLAB's pop_jointprob function with a 6SD threshold). Trials where participants repsonded incorrectly were also excluded. A fronto-central cluster of electrodes and a posterior cluster of electrodes weres then created based on the channels used by @poljac_dissociable_2014 and we extracted component amplitudes by averaging the 300ms period directly preceding stimulus onset.
 
 ## Statistical analysis
 
@@ -283,6 +293,10 @@ For behavioural analyses we first calculated the switch rate for all participant
 In the categorisation task, 4 participants had to be excluded because less than 70% of the trials were left in the categorisation task (equivalent to an average of 202 trials remaining in each condition), or because their switch rate between the tasks was less than 0.2. As a result, 11 participants were remaining in each group. Our analyses focused on two components of interest, the N$_{\text{T}}$ and P$_{\text{D}}$. In order to determine the time range for the N$_{\text{T}}$, a grand average ERP of all participants was created for lateralised predictor trials (colour singleton for colour group participants and shape singleton for shape participants). The peak negativity that occurred later than 200ms post-stimulus was defined as the Nt, and a 50ms time window was centred on this timepoint producing a window from 206 to 256ms. For the P$_{\text{D}}$ component, we created a grand average ERP for lateralised non-predictor trials (the shape singleton for the colour group and the colour singleton for the shane group), identified the peak positivity that occurred later than 200ms poststimulus and centred a 50ms window on this timepoint which produced a window from 238 to 288ms.
 
 Five participants were excluded because less than 85% of trials remained in the search task after artifact rejection (equivalent to an average of 163 trials remaining in each condition), or their switch rate between the tasks was less than 0.2. As a result, 10 participants remained in the colour group, and 11 participants in the shape group. We again focused analyses on the N$_{\text{T}}$ and P$_{\text{D}}$ components. To select the N$_{\text{T}}$ time window we created a grand average of all participants for trials with a lateralised target, identified the peak negativity that occurred later than 200ms poststimulus and centred a 50ms window on this time point. This produced a time range of 227 to 277ms post-stimulus onset. For the P$_{\text{D}}$ component, we created a grand average ERP for trials with a lateralised distractor, identified the peak positivity that occurred later than 200ms poststimulus and centred a 50ms window on this timepoint which produced a window from 264 to 314ms.
+
+##### Comparison to @kadel2017selection
+
+An independent samples t test was used to compare the CNV amplitude between our data and the data from @kadel2017selection, and a second independent samples t test was was to compare the posterior positivity bewteen the two experiments.
 
 ### Voluntary task selection
 
@@ -1461,6 +1475,41 @@ ggsave("Figures/switchcost.jpg", pg, width = 16, height = 8, units = "cm")
 ```{r switchCostPlot, fig.cap= "(ref:SCPlot)"}
 include_graphics("Figures/switchcost.jpg", auto_pdf = TRUE)
 ```
+
+## Comparison to @kadel2017selection
+
+```{r}
+load('CNV/plotData_readyforplotsandstats.RData')
+x = c(-800,-500)
+y=c(0,0)
+lineData = data.frame(x=x,y=y)
+
+plotData %>%
+  group_by(sample, Chan, Exp) %>%
+  summarise(mean = mean(mean)) %>%
+  ggplot() +
+  geom_rect(xmin = -300, xmax=-0, ymin = -Inf, ymax = Inf, size = 0, fill = "lemonchiffon") +
+  geom_line(aes(sample, mean, colour = Exp),size=1) +
+  scale_x_continuous(name ="Latency (ms)", expand = c(0, 0)) +
+  scale_y_reverse(name =expression(paste("Amplitude (",mu,"v)")), expand = c(0, 0)) +
+  facet_grid(Chan~.,scales = "free_y") +
+  geom_vline(xintercept = 0,linetype = "dashed" )+
+  geom_vline(xintercept = -500)+
+  geom_hline(yintercept = 0,linetype = "dashed") +
+  geom_line(data = lineData,aes(x=x,y=y)) +
+  theme_apa() +
+    theme(panel.spacing.y = unit(3, "lines"), text= element_text(size=fontSize),
+          axis.text.x = element_text(size = fontSize*0.93),
+          axis.text.y = element_text(size = fontSize*0.93),
+          legend.title = element_text( size = fontSize*1.1),
+          legend.text = element_text( size = fontSize*0.93),
+          legend.position = "bottom",
+          plot.margin = unit(c(0,0,0,0),"cm"),
+          plot.title = element_text(family = "sans", size = 18, margin=margin(0,0,30,0))
+          )
+ggsave("Figures/CNVERPs_Average.jpg", dpi = 300, width = 5, height = 5.3, units = c("in"))
+```
+
 
 # Discussion
 

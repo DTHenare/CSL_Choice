@@ -120,6 +120,8 @@ plotData$Exp = "Cued"
 plotData= plotData %>% mutate(Subject = paste("cue",as.character(Subject),sep =""))
 plotData <- rbind(choicePlot,plotData)
 
+save(plotData, file = paste(dPath,"plotData_readyforplotsandstats.RData",sep=""))
+
 x = c(-800,-500)
 y=c(0,0)
 lineData = data.frame(x=x,y=y)

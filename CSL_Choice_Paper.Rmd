@@ -1469,7 +1469,7 @@ include_graphics("Figures/switchcost.jpg", auto_pdf = TRUE)
 
 ## Comparison to @kadel2017selection
 
-```{r prepComparisonMain}
+```{r prepComparisonMain, warnings = FALSE}
 load('CNV/plotData_readyforplotsandstats.RData')
 
 #Stats
@@ -1484,7 +1484,7 @@ post.stats <- apa_print(t.test(posteriorData$mean[posteriorData$Exp == "Voluntar
 source('CreateTopography.R')
 ```
 
-(ref:ExpCompPlot) Preparatory activity in the voluntary task selection procedure used in our experiment, compared to the preparatory activity in a cued version of our task carried out by @kadel2017selection. A) ERP activity centred on the stimulus display (either learn or search) onset taken from a cluster of fronto-central electrodes to measure the CNV, and a cluster of posterior electrodes to measure teh posterior positivity. The solid vertical line indicates the onset of the fixation cross preceding the stimulus display on each trial. In the Cued task this fixation indicated which task participants would be presented with, int he voluntary task this fixation started after participants had selected the task they would like to perform. The vertical dotted line shows the onset of the stimulus display and the component window used to measure preparatory activity is highlighted in yellow. B) Scalp distribution of ERP activity within the time window of interest, plotted separately for the two experiments. These display the larger fronto-central negativity typical of voluntary task switching paradigms and indicative of enhanced top-down control.
+(ref:ExpCompPlot) Preparatory activity in the voluntary task selection procedure used in our experiment, compared to the preparatory activity in a cued version of our task carried out by @kadel2017selection. A) ERP activity centred on the stimulus display onset taken from a cluster of fronto-central electrodes to measure the CNV, and a cluster of posterior electrodes to measure the posterior positivity. The solid vertical line indicates the onset of the fixation cross preceding the stimulus display on each trial. In the Cued task this fixation indicated which task participants would be presented with, in the voluntary task this fixation started after participants had selected the task they would like to perform. The vertical dotted line shows the onset of the stimulus display and the component window used to measure preparatory activity is highlighted in yellow. B) Scalp distribution of ERP activity within the time window of interest, plotted separately for the two experiments. We observe a larger fronto-central negativity typical of voluntary task switching paradigms and indicative of enhanced top-down control relative to the cued task paradigm.
 
 ```{r expCompPrepPlot, fig.cap= "(ref:ExpCompPlot)"}
 include_graphics("Figures/comp.jpg", auto_pdf = TRUE)

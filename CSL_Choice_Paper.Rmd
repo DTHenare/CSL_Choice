@@ -1478,8 +1478,18 @@ include_graphics("Figures/switchcost.jpg", auto_pdf = TRUE)
 
 ## Comparison to @kadel2017selection
 
-```{r}
+```{r .prepComparisonMain}
 load('CNV/plotData_readyforplotsandstats.RData')
+
+#Stats
+frontalData <- plotData %>% filter(Chan == "Fz", sample > -300, sample<0)
+posteriorData <- plotData %>% filter(Chan == "Pz", sample > -300, sample<0)
+frontalData <- frontalData %>% group_by(sample, Exp) %>% summarise(mean = mean(mean))
+front.stats <- apa_print(t.test(frontalData$mean[frontalData$Exp == "Voluntary"],frontalData$mean[frontalData$Exp == "Cued"],paired = 0))
+posteriorData <- posteriorData %>% group_by(sample, Exp) %>% summarise(mean = mean(mean))
+post.stats <- apa_print(t.test(posteriorData$mean[posteriorData$Exp == "Voluntary"],posteriorData$mean[posteriorData$Exp == "Cued"],paired = 0))
+
+#ERP plot
 x = c(-800,-500)
 y=c(0,0)
 lineData = data.frame(x=x,y=y)
@@ -1498,18 +1508,19 @@ plotData %>%
   geom_hline(yintercept = 0,linetype = "dashed") +
   geom_line(data = lineData,aes(x=x,y=y)) +
   theme_apa() +
-    theme(panel.spacing.y = unit(3, "lines"), text= element_text(size=fontSize),
+  theme(panel.spacing.y = unit(3, "lines"), text= element_text(size=fontSize),
           axis.text.x = element_text(size = fontSize*0.93),
           axis.text.y = element_text(size = fontSize*0.93),
           legend.title = element_text( size = fontSize*1.1),
           legend.text = element_text( size = fontSize*0.93),
           legend.position = "bottom",
-          plot.margin = unit(c(0,0,0,0),"cm"),
+          plot.margin = unit(c(1,0,0,0),"cm"),
           plot.title = element_text(family = "sans", size = 18, margin=margin(0,0,30,0))
           )
 ggsave("Figures/CNVERPs_Average.jpg", dpi = 300, width = 5, height = 5.3, units = c("in"))
 ```
 
+Comparing the preparatory activity in our experiment to the preparatory activity recorded by @kadel2017selection, we see a significantly larger CNV at frono-central electrodes in our voluntary task switching procedure (`r front.stats$full_result`). We also see a significantly larger positivity at posterior electrods in the cued task switching procedure used by @kadel2017selection (`r post.stats$full_result`).
 
 # Discussion
 
@@ -1525,7 +1536,7 @@ The final component of interest in our study was the P$_{\text{D}}$ component, a
 
 A substantial body of work has demonstrated the role that top-down control plays in directing attention to relevant stimuli. Early research showed that top-down control settings could be used to enhance the processing of specific locations [@eriksen1972temporal], as well as specific features like colour, size, and orientation [@von1970selection;@ansorge2003top;@ansorge2005top;@wolfe2004attributes]. Recent research has established that abstract top-down control settings are also effective. For example, participants are able to engage control settings that prepare for oddball detection [@bacon1994overriding;@pashler1988cross], relative features (eg. "redder" items; @becker2010role, @becker2013attentional), and semantic categories [@barnard2004paying;@leblanc2007can;@wyble2009categorically;@wyble2013contingent]. A large portion of this literature has focused on the interaction between top-down control and bottom-up salience, and the question of whether top-down control settings prevent capture by salient distractors. Given the relative novelty of selection history as an area of study, its interaction with top-down control remains poorly understood. Previous work using a version of our task in which participants were cued about the task they would perform on the subsequent trial, or performed the tasks in a fixed, predictable order [@kadel2017selection] showed the same selection history effects reported here, suggesting that top-down preparation cannot overrule the effect that selection history has on attentional filter settings.
 
-Our study extends on previous work through the use of a voluntary task selection design. Experiments from the task switching literature have provided a number of ways that top-down control can be improved in tasks like the one used here. Examples include task cuing paradigms in which a cue is presented before the trial to inform participants which task they are about to perform, as well as the alternating-runs paradigm where tasks are performed in a predictable sequence for example, A-A-B-B-A-A-B-B [@kiesel2010control]. Both of these procedures allow the participant to switch tasks sets in preparation for the upcoming trial demands and have been shown to reduce the cost of a task switch as a result. Voluntary task selection is a more recent development along these lines [@arrington2004cost;@arrington2005voluntary], and ERP evidence suggests that it results in even greater preparatory reconfiguration processes than the cuing paradigms used previously [@kang2014electrophysiological;@vandamme2010voluntary]. Our results extend on theseresults by showing that increased top-down control cannot eliminate selection history effects, even when the opportunity for top-down preparatory control is maximised.
+Our study extends on previous work through the use of a voluntary task selection design. Experiments from the task switching literature have provided a number of ways that top-down control can be improved in tasks like the one used here. Examples include task cuing paradigms in which a cue is presented before the trial to inform participants which task they are about to perform, as well as the alternating-runs paradigm where tasks are performed in a predictable sequence for example, A-A-B-B-A-A-B-B [@kiesel2010control]. Both of these procedures allow the participant to switch tasks sets in preparation for the upcoming trial demands and have been shown to reduce the cost of a task switch as a result. Voluntary task selection is a more recent development along these lines [@arrington2004cost;@arrington2005voluntary], and ERP evidence suggests that it results in even greater preparatory reconfiguration processes than the cuing paradigms used previously [@kang2014electrophysiological;@vandamme2010voluntary]. Our results extend on these results by showing that increased top-down control cannot eliminate selection history effects, even when the opportunity for top-down preparatory control is maximised. 
 
 Another advantage of the voluntary task selection design is that it allows us to measure choice processes. Participants are typically instructed to attempt to distribute their choices as randomly as possible, in which case the probability of switching on a given trial would be 50%. Results from voluntary task switching experiments have typically shown that participants do not produce switch rates of 50% but instead show a fairly consistent repetition bias [@arrington2005voluntary;@arrington2004cost]. Importantly, this does not appear to be a general consequence of asking people to produce random sequences, which has been shown to instead produce the opposite effect - a switching bias [@arrington2004cost;@nickerson2002production]. @arrington2004cost suggested that the repetition bias may reflect participants’ attempts to avoid the costs of a task switch, and they supported this by showing that the repetition bias is mediated by the length of time preceding a choice. When participants were given more time between trials before they had to make a choice, both switch costs and the magnitude of the repetition bias were reduced.
 

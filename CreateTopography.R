@@ -216,8 +216,6 @@ for (exp in 1:2) {
   }
 }
 
-topos <- grid.arrange(choiceTopo,HannaTopo, ncol = 2, nrow = 1)
-
 load('CNV/plotData_readyforplotsandstats.RData')
 fontSize = 12
 x = c(-800,-500)

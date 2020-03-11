@@ -1384,15 +1384,6 @@ shpSch.SC <- apa_print(t.test(SCdirect.dat$SwitchCosts[SCdirect.dat$Group == "Sh
 shpCat.SC <- apa_print(t.test(SCdirect.dat$SwitchCosts[SCdirect.dat$Group == "Shape" & SCdirect.dat$Procedure.Trial. == "TaskL"], mu = 0, alternative = "greater"))
 ```
 
-```{r}
-#We performed a 2x2 ANOVA in order to evaluate the effect of task transition (repeat vs switch) and Group (shape vs colour) on the response times to the categorisation task displays. The results showed no significant main effect of Group (`r learnSC.res$full_result$Group`) , however there was a significant main effect of task transition on response times where switching tasks resulted in a significant slowing of responses to the task display (`r learnSC.res$full_result$SwitchCount`). There was also a significant interaction between group and task transition (`r learnSC.res$full_result$SwitchCount_Group`). When we follow up this interaction we see that there are significant switch costs for the colour group (`r learnSC.fup$full_result$Rep_Switch_Colour`) however we do not observe significant switch costs for participants in the shape group (`r learnSC.fup$full_result$Rep_Switch_Shape`). Switch costs for both groups in each task are shown in figure\ \@ref(fig:switchCostPlot).
-
-#We also carried out a 2x2 ANOVA in order to evaluate the effect of task transition (repeat vs switch) and Group (shape vs colour) on the response times to the search task displays. The results showed no significant main effect of group(`r searchSC.res$full_result$Group`), however there was a significant main effect of task transition on response times where switching tasks resulted in a significant slowing of responses to the task display (`r searchSC.res$full_result$SwitchCount`). There was no significant interaction between group and task transition(`r searchSC.res$full_result$Group_SwitchCount`).
-
-#One sample t-tests for switch costs > 0
-#First, one sample t tests were used to show that participants in the colour group incurred significant switch costs in the both the categorisation task (`r colCat.SC$full_result`) and the search task (`r colSch.SC$full_result`). Similarly, participants in the shape group showed significant switch costs during both categorisation (`r shpCat.SC$full_result`) and search (`r shpSch.SC$full_result`).
-```
-
 Switch costs were calculated by subtracting repsonse times to repetition trials from response times to switch trials. We performed a 2x2 ANOVA in order to evaluate the effect of task (categorisation vs search) and group (colour vs shape) on the size of these switch costs. Our results showed a significant effect of task (`r SCdirect.res$full_result$Procedure_Trial_`), but not group (`r SCdirect.res$full_result$Group`), however these effects were superceded by a significant interaction between task and group (`r SCdirect.res$full_result$Group_Procedure_Trial_`). Follow-up comparisons (visualised in Figure\ \@ref(fig:switchCostPlot)) demonstrated that participants in the colour group had significantly larger switch costs in the categorisation task (`r intr.group.sc$text[2]`) than the search task (`r paste(intr.group.sc$text[1], ", ", SCdirect.grp.fup$statistic$TaskC_TaskL_Colour, sep = "")`), whereas participants in the shape group showed no difference between the categorisation (`r intr.group.sc$text[4]`) and search tasks (`r paste(intr.group.sc$text[3], ", ", SCdirect.grp.fup$statistic$TaskC_TaskL_Shape, sep = "")`). In the categorisation task, participants in the colour group had significantly larger switch costs than participants in the shape group (`r SCdirect.tsk.fup$statistic$Colour_Shape_TaskL`) however there was no difference between the two groups in the search task (`r SCdirect.tsk.fup$statistic$Colour_Shape_TaskC`). A set of one sampled t tests confirm that switch costs differ from 0 for both groups in all conditions (all p values <0.001).
 
 (ref:SCPlot) Response times for switch and repeat trials for the colour group (green) and the shape group (grey) in each task. For the search task (left) we observed a switch cost (faster responses to repetition trials) for both groups of participants. In the categorisation task (right) participants in the colour group (green) showed significant switch costs however participants in the shape group (grey) showed comparatively small differences.
@@ -1478,7 +1469,7 @@ include_graphics("Figures/switchcost.jpg", auto_pdf = TRUE)
 
 ## Comparison to @kadel2017selection
 
-```{r .prepComparisonMain}
+```{r prepComparisonMain}
 load('CNV/plotData_readyforplotsandstats.RData')
 
 #Stats
@@ -1490,37 +1481,17 @@ posteriorData <- posteriorData %>% group_by(sample, Exp) %>% summarise(mean = me
 post.stats <- apa_print(t.test(posteriorData$mean[posteriorData$Exp == "Voluntary"],posteriorData$mean[posteriorData$Exp == "Cued"],paired = 0))
 
 #ERP plot
-x = c(-800,-500)
-y=c(0,0)
-lineData = data.frame(x=x,y=y)
-
-plotData %>%
-  group_by(sample, Chan, Exp) %>%
-  summarise(mean = mean(mean)) %>%
-  ggplot() +
-  geom_rect(xmin = -300, xmax=-0, ymin = -Inf, ymax = Inf, size = 0, fill = "lemonchiffon") +
-  geom_line(aes(sample, mean, colour = Exp),size=1) +
-  scale_x_continuous(name ="Latency (ms)", expand = c(0, 0)) +
-  scale_y_reverse(name =expression(paste("Amplitude (",mu,"v)")), expand = c(0, 0)) +
-  facet_grid(Chan~.,scales = "free_y") +
-  geom_vline(xintercept = 0,linetype = "dashed" )+
-  geom_vline(xintercept = -500)+
-  geom_hline(yintercept = 0,linetype = "dashed") +
-  geom_line(data = lineData,aes(x=x,y=y)) +
-  theme_apa() +
-  theme(panel.spacing.y = unit(3, "lines"), text= element_text(size=fontSize),
-          axis.text.x = element_text(size = fontSize*0.93),
-          axis.text.y = element_text(size = fontSize*0.93),
-          legend.title = element_text( size = fontSize*1.1),
-          legend.text = element_text( size = fontSize*0.93),
-          legend.position = "bottom",
-          plot.margin = unit(c(1,0,0,0),"cm"),
-          plot.title = element_text(family = "sans", size = 18, margin=margin(0,0,30,0))
-          )
-ggsave("Figures/CNVERPs_Average.jpg", dpi = 300, width = 5, height = 5.3, units = c("in"))
+source('CreateTopography.R')
 ```
 
-Comparing the preparatory activity in our experiment to the preparatory activity recorded by @kadel2017selection, we see a significantly larger CNV at frono-central electrodes in our voluntary task switching procedure (`r front.stats$full_result`). We also see a significantly larger positivity at posterior electrods in the cued task switching procedure used by @kadel2017selection (`r post.stats$full_result`).
+(ref:ExpCompPlot) Preparatory activity in the voluntary task selection procedure used in our experiment, compared to the preparatory activity in a cued version of our task carried out by @kadel2017selection. A) ERP activity centred on the stimulus display (either learn or search) onset taken from a cluster of fronto-central electrodes to measure the CNV, and a cluster of posterior electrodes to measure teh posterior positivity. The solid vertical line indicates the onset of the fixation cross preceding the stimulus display on each trial. In the Cued task this fixation indicated which task participants would be presented with, int he voluntary task this fixation started after participants had selected the task they would like to perform. The vertical dotted line shows the onset of the stimulus display and the component window used to measure preparatory activity is highlighted in yellow. B) Scalp distribution of ERP activity within the time window of interest, plotted separately for the two experiments. These display the larger fronto-central negativity typical of voluntary task switching paradigms and indicative of enhanced top-down control.
+
+```{r expCompPrepPlot, fig.cap= "(ref:ExpCompPlot)"}
+include_graphics("Figures/comp.jpg", auto_pdf = TRUE)
+```
+
+
+Comparison of the preparatory activity in our experiment to the preparatory activity recorded by @kadel2017selection is shown in figure, we see a significantly larger CNV at frono-central electrodes in our voluntary task switching procedure (`r front.stats$full_result`). We also see a significantly larger positivity at posterior electrods in the cued task switching procedure used by @kadel2017selection (`r post.stats$full_result`).
 
 # Discussion
 

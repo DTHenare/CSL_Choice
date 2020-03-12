@@ -250,3 +250,5 @@ ERPs <- plotData %>%
 
 final <- ERPs / (HannaTopo + choiceTopo+ plot_layout(guides = 'collect')) 
 ggsave("Figures/comp.jpg", final, width = 16, height = 18, units = "cm")
+
+rm(topoAll,plotData, ERPs, HannaTopo, choiceTopo)

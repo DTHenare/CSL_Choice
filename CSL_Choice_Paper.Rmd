@@ -1491,11 +1491,78 @@ source('CreateTopography.R')
 include_graphics("Figures/comp.jpg", auto_pdf = TRUE)
 ```
 
-
 Comparison of the preparatory activity in our experiment to the preparatory activity recorded by @kadel2017selection is shown in Figure\ \@ref(fig:expCompPrepPlot), we see a significantly larger CNV at frono-central electrodes in our voluntary task switching procedure (`r front.stats$full_result`). We also see a significantly larger positivity at posterior electrods in the cued task switching procedure used by @kadel2017selection (`r post.stats$full_result`).
+
+```{r taskbyswitchstats}
+frontalData <- plotData %>% filter(Chan == "Fz", sample > -300, sample<0)
+posteriorData <- plotData %>% filter(Chan == "Pz", sample > -300, sample<0)
+v1.frontal.aov <- afex::aov_ez(
+  data = frontalData,
+  dv = "mean",
+  id = "Subject", 
+  within = c("RepSwitch", "TaskChoice"),
+  between = "Exp"
+)
+v1.frontalCNV.fup1 <- apa_print.emmGrid(pairs(emmeans(v1.frontal.aov, ~Exp|TaskChoice)))
+v1.frontalCNV.fup2 <- apa_print.emmGrid(pairs(emmeans(v1.frontal.aov, ~TaskChoice|Exp)))
+v1.frontalCNV.fup3 <- apa_print.emmGrid(pairs(emmeans(v1.frontal.aov, ~RepSwitch|TaskChoice)))
+v1.frontalCNV.fup4 <- apa_print.emmGrid(pairs(emmeans(v1.frontal.aov, ~TaskChoice|RepSwitch)))
+v1.frontal.aov <- apa_print(v1.frontal.aov)
+
+v1.post.aov <- afex::aov_ez(
+  data = posteriorData,
+  dv = "mean",
+  id = "Subject",
+  within = c("RepSwitch", "TaskChoice"),
+  between = "Exp"
+)
+v1.postCNV.fup1 <- apa_print.emmGrid(pairs(emmeans(v1.post.aov, ~Exp|TaskChoice)))
+v1.postCNV.fup2 <- apa_print.emmGrid(pairs(emmeans(v1.post.aov, ~TaskChoice|Exp)))
+v1.post.aov <- apa_print(v1.post.aov)
+
+#Separate tests by experiment
+frontalData <- plotData %>% filter(Chan == "Fz", sample > -300, sample<0, Exp == "Cued")
+v2cued.frontal.aov <- afex::aov_ez(
+  data = frontalData,
+  dv = "mean",
+  id = "Subject", 
+  within = c("RepSwitch", "TaskChoice")
+)
+v2cued.frontalCNV.fup <- apa_print.emmGrid(pairs(emmeans(v2cued.frontal.aov, ~RepSwitch|TaskChoice)))
+v2cued.frontalCNV.fup <- apa_print.emmGrid(pairs(emmeans(v2cued.frontal.aov, ~TaskChoice|RepSwitch)))
+v2cued.frontal.aov <- apa_print(v2cued.frontal.aov)
+
+posteriorData <- plotData %>% filter(Chan == "Pz", sample > -300, sample<0, Exp == "Cued")
+v2cued.post.aov <- afex::aov_ez(
+  data = posteriorData,
+  dv = "mean",
+  id = "Subject",
+  within = c("RepSwitch", "TaskChoice")
+)
+v2cued.post.aov <- apa_print(v2cued.post.aov)
+
+frontalData <- plotData %>% filter(Chan == "Fz", sample > -300, sample<0, Exp == "Voluntary")
+v2vol.frontal.aov <- afex::aov_ez(
+  data = frontalData,
+  dv = "mean",
+  id = "Subject", 
+  within = c("RepSwitch", "TaskChoice")
+)
+v2vol.frontal.aov <- apa_print(v2vol.frontal.aov)
+
+posteriorData <- plotData %>% filter(Chan == "Pz", sample > -300, sample<0, Exp == "Voluntary")
+v2vol.post.aov <- afex::aov_ez(
+  data = posteriorData,
+  dv = "mean",
+  id = "Subject",
+  within = c("RepSwitch", "TaskChoice")
+)
+v2vol.post.aov<- apa_print(v2vol.post.aov)
+```
 
 
 ```{r taskbyswitchplot}
+levels(plotData$Chan) = c("Frontal", "Posterior")
 fontSize = 12
 x = c(-800,-500)
 y=c(0,0)
@@ -1514,17 +1581,30 @@ plotData %>%
   geom_hline(yintercept = 0,linetype = "dashed") +
   geom_line(data = lineData,aes(x=x,y=y)) +
   theme_apa() +
-  theme(panel.spacing.y = unit(2, "lines"), text= element_text(size=fontSize),
-        axis.text.x = element_text(size = fontSize*0.8),
-        axis.text.y = element_text(size = fontSize*0.8),
+  theme(panel.spacing.y = unit(1, "lines"), text= element_text(size=fontSize*0.7),
+        panel.spacing.x = unit(2, "lines"),
+        axis.text.x = element_text(size = fontSize*0.7),
+        axis.text.y = element_text(size = fontSize*0.7),
         legend.title = element_blank(),
-        legend.text = element_text( size = fontSize*0.8),
-        #legend.position = "bottom",
+        legend.text = element_text( size = fontSize*0.7),
+        legend.position = "bottom",
         plot.margin = unit(c(0,0,0,0),"cm")
         #,plot.title = element_text(family = "sans", size = 18, margin=margin(0,0,0,0))
   )
 ggsave("Figures/CNVbycondition.jpg", width = 16, height = 9, units = "cm", dpi = 300)
 ```
+
+(ref:ExpCompbyCondPlot) Preparatory activity in the cued tasking switching experiment (left), and the voluntary task switching experiment (right) separated by both task performed (categorisation vs search) and task transition (switch vs repetition) from the previous trial. The solid vertical line indicates the onset of the fixation cross preceding the stimulus display on each trial. In the Cued task this fixation indicated which task participants would be presented with, in the voluntary task this fixation started after participants had selected the task they would like to perform. The vertical dotted line shows the onset of the stimulus display and the component window used to measure preparatory activity is highlighted in yellow.
+
+```{r expCompPrepbyTaskPlot, fig.cap= "(ref:ExpCompbyCondPlot)"}
+include_graphics("Figures/CNVbycondition.jpg", auto_pdf = TRUE)
+```
+
+## Version 1 – everything in one analysis
+Additionally, for each experiment we decided to perform a 2x2x2 ANOVA to investigate the effect of task (categorisation vs search), transition (switch vs repetition), and experiment (cued vs voluntary task switching) on preparatory activity at both frontal and posterior electrode clusters. When performed with CNV amplitude as the dependent variable, we observed significant main effects of experiment (`r v1.frontal.aov$full_result$Exp`), and task (`r v1.frontal.aov$full_result$TaskChoice`), however these effects are superseded by a significant interaction between experiment and task(`r v1.frontal.aov$full_result$Exp_TaskChoice`). Follow-up contrasts reveal that the CNV is larger during voluntary task switching than cued task switching when preparing for the search task (`r v1.frontalCNV.fup1$full_result$Cued_Voluntary_Search`), but not the categorisation task (`r v1.frontalCNV.fup1$full_result$Cued_Voluntary_Learn`). Follow-up contrasts also show that for participants in the cued task switching experiment, the CNV is larger during preparation for the search task than for the categorisation task (`r v1.frontalCNV.fup2$full_result$Learn_Search_Cued`), whereas no significant difference between tasks was observed for participants in the voluntary task switching experiment (`r v1.frontalCNV.fup2$full_result$Learn_Search_Cued`). This analysis did not show any significant main effect of transition (`r v1.frontal.aov$full_result$RepSwitch`), however transition did interact significantly with task (`r v1.frontal.aov$full_result$RepSwitch_TaskChoice`). Follow-up comparisons revealed that for the categorisation task, the CNV was significantly larger in repetition trials than in switch trials (`r v1.frontalCNV.fup3$full_result$Repetition_Switch_Learn`), whereas no significant difference was observed in the search task(`r v1.frontalCNV.fup3$full_result$Repetition_Switch_Search`). Additionally, we see that the CNV is larger for categorisation trials than for search trials in both switch trials(`r v1.frontalCNV.fup4$full_result$Learn_Search_Switch`) and repetition trials (`r v1.frontalCNV.fup4$full_result$Learn_Search_Repetition`). The 3-way interaction between task, transition, and experiment was not significant (`r v1.frontal.aov$full_result$Exp_RepSwitch_TaskChoice`).
+
+When this analysis is repeated using posterior positive amplitude as the dependent variable, we saw a significantly larger positivity for switch trials than repetition trials (`r v1.post.aov$full_result$RepSwitch`), and this effect did not interact with experiment (`r v1.post.aov$full_result$Exp_RepSwitch`) or task (`r v1.post.aov$full_result$RepSwitch_TaskChoice`). We also see significant main effects of task (`r v1.post.aov$full_result$TaskChoice`) and experiment (`r v1.post.aov$full_result$Exp`), however these are superseded by an interaction between task and experiment (`r v1.post.aov$full_result$Exp_TaskChoice`). Follow-up contrasts on this interaction show that for categorisation trials, there is a significantly larger positivity in cued task switching compared to voluntary (`r v1.postCNV.fup1$full_result$Cued_Voluntary_Learn`), and in search trials there is also a significantly larger positivity in cued task switching compared to voluntary task switching (`r v1.postCNV.fup1$full_result$Cued_Voluntary_Search`). In the cued task switching experiment we also see a significant difference in component amplitude between categorisation and search trials (`r v1.postCNV.fup2$full_result$Learn_Search_Cued`), however in the voluntary selection paradigm we see no such difference between categorisation and search (`r v1.postCNV.fup2$full_result$Learn_Search_Cued`). We do not see a significant 3-way interaction between task, transition, and experiment(`r v1.post.aov$full_result$Exp_RepSwitch_TaskChoice`).
+
 
 # Discussion
 

@@ -313,7 +313,361 @@ Independent samples t tests were used to compare the preparatory activity betwee
 
 # Results
 ```{r exclusion criteria}
-minSwitchRate = 0.2
+minSwitchRate = 0.05
+```
+## Voluntary Task Selection
+
+### Task Choice
+
+```{r taskChoiceStats}
+bias.dat <- behavData %>%
+  filter(switchRate > minSwitchRate,CompSearch.RT < compCutoff | LearnSearch.RT < learnCutoff) %>%
+  group_by(Block, Subject, Group) %>%
+  mutate(choseSearch = ifelse(is.na(Compound),0,1)) %>%
+  summarise(percentSearch = mean(choseSearch)*100) %>%
+  mutate(bias = abs(50-percentSearch)) %>%
+  group_by(Subject, Group) %>%
+  summarise(bias = mean(bias))
+bias.stat <- t.test(bias.dat$bias, mu = 0)
+```
+
+Participants were asked to keep the task selection balanced at around 50% search and 50% choice trials throughout the experiment. In order to measure this we calculated task choice across the task and show that participants typically succeeded in maintaining approximately 50% of each trial across the task (see Figure\ \@ref(fig:choseSearch)A).
+
+(ref:choseSearchPlot) (A) Proportion of search trials chosen by each individual across blocks throughout the experiment for participants in the shape group (grey) and colour group (green). Lines have been smoothed with a loess function for visualisation. (B) Time taken for participants in the colour group (green) and the shape group (grey) to make their task selection at the start of each trial. This is depicted separately for trials where they chose to switch task versus those where they chose to repeat the previous task. Thick lines represent the group averages while thin lines represent individual data.
+
+```{r createChoseSearch, include = FALSE}
+choicePercent <- behavData %>%
+  filter(switchRate > minSwitchRate) %>%
+  group_by(Block, Subject, Group) %>%
+  mutate(choseSearch = ifelse(is.na(Compound),0,1)) %>%
+  summarise(percentSearch = mean(choseSearch)*100) %>%
+  ggplot(aes(x=Block, y=percentSearch, colour = Group, group = Subject)) +
+  geom_smooth(se = FALSE, alpha = 0.3, size=.5) +
+  scale_colour_manual(values=c("green4", "gray42")) +
+  labs(y = "Chose search (%)") +
+  lims(y=c(0,100)) +
+  ggtitle("A") +
+  theme(#legend.position = "None"#,
+        #axis.title.x = element_blank())
+    legend.position = c(0, 1), 
+       legend.justification = c(0, 1),
+    legend.text=element_text(size=8),
+    legend.title=element_blank(),
+    plot.title = element_text(hjust = 0)
+  )
+choiceRTAvg <- behavData %>%
+  filter(switchRate > minSwitchRate, Choice1.RT>0) %>%
+  group_by(Group, repswitch) %>%
+  summarise(mean = mean(Choice1.RT))
+choiceRTPlot <- behavData %>%
+  filter(switchRate > minSwitchRate, Choice1.RT>0) %>%
+  group_by(Subject,Group, repswitch) %>%
+  summarise(mean = mean(Choice1.RT)) %>%
+  ggplot(aes(x = repswitch, y = mean)) +
+  geom_point(aes(colour = Group), size = 2, alpha = 0.3) +
+  geom_line(aes(colour = Group, group = Subject), alpha = 0.3) +
+  geom_point(data = choiceRTAvg, aes(colour = Group),size = 5) +
+  geom_line(data = choiceRTAvg, aes(group = Group, colour = Group), size=2) +
+  ggtitle("B") +
+  facet_grid(.~Group) +
+  scale_colour_manual(values=c("green4", "gray42")) +
+  scale_y_continuous(name = "Task choice time (ms)",limits = c(0,500)) +
+  scale_x_discrete(limits=c("switch", "rep"), labels = c("Switch", "Rep.")) +
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        panel.background = element_blank(),
+        #strip.text.x = element_blank(),
+        axis.line = element_line(colour = "black"),
+        #axis.text.x = element_blank(),
+        axis.title.x = element_text(color = "white"),
+        #axis.ticks = element_blank(),
+        #strip.text.x = element_blank(),
+        strip.background = element_rect(fill = "white"),
+        plot.title = element_text(hjust = 0),
+        legend.position = "none"#,
+        #text= element_text(size=18)
+        )
+final <- grid.arrange(choicePercent,choiceRTPlot, ncol = 2, nrow = 1,  widths = c(1,1), layout_matrix = rbind(c(1,2)))
+ggsave("Figures/taskChoice.jpg", plot = final, dpi = 600, width = 16, height = 8, units = "cm")
+```
+
+```{r choseSearch, fig.cap = "(ref:choseSearchPlot)"}
+include_graphics("Figures/taskChoice.jpg", auto_pdf = TRUE)
+```
+
+```{r choiceRT}
+choiceRT.dat <- behavData %>%
+  filter(switchRate > minSwitchRate,CompSearch.RT < compCutoff | LearnSearch.RT < learnCutoff, Choice1.RT>0) %>%
+  group_by(Subject,Group, repswitch) %>%
+  summarise(mean = mean(Choice1.RT))
+choiceRT.stat <- aov_ez(
+  data = choiceRT.dat,
+  dv = "mean",
+  id = "Subject", 
+  within = c("repswitch"),
+  between = "Group"
+)
+choiceRT.res <- apa_print(choiceRT.stat)
+choiceRT.fup <- apa_print.emmGrid(pairs(emmeans(choiceRT.stat, ~repswitch|Group)))
+
+```
+
+In addition, a 2x2 ANOVA was performed in order to evaluate the effect of task transition (repeat vs switch) and group (colour vs shape) on the time taken to make a task choice. The results (depicted in Figure\ \@ref(fig:choseSearch)B) showed no significant main effects of Group (`r choiceRT.res$full_result$Group`) and task transition (`r choiceRT.res$full_result$repswitch`), as well as no significant interaction between group and task transition (`r choiceRT.res$full_result$Group_repswitch`). 
+
+### Switch Rates
+
+```{r switchRateStats}
+switch <- behavData %>%
+  filter(switchRate > minSwitchRate,CompSearch.RT < compCutoff | LearnSearch.RT < learnCutoff) %>%
+  summarise(mean = mean(SwitchCount))
+SR <- behavData %>%
+  filter(switchRate > minSwitchRate,CompSearch.RT < compCutoff | LearnSearch.RT < learnCutoff) %>%
+  group_by(Subject,Group) %>%
+  summarise(mean = mean(SwitchCount))
+shapeSR.t <- t.test(SR$mean[SR$Group=="Shape"], mu = 0.5)
+shapeSR.res <- apa_print(shapeSR.t)
+colourSR.t <- t.test(SR$mean[SR$Group=="Colour"], mu = 0.5)
+colourSR.res <- apa_print(colourSR.t)
+comparisonSR = t.test(SR$mean[SR$Group=="Colour"],SR$mean[SR$Group=="Shape"], alternative = "less")
+comparisonSR.res = apa_print(comparisonSR)
+```
+
+Participants were encouraged to make their task selections as random as possible, which would produce a switch rate of 50%, however average switch rate across all participants was `r as.character(round(switch$mean*100, digits = 2))`%. Analysis of the voluntary task choice showed that while participants in the shape group showed no significant deviation from a switch rate of 50% (`r shapeSR.res$full_result`), participants in the colour group showed a significant repetiton bias (`r colourSR.res$full_result`). When we directly tested whether switch rates in the colour group were lower than the shape group we also saw a significant difference (`r comparisonSR.res$full_result`). Switch rates are shown in Figure\ \@ref(fig:SwitchRateViolin).
+
+(ref:SRPlot) Voluntary switch rates for each individual separated by group assignment. Dots show each individual's switch rate alongside a boxplot and violin plot to display the range and distribution of switch rates. A switch rate of 50% is expected when participants are randomly selecting the task on each trial as instructed.
+
+```{r SwitchRateViolinandSave, include = FALSE}
+behavData %>%
+  filter(switchRate > minSwitchRate,CompSearch.RT < compCutoff | LearnSearch.RT < learnCutoff) %>%
+  mutate(GroupNum = as.integer(Group)) %>%
+  group_by(Subject,Group, GroupNum) %>%
+  summarise(mean = mean(SwitchCount)*100) %>%
+  ggplot( aes(x = GroupNum, y = mean, fill = Group)) +
+  #geom_hline(aes(yintercept=50), size = 1.5, linetype="dashed") +
+  geom_flat_violin(aes(fill = Group),position = position_nudge(x = .1, y = 0), adjust = 1.5, trim = FALSE, alpha = .75, colour = NA) +
+  geom_point(aes(x = GroupNum-0.15, y = mean, colour = Group),position = position_jitter(width = .05), size = 4, shape = 20) +
+  geom_boxplot(aes(x = GroupNum, y = mean, fill = Group),outlier.shape = NA, alpha = .75, width = .1, colour = "black") +
+  scale_colour_manual(values=c("green4", "gray42")) +
+  scale_fill_manual(values=c("green4", "gray42")) +
+  labs(y = "Switch Rate (%)") +
+  lims(y=c(0,100)) +
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        panel.background = element_blank(),
+        axis.line = element_line(colour = "black"),
+        axis.text.x = element_blank(),
+        axis.title.x = element_blank(),
+        axis.ticks = element_blank(),
+        text= element_text(size=18)
+        )
+ggsave('Figures/SRviolin.jpg',width=5, height=4, units="in", dpi = 300)
+```
+
+```{r SwitchRateViolin, fig.cap = "(ref:SRPlot)"}
+include_graphics("Figures/SRviolin.jpg", auto_pdf = TRUE)
+```
+
+### Switch Costs
+
+```{r switchCostStats, include = FALSE}
+searchSC.dat <- behavData %>%
+filter(Procedure.Trial. == "TaskC") %>%
+filter(switchRate > minSwitchRate,CompSearch.RT < compCutoff | LearnSearch.RT < learnCutoff) %>%
+mutate(respTime = ifelse(!is.na(CompSearch.RT),CompSearch.RT,LearnSearch.RT), SwitchCount = ifelse(SwitchCount == 1, "Switch", "Rep")) %>%
+group_by(Subject, Group, SwitchCount) %>%
+summarise(RT = mean(respTime))
+searchSC.stat <- aov_ez(
+  data = searchSC.dat,
+  dv = "RT",
+  id = "Subject", 
+  within = c("SwitchCount"),
+  between = "Group"
+)
+searchSC.res <- apa_print(searchSC.stat)
+
+learnSC.dat <- behavData %>%
+filter(Procedure.Trial. == "TaskL") %>%
+filter(switchRate > minSwitchRate,CompSearch.RT < compCutoff | LearnSearch.RT < learnCutoff) %>%
+mutate(respTime = ifelse(!is.na(CompSearch.RT),CompSearch.RT,LearnSearch.RT), SwitchCount = ifelse(SwitchCount == 1, "Switch", "Rep")) %>%
+group_by(Subject, Group, SwitchCount) %>%
+summarise(RT = mean(respTime))
+learnSC.stat <- aov_ez(
+  data = learnSC.dat,
+  dv = "RT",
+  id = "Subject", 
+  within = c("SwitchCount"),
+  between = "Group"
+)
+learnSC.res <- apa_print(learnSC.stat)
+learnSC.fup <- apa_print.emmGrid(pairs(emmeans(learnSC.stat, ~SwitchCount|Group)))
+#intr.lrnSC <- learnSC.dat %>%
+#  spread(Contra, RT) %>%
+#  mutate(seDiff = Contralateral-Ipsilateral) %>%
+#  group_by(Group) %>%
+#  summarise(mean = mean(seDiff),se = sqrt(sd(seDiff)/length(unique(Subject)))) %>%
+#  mutate( text = paste("$\\Delta M = ", as.character(round(mean,2)), ", $SE$ = ", as.character(round(se,2)), "$", sep=""))
+
+#Switch costs correlate with distractor interference?
+#Switch costs correlate with P$_{\text{D}}$ amplitude?
+learnSC.dat1 <- learnSC.dat %>%
+  spread(SwitchCount, RT) %>%
+  mutate(sc = Switch-Rep)
+
+SC.dat <- behavData %>%
+filter(switchRate > minSwitchRate,CompSearch.RT < compCutoff | LearnSearch.RT < learnCutoff) %>%
+mutate(respTime = ifelse(!is.na(CompSearch.RT),CompSearch.RT,LearnSearch.RT), SwitchCount = ifelse(SwitchCount == 1, "Switch", "Rep")) %>%
+group_by(Subject, Group, SwitchCount, Procedure.Trial.) %>%
+summarise(RT = mean(respTime))
+SC.stat <- aov_ez(
+  data = SC.dat,
+  dv = "RT",
+  id = "Subject", 
+  within = c("SwitchCount", "Procedure.Trial."),
+  between = "Group"
+)
+pairs(emmeans(SC.stat, ~SwitchCount|Group*Procedure.Trial.))
+pairs(emmeans(SC.stat, ~SwitchCount|Group))
+pairs(emmeans(SC.stat, ~SwitchCount|Procedure.Trial.))
+colourSC.dat <- behavData %>%
+  filter(Group == "Colour")%>%
+  filter(switchRate > minSwitchRate,CompSearch.RT < compCutoff | LearnSearch.RT < learnCutoff) %>%
+  mutate(respTime = ifelse(!is.na(CompSearch.RT),CompSearch.RT,LearnSearch.RT), SwitchCount = ifelse(SwitchCount == 1, "Switch", "Rep")) %>%
+  group_by(Subject, Group, SwitchCount, Procedure.Trial.) %>%
+  summarise(RT = mean(respTime))
+colourSC.stat <- aov_ez(
+  data = colourSC.dat,
+  dv = "RT",
+  id = "Subject", 
+  within = c("SwitchCount", "Procedure.Trial.")
+)
+shapeSC.dat <- behavData %>%
+  filter(Group == "Shape")%>%
+  filter(switchRate > minSwitchRate,CompSearch.RT < compCutoff | LearnSearch.RT < learnCutoff) %>%
+  mutate(respTime = ifelse(!is.na(CompSearch.RT),CompSearch.RT,LearnSearch.RT), SwitchCount = ifelse(SwitchCount == 1, "Switch", "Rep")) %>%
+  group_by(Subject, Group, SwitchCount, Procedure.Trial.) %>%
+  summarise(RT = mean(respTime))
+shapeSC.stat <- aov_ez(
+  data = shapeSC.dat,
+  dv = "RT",
+  id = "Subject", 
+  within = c("SwitchCount", "Procedure.Trial.")
+)
+
+SCdirect.dat <- behavData %>%
+  filter(switchRate > minSwitchRate,CompSearch.RT < compCutoff | LearnSearch.RT < learnCutoff) %>%
+  mutate(respTime = ifelse(!is.na(CompSearch.RT),CompSearch.RT,LearnSearch.RT), SwitchCount = ifelse(SwitchCount == 1, "Switch", "Rep")) %>%
+  group_by(Subject, Group, SwitchCount, Procedure.Trial.) %>%
+  summarise(RT = mean(respTime)) %>%
+  spread(SwitchCount, RT) %>%
+  mutate(SwitchCosts = Switch-Rep)
+SCdirect.stat <- aov_ez(
+  data = SCdirect.dat,
+  dv = "SwitchCosts",
+  id = "Subject", 
+  within = c("Procedure.Trial."),
+  between = "Group"
+)
+SCdirect.res <- apa_print(SCdirect.stat)
+SCdirect.grp.fup <- apa_print(pairs(emmeans(SCdirect.stat, ~Procedure.Trial.|Group)))
+SCdirect.tsk.fup <- apa_print(pairs(emmeans(SCdirect.stat, ~Group|Procedure.Trial.)))
+intr.group.sc <- behavData %>%
+  filter(switchRate > minSwitchRate,CompSearch.RT < compCutoff | LearnSearch.RT < learnCutoff) %>%
+  mutate(respTime = ifelse(!is.na(CompSearch.RT),CompSearch.RT,LearnSearch.RT), SwitchCount = ifelse(SwitchCount == 1, "Switch", "Rep")) %>%
+  group_by(Subject, Group, SwitchCount, Procedure.Trial.) %>%
+  summarise(RT = mean(respTime)) %>%
+  spread(SwitchCount, RT) %>%
+  mutate(SwitchCosts = Switch-Rep) %>%
+  group_by(Group, Procedure.Trial.) %>%
+  summarise(se = sqrt(sd(SwitchCosts)/length(unique(Subject))), mean = mean(SwitchCosts)) %>%
+  mutate( text = paste("$\\Delta M = ", as.character(round(mean,2)), "ms, SE = ", as.character(round(se,2)), "$", sep=""))
+  
+colSch.SC <- apa_print(t.test(SCdirect.dat$SwitchCosts[SCdirect.dat$Group == "Colour" & SCdirect.dat$Procedure.Trial. == "TaskC"], mu = 0, alternative = "greater"))
+colCat.SC <- apa_print(t.test(SCdirect.dat$SwitchCosts[SCdirect.dat$Group == "Colour" & SCdirect.dat$Procedure.Trial. == "TaskL"], mu = 0, alternative = "greater"))
+shpSch.SC <- apa_print(t.test(SCdirect.dat$SwitchCosts[SCdirect.dat$Group == "Shape" & SCdirect.dat$Procedure.Trial. == "TaskC"], mu = 0, alternative = "greater"))
+shpCat.SC <- apa_print(t.test(SCdirect.dat$SwitchCosts[SCdirect.dat$Group == "Shape" & SCdirect.dat$Procedure.Trial. == "TaskL"], mu = 0, alternative = "greater"))
+```
+
+Switch costs were calculated by subtracting repsonse times to repetition trials from response times to switch trials. We performed a 2x2 ANOVA in order to evaluate the effect of task (categorisation vs search) and group (colour vs shape) on the size of these switch costs. Our results showed a significant effect of task (`r SCdirect.res$full_result$Procedure_Trial_`), but not group (`r SCdirect.res$full_result$Group`), however these effects were superceded by a significant interaction between task and group (`r SCdirect.res$full_result$Group_Procedure_Trial_`). Follow-up comparisons (visualised in Figure\ \@ref(fig:switchCostPlot)) demonstrated that participants in the colour group had significantly larger switch costs in the categorisation task (`r intr.group.sc$text[2]`) than the search task (`r paste(intr.group.sc$text[1], ", ", SCdirect.grp.fup$statistic$TaskC_TaskL_Colour, sep = "")`), whereas participants in the shape group showed no difference between the categorisation (`r intr.group.sc$text[4]`) and search tasks (`r paste(intr.group.sc$text[3], ", ", SCdirect.grp.fup$statistic$TaskC_TaskL_Shape, sep = "")`). In the categorisation task, participants in the colour group had significantly larger switch costs than participants in the shape group (`r SCdirect.tsk.fup$statistic$Colour_Shape_TaskL`) however there was no difference between the two groups in the search task (`r SCdirect.tsk.fup$statistic$Colour_Shape_TaskC`). A set of one sampled t tests confirm that switch costs differ from 0 for both groups in all conditions (all p values <0.001).
+
+(ref:SCPlot) Response times for switch and repeat trials for the colour group (green) and the shape group (grey) in each task. For the search task (left) we observed a switch cost (faster responses to repetition trials) for both groups of participants. In the categorisation task (right) participants in the colour group (green) showed significant switch costs however participants in the shape group (grey) showed comparatively small differences.
+
+```{r make_switchCostPlot, include=FALSE}
+switchCost.se <- behavData %>%
+filter(Procedure.Trial. == "TaskC") %>%
+filter(switchRate > minSwitchRate,CompSearch.RT < compCutoff | LearnSearch.RT < learnCutoff) %>%
+mutate(respTime = ifelse(!is.na(CompSearch.RT),CompSearch.RT,LearnSearch.RT), SwitchCount = ifelse(SwitchCount == 1, "Switch", "Rep")) %>%
+group_by(Subject, Group, SwitchCount) %>%
+summarise(RT = mean(respTime)) %>%
+group_by(Group, SwitchCount) %>%
+summarise(se = sd(RT)/sqrt(length(unique(Subject))),RT = mean(RT))
+plot1 <- behavData %>%
+filter(Procedure.Trial. == "TaskC") %>%
+filter(switchRate > minSwitchRate,CompSearch.RT < compCutoff | LearnSearch.RT < learnCutoff) %>%
+mutate(respTime = ifelse(!is.na(CompSearch.RT),CompSearch.RT,LearnSearch.RT), SwitchCount = ifelse(SwitchCount == 1, "Switch", "Rep")) %>%
+group_by(Subject, Group, SwitchCount) %>%
+summarise(RT = mean(respTime)) %>%
+ggplot(aes(x=SwitchCount, y=RT, fill = Group)) +
+geom_point(aes(colour = Group), size = 2, alpha = 0.3) +
+geom_line(aes(colour = Group, group = Subject), alpha = 0.3) +
+geom_point(data = switchCost.se, aes(colour = Group),size = 5) +
+geom_line(data = switchCost.se, aes(group = Group, colour = Group), size=2) +
+facet_grid(.~Group) +
+scale_colour_manual(values=c("green4", "gray42")) +
+scale_fill_manual(values=c("green4", "gray42")) +
+scale_y_continuous(limits = c(250,1100), expand = c(0, 0)) +
+scale_x_discrete(limits = c("Switch", "Rep"), labels = c("Switch", "Rep")) +
+labs(y = "Response time (ms)", x = "Search Task") +
+theme(panel.grid.major = element_blank(),
+panel.grid.minor = element_blank(),
+panel.background = element_blank(),
+axis.line = element_line(colour = "black"),
+#axis.title.x = element_text("Search Task"),
+axis.ticks = element_blank(),
+text= element_text(size=18),
+strip.background = element_blank(),
+legend.position = "none"
+)
+switchCost.se <- behavData %>%
+filter(Procedure.Trial. == "TaskL") %>%
+filter(switchRate > minSwitchRate,CompSearch.RT < compCutoff | LearnSearch.RT < learnCutoff) %>%
+mutate(respTime = ifelse(!is.na(CompSearch.RT),CompSearch.RT,LearnSearch.RT), SwitchCount = ifelse(SwitchCount == 1, "Switch", "Rep")) %>%
+group_by(Subject, Group, SwitchCount) %>%
+summarise(RT = mean(respTime)) %>%
+group_by(Group, SwitchCount) %>%
+summarise(se = sd(RT)/sqrt(length(unique(Subject))),RT = mean(RT))
+plot2 <- behavData %>%
+filter(Procedure.Trial. == "TaskL") %>%
+filter(switchRate > minSwitchRate,CompSearch.RT < compCutoff | LearnSearch.RT < learnCutoff) %>%
+mutate(respTime = ifelse(!is.na(CompSearch.RT),CompSearch.RT,LearnSearch.RT), SwitchCount = ifelse(SwitchCount == 1, "Switch", "Rep")) %>%
+group_by(Subject, Group, SwitchCount) %>%
+summarise(RT = mean(respTime)) %>%
+ggplot(aes(x=SwitchCount, y=RT, fill = Group)) +
+geom_point(aes(colour = Group), size = 2, alpha = 0.3) +
+geom_line(aes(colour = Group, group = Subject), alpha = 0.3) +
+geom_point(data = switchCost.se, aes(colour = Group),size = 5) +
+geom_line(data = switchCost.se, aes(group = Group, colour = Group), size=2) +
+facet_grid(.~Group) +
+scale_colour_manual(values=c("green4", "gray42")) +
+scale_fill_manual(values=c("green4", "gray42")) +
+scale_y_continuous(limits = c(250,1100), expand = c(0, 0)) +
+scale_x_discrete(limits = c("Switch","Rep"), labels = c("Switch", "Rep")) +
+labs(y = "Response time (ms)", x = "Categorisation task") +
+theme(panel.grid.major = element_blank(),
+panel.grid.minor = element_blank(),
+panel.background = element_blank(),
+axis.line = element_line(colour = "black"),
+axis.title.y = element_text(colour = "white"),
+axis.ticks = element_blank(),
+text= element_text(size=18),
+strip.background = element_blank(),
+legend.position = "none"
+)
+pg <- grid.arrange(plot1,plot2, ncol = 2, nrow = 1)
+ggsave("Figures/switchcost.jpg", pg, width = 16, height = 8, units = "cm")
+```
+
+```{r switchCostPlot, fig.cap= "(ref:SCPlot)"}
+include_graphics("Figures/switchcost.jpg", auto_pdf = TRUE)
 ```
 
 ## Selection History
@@ -423,7 +777,7 @@ task.rt <- rt %>%
 
 A 2x2 ANOVA was carried out in order to evaluate whether there were effects of group (shape vs colour) and task (categorisation vs search) on participant response times. The results showed that response times of participants in the shape group ($M$ = `r as.character(round(group.rt$mean[2],2))`ms, $SE$ = `r as.character(round(group.rt$se[2],2))`) were not significantly different from participants in the colour group (`r paste("$M$ = ", as.character(round(group.rt$mean[1],2)), "ms, $SE$ = ", as.character(round(group.rt$se[1],2)), ", " ,rt.res$full_result$Group, sep = "")`). However, participants (irrespective of group) performed significantly faster in the categorisation task ($M$ = `r as.character(round(task.rt$mean[2],2))`ms, $SE$ = `r as.character(round(task.rt$se[2],2))`) than they did in the search task (`r paste("$M$ = ", as.character(round(task.rt$mean[1],2)), "ms, $SE$ = ", as.character(round(task.rt$se[1],2)), ", " ,rt.res$full_result$Procedure_Trial_, sep = "")`). We did not observe a significant interaction between group and task (`r rt.res$full_result$Group_Procedure_Trial_`).
 
-A 2x2 ANOVA carried out on participant accuracy showed neither a significant difference in accuracy between the shape group ($M$ = `r as.character(round(group.acc$mean[2],2))`%, $SE$ = `r as.character(round(group.acc$se[2],2))`) and the shape group (`r paste("$M$ = ", as.character(round(group.acc$mean[1],2)), "%, $SE$ = ", as.character(round(group.acc$se[1],2)), ", " ,acc.res$full_result$Group, sep = "")`), nor any significant difference on the categorisation task ($M$ = `r as.character(round(task.acc$mean[1],2))`%, $SE$ = `r as.character(round(task.acc$se[1],2))`) and the search task (`r paste("$M$ = ", as.character(round(task.acc$mean[2],2)), "%, $SE$ = ", as.character(round(task.acc$se[2],2)), ", " ,acc.res$full_result$Procedure_Trial_, sep = "")`). There was also no significant interaction between group and task on accuracy (`r acc.res$full_result$Group_Procedure_Trial_`).
+A 2x2 ANOVA carried out on participant accuracy showed neither a significant difference in accuracy between the shape group ($M$ = `r as.character(round(group.acc$mean[2],2))`%, $SE$ = `r as.character(round(group.acc$se[2],2))`) and the colour group (`r paste("$M$ = ", as.character(round(group.acc$mean[1],2)), "%, $SE$ = ", as.character(round(group.acc$se[1],2)), ", " ,acc.res$full_result$Group, sep = "")`), nor any significant difference on the categorisation task ($M$ = `r as.character(round(task.acc$mean[1],2))`%, $SE$ = `r as.character(round(task.acc$se[1],2))`) and the search task (`r paste("$M$ = ", as.character(round(task.acc$mean[2],2)), "%, $SE$ = ", as.character(round(task.acc$se[2],2)), ", " ,acc.res$full_result$Procedure_Trial_, sep = "")`). There was also no significant interaction between group and task on accuracy (`r acc.res$full_result$Group_Procedure_Trial_`).
 
 #### Search task distraction
 
@@ -1120,360 +1474,6 @@ rm(list = ls(pattern = "img"))
 rm(list = ls(pattern = "grand"))
 rm(allData, diffDirect, NtTDdiff, PdDTdiff)
 gc()
-```
-## Voluntary Task Selection
-
-### Task Choice
-
-```{r taskChoiceStats}
-bias.dat <- behavData %>%
-  filter(switchRate > minSwitchRate,CompSearch.RT < compCutoff | LearnSearch.RT < learnCutoff) %>%
-  group_by(Block, Subject, Group) %>%
-  mutate(choseSearch = ifelse(is.na(Compound),0,1)) %>%
-  summarise(percentSearch = mean(choseSearch)*100) %>%
-  mutate(bias = abs(50-percentSearch)) %>%
-  group_by(Subject, Group) %>%
-  summarise(bias = mean(bias))
-bias.stat <- t.test(bias.dat$bias, mu = 0)
-```
-
-Participants were asked to keep the task selection balanced at around 50% search and 50% choice trials throughout the experiment. In order to measure this we calculated task choice across the task and show that participants typically succeeded in maintaining approximately 50% of each trial across the task (see Figure\ \@ref(fig:choseSearch)A).
-
-(ref:choseSearchPlot) (A) Proportion of search trials chosen by each individual across blocks throughout the experiment for participants in the shape group (grey) and colour group (green). Lines have been smoothed with a loess function for visualisation. (B) Time taken for participants in the colour group (green) and the shape group (grey) to make their task selection at the start of each trial. This is depicted separately for trials where they chose to switch task versus those where they chose to repeat the previous task. Thick lines represent the group averages while thin lines represent individual data.
-
-```{r createChoseSearch, include = FALSE}
-choicePercent <- behavData %>%
-  filter(switchRate > minSwitchRate) %>%
-  group_by(Block, Subject, Group) %>%
-  mutate(choseSearch = ifelse(is.na(Compound),0,1)) %>%
-  summarise(percentSearch = mean(choseSearch)*100) %>%
-  ggplot(aes(x=Block, y=percentSearch, colour = Group, group = Subject)) +
-  geom_smooth(se = FALSE, alpha = 0.3, size=.5) +
-  scale_colour_manual(values=c("green4", "gray42")) +
-  labs(y = "Chose search (%)") +
-  lims(y=c(0,100)) +
-  ggtitle("A") +
-  theme(#legend.position = "None"#,
-        #axis.title.x = element_blank())
-    legend.position = c(0, 1), 
-       legend.justification = c(0, 1),
-    legend.text=element_text(size=8),
-    legend.title=element_blank(),
-    plot.title = element_text(hjust = 0)
-  )
-choiceRTAvg <- behavData %>%
-  filter(switchRate > minSwitchRate, Choice1.RT>0) %>%
-  group_by(Group, repswitch) %>%
-  summarise(mean = mean(Choice1.RT))
-choiceRTPlot <- behavData %>%
-  filter(switchRate > minSwitchRate, Choice1.RT>0) %>%
-  group_by(Subject,Group, repswitch) %>%
-  summarise(mean = mean(Choice1.RT)) %>%
-  ggplot(aes(x = repswitch, y = mean)) +
-  geom_point(aes(colour = Group), size = 2, alpha = 0.3) +
-  geom_line(aes(colour = Group, group = Subject), alpha = 0.3) +
-  geom_point(data = choiceRTAvg, aes(colour = Group),size = 5) +
-  geom_line(data = choiceRTAvg, aes(group = Group, colour = Group), size=2) +
-  ggtitle("B") +
-  facet_grid(.~Group) +
-  scale_colour_manual(values=c("green4", "gray42")) +
-  scale_y_continuous(name = "Task choice time (ms)",limits = c(0,500)) +
-  scale_x_discrete(limits=c("switch", "rep"), labels = c("Switch", "Rep.")) +
-  theme(panel.grid.major = element_blank(), 
-        panel.grid.minor = element_blank(),
-        panel.background = element_blank(),
-        #strip.text.x = element_blank(),
-        axis.line = element_line(colour = "black"),
-        #axis.text.x = element_blank(),
-        axis.title.x = element_text(color = "white"),
-        #axis.ticks = element_blank(),
-        #strip.text.x = element_blank(),
-        strip.background = element_rect(fill = "white"),
-        plot.title = element_text(hjust = 0),
-        legend.position = "none"#,
-        #text= element_text(size=18)
-        )
-final <- grid.arrange(choicePercent,choiceRTPlot, ncol = 2, nrow = 1,  widths = c(1,1), layout_matrix = rbind(c(1,2)))
-ggsave("Figures/taskChoice.jpg", plot = final, dpi = 600, width = 16, height = 8, units = "cm")
-```
-
-```{r choseSearch, fig.cap = "(ref:choseSearchPlot)"}
-include_graphics("Figures/taskChoice.jpg", auto_pdf = TRUE)
-```
-
-```{r choiceRT}
-choiceRT.dat <- behavData %>%
-  filter(switchRate > minSwitchRate,CompSearch.RT < compCutoff | LearnSearch.RT < learnCutoff, Choice1.RT>0) %>%
-  group_by(Subject,Group, repswitch) %>%
-  summarise(mean = mean(Choice1.RT))
-choiceRT.stat <- aov_ez(
-  data = choiceRT.dat,
-  dv = "mean",
-  id = "Subject", 
-  within = c("repswitch"),
-  between = "Group"
-)
-choiceRT.res <- apa_print(choiceRT.stat)
-choiceRT.fup <- apa_print.emmGrid(pairs(emmeans(choiceRT.stat, ~repswitch|Group)))
-
-```
-
-In addition, a 2x2 ANOVA was performed in order to evaluate the effect of task transition (repeat vs switch) and group (colour vs shape) on the time taken to make a task choice. The results (depicted in Figure\ \@ref(fig:choseSearch)B) showed no significant main effects of Group (`r choiceRT.res$full_result$Group`) and task transition (`r choiceRT.res$full_result$repswitch`), as well as no significant interaction between group and task transition (`r choiceRT.res$full_result$Group_repswitch`). 
-
-### Switch Rates
-
-```{r switchRateStats}
-switch <- behavData %>%
-  filter(switchRate > minSwitchRate,CompSearch.RT < compCutoff | LearnSearch.RT < learnCutoff) %>%
-  summarise(mean = mean(SwitchCount))
-SR <- behavData %>%
-  filter(switchRate > minSwitchRate,CompSearch.RT < compCutoff | LearnSearch.RT < learnCutoff) %>%
-  group_by(Subject,Group) %>%
-  summarise(mean = mean(SwitchCount))
-shapeSR.t <- t.test(SR$mean[SR$Group=="Shape"], mu = 0.5)
-shapeSR.res <- apa_print(shapeSR.t)
-colourSR.t <- t.test(SR$mean[SR$Group=="Colour"], mu = 0.5)
-colourSR.res <- apa_print(colourSR.t)
-comparisonSR = t.test(SR$mean[SR$Group=="Colour"],SR$mean[SR$Group=="Shape"], alternative = "less")
-comparisonSR.res = apa_print(comparisonSR)
-```
-
-Participants were encouraged to make their task selections as random as possible, which would produce a switch rate of 50%, however average switch rate across all participants was `r as.character(round(switch$mean*100, digits = 2))`%. Analysis of the voluntary task choice showed that while participants in the shape group showed no significant deviation from a switch rate of 50% (`r shapeSR.res$full_result`), participants in the colour group showed a significant repetiton bias (`r colourSR.res$full_result`). When we directly tested whether switch rates in the colour group were lower than the shape group we also saw a significant difference (`r comparisonSR.res$full_result`). Switch rates are shown in Figure\ \@ref(fig:SwitchRateViolin).
-
-(ref:SRPlot) Voluntary switch rates for each individual separated by group assignment. Dots show each individual's switch rate alongside a boxplot and violin plot to display the range and distribution of switch rates. A switch rate of 50% is expected when participants are randomly selecting the task on each trial as instructed.
-
-```{r SwitchRateViolinandSave, include = FALSE}
-behavData %>%
-  filter(switchRate > minSwitchRate,CompSearch.RT < compCutoff | LearnSearch.RT < learnCutoff) %>%
-  mutate(GroupNum = as.integer(Group)) %>%
-  group_by(Subject,Group, GroupNum) %>%
-  summarise(mean = mean(SwitchCount)*100) %>%
-  ggplot( aes(x = GroupNum, y = mean, fill = Group)) +
-  #geom_hline(aes(yintercept=50), size = 1.5, linetype="dashed") +
-  geom_flat_violin(aes(fill = Group),position = position_nudge(x = .1, y = 0), adjust = 1.5, trim = FALSE, alpha = .75, colour = NA) +
-  geom_point(aes(x = GroupNum-0.15, y = mean, colour = Group),position = position_jitter(width = .05), size = 4, shape = 20) +
-  geom_boxplot(aes(x = GroupNum, y = mean, fill = Group),outlier.shape = NA, alpha = .75, width = .1, colour = "black") +
-  scale_colour_manual(values=c("green4", "gray42")) +
-  scale_fill_manual(values=c("green4", "gray42")) +
-  labs(y = "Switch Rate (%)") +
-  lims(y=c(0,100)) +
-  theme(panel.grid.major = element_blank(), 
-        panel.grid.minor = element_blank(),
-        panel.background = element_blank(),
-        axis.line = element_line(colour = "black"),
-        axis.text.x = element_blank(),
-        axis.title.x = element_blank(),
-        axis.ticks = element_blank(),
-        text= element_text(size=18)
-        )
-ggsave('Figures/SRviolin.jpg',width=5, height=4, units="in", dpi = 300)
-```
-
-```{r SwitchRateViolin, fig.cap = "(ref:SRPlot)"}
-include_graphics("Figures/SRviolin.jpg", auto_pdf = TRUE)
-```
-
-### Switch Costs
-
-```{r switchCostStats, include = FALSE}
-searchSC.dat <- behavData %>%
-filter(Procedure.Trial. == "TaskC") %>%
-filter(switchRate > minSwitchRate,CompSearch.RT < compCutoff | LearnSearch.RT < learnCutoff) %>%
-mutate(respTime = ifelse(!is.na(CompSearch.RT),CompSearch.RT,LearnSearch.RT), SwitchCount = ifelse(SwitchCount == 1, "Switch", "Rep")) %>%
-group_by(Subject, Group, SwitchCount) %>%
-summarise(RT = mean(respTime))
-searchSC.stat <- aov_ez(
-  data = searchSC.dat,
-  dv = "RT",
-  id = "Subject", 
-  within = c("SwitchCount"),
-  between = "Group"
-)
-searchSC.res <- apa_print(searchSC.stat)
-
-learnSC.dat <- behavData %>%
-filter(Procedure.Trial. == "TaskL") %>%
-filter(switchRate > minSwitchRate,CompSearch.RT < compCutoff | LearnSearch.RT < learnCutoff) %>%
-mutate(respTime = ifelse(!is.na(CompSearch.RT),CompSearch.RT,LearnSearch.RT), SwitchCount = ifelse(SwitchCount == 1, "Switch", "Rep")) %>%
-group_by(Subject, Group, SwitchCount) %>%
-summarise(RT = mean(respTime))
-learnSC.stat <- aov_ez(
-  data = learnSC.dat,
-  dv = "RT",
-  id = "Subject", 
-  within = c("SwitchCount"),
-  between = "Group"
-)
-learnSC.res <- apa_print(learnSC.stat)
-learnSC.fup <- apa_print.emmGrid(pairs(emmeans(learnSC.stat, ~SwitchCount|Group)))
-#intr.lrnSC <- learnSC.dat %>%
-#  spread(Contra, RT) %>%
-#  mutate(seDiff = Contralateral-Ipsilateral) %>%
-#  group_by(Group) %>%
-#  summarise(mean = mean(seDiff),se = sqrt(sd(seDiff)/length(unique(Subject)))) %>%
-#  mutate( text = paste("$\\Delta M = ", as.character(round(mean,2)), ", $SE$ = ", as.character(round(se,2)), "$", sep=""))
-
-#Switch costs correlate with distractor interference?
-#Switch costs correlate with P$_{\text{D}}$ amplitude?
-learnSC.dat1 <- learnSC.dat %>%
-  spread(SwitchCount, RT) %>%
-  mutate(sc = Switch-Rep)
-
-SC.dat <- behavData %>%
-filter(switchRate > minSwitchRate,CompSearch.RT < compCutoff | LearnSearch.RT < learnCutoff) %>%
-mutate(respTime = ifelse(!is.na(CompSearch.RT),CompSearch.RT,LearnSearch.RT), SwitchCount = ifelse(SwitchCount == 1, "Switch", "Rep")) %>%
-group_by(Subject, Group, SwitchCount, Procedure.Trial.) %>%
-summarise(RT = mean(respTime))
-SC.stat <- aov_ez(
-  data = SC.dat,
-  dv = "RT",
-  id = "Subject", 
-  within = c("SwitchCount", "Procedure.Trial."),
-  between = "Group"
-)
-pairs(emmeans(SC.stat, ~SwitchCount|Group*Procedure.Trial.))
-pairs(emmeans(SC.stat, ~SwitchCount|Group))
-pairs(emmeans(SC.stat, ~SwitchCount|Procedure.Trial.))
-colourSC.dat <- behavData %>%
-  filter(Group == "Colour")%>%
-  filter(switchRate > minSwitchRate,CompSearch.RT < compCutoff | LearnSearch.RT < learnCutoff) %>%
-  mutate(respTime = ifelse(!is.na(CompSearch.RT),CompSearch.RT,LearnSearch.RT), SwitchCount = ifelse(SwitchCount == 1, "Switch", "Rep")) %>%
-  group_by(Subject, Group, SwitchCount, Procedure.Trial.) %>%
-  summarise(RT = mean(respTime))
-colourSC.stat <- aov_ez(
-  data = colourSC.dat,
-  dv = "RT",
-  id = "Subject", 
-  within = c("SwitchCount", "Procedure.Trial.")
-)
-shapeSC.dat <- behavData %>%
-  filter(Group == "Shape")%>%
-  filter(switchRate > minSwitchRate,CompSearch.RT < compCutoff | LearnSearch.RT < learnCutoff) %>%
-  mutate(respTime = ifelse(!is.na(CompSearch.RT),CompSearch.RT,LearnSearch.RT), SwitchCount = ifelse(SwitchCount == 1, "Switch", "Rep")) %>%
-  group_by(Subject, Group, SwitchCount, Procedure.Trial.) %>%
-  summarise(RT = mean(respTime))
-shapeSC.stat <- aov_ez(
-  data = shapeSC.dat,
-  dv = "RT",
-  id = "Subject", 
-  within = c("SwitchCount", "Procedure.Trial.")
-)
-
-SCdirect.dat <- behavData %>%
-  filter(switchRate > minSwitchRate,CompSearch.RT < compCutoff | LearnSearch.RT < learnCutoff) %>%
-  mutate(respTime = ifelse(!is.na(CompSearch.RT),CompSearch.RT,LearnSearch.RT), SwitchCount = ifelse(SwitchCount == 1, "Switch", "Rep")) %>%
-  group_by(Subject, Group, SwitchCount, Procedure.Trial.) %>%
-  summarise(RT = mean(respTime)) %>%
-  spread(SwitchCount, RT) %>%
-  mutate(SwitchCosts = Switch-Rep)
-SCdirect.stat <- aov_ez(
-  data = SCdirect.dat,
-  dv = "SwitchCosts",
-  id = "Subject", 
-  within = c("Procedure.Trial."),
-  between = "Group"
-)
-SCdirect.res <- apa_print(SCdirect.stat)
-SCdirect.grp.fup <- apa_print(pairs(emmeans(SCdirect.stat, ~Procedure.Trial.|Group)))
-SCdirect.tsk.fup <- apa_print(pairs(emmeans(SCdirect.stat, ~Group|Procedure.Trial.)))
-intr.group.sc <- behavData %>%
-  filter(switchRate > minSwitchRate,CompSearch.RT < compCutoff | LearnSearch.RT < learnCutoff) %>%
-  mutate(respTime = ifelse(!is.na(CompSearch.RT),CompSearch.RT,LearnSearch.RT), SwitchCount = ifelse(SwitchCount == 1, "Switch", "Rep")) %>%
-  group_by(Subject, Group, SwitchCount, Procedure.Trial.) %>%
-  summarise(RT = mean(respTime)) %>%
-  spread(SwitchCount, RT) %>%
-  mutate(SwitchCosts = Switch-Rep) %>%
-  group_by(Group, Procedure.Trial.) %>%
-  summarise(se = sqrt(sd(SwitchCosts)/length(unique(Subject))), mean = mean(SwitchCosts)) %>%
-  mutate( text = paste("$\\Delta M = ", as.character(round(mean,2)), "ms, SE = ", as.character(round(se,2)), "$", sep=""))
-  
-colSch.SC <- apa_print(t.test(SCdirect.dat$SwitchCosts[SCdirect.dat$Group == "Colour" & SCdirect.dat$Procedure.Trial. == "TaskC"], mu = 0, alternative = "greater"))
-colCat.SC <- apa_print(t.test(SCdirect.dat$SwitchCosts[SCdirect.dat$Group == "Colour" & SCdirect.dat$Procedure.Trial. == "TaskL"], mu = 0, alternative = "greater"))
-shpSch.SC <- apa_print(t.test(SCdirect.dat$SwitchCosts[SCdirect.dat$Group == "Shape" & SCdirect.dat$Procedure.Trial. == "TaskC"], mu = 0, alternative = "greater"))
-shpCat.SC <- apa_print(t.test(SCdirect.dat$SwitchCosts[SCdirect.dat$Group == "Shape" & SCdirect.dat$Procedure.Trial. == "TaskL"], mu = 0, alternative = "greater"))
-```
-
-Switch costs were calculated by subtracting repsonse times to repetition trials from response times to switch trials. We performed a 2x2 ANOVA in order to evaluate the effect of task (categorisation vs search) and group (colour vs shape) on the size of these switch costs. Our results showed a significant effect of task (`r SCdirect.res$full_result$Procedure_Trial_`), but not group (`r SCdirect.res$full_result$Group`), however these effects were superceded by a significant interaction between task and group (`r SCdirect.res$full_result$Group_Procedure_Trial_`). Follow-up comparisons (visualised in Figure\ \@ref(fig:switchCostPlot)) demonstrated that participants in the colour group had significantly larger switch costs in the categorisation task (`r intr.group.sc$text[2]`) than the search task (`r paste(intr.group.sc$text[1], ", ", SCdirect.grp.fup$statistic$TaskC_TaskL_Colour, sep = "")`), whereas participants in the shape group showed no difference between the categorisation (`r intr.group.sc$text[4]`) and search tasks (`r paste(intr.group.sc$text[3], ", ", SCdirect.grp.fup$statistic$TaskC_TaskL_Shape, sep = "")`). In the categorisation task, participants in the colour group had significantly larger switch costs than participants in the shape group (`r SCdirect.tsk.fup$statistic$Colour_Shape_TaskL`) however there was no difference between the two groups in the search task (`r SCdirect.tsk.fup$statistic$Colour_Shape_TaskC`). A set of one sampled t tests confirm that switch costs differ from 0 for both groups in all conditions (all p values <0.001).
-
-(ref:SCPlot) Response times for switch and repeat trials for the colour group (green) and the shape group (grey) in each task. For the search task (left) we observed a switch cost (faster responses to repetition trials) for both groups of participants. In the categorisation task (right) participants in the colour group (green) showed significant switch costs however participants in the shape group (grey) showed comparatively small differences.
-
-```{r make_switchCostPlot, include=FALSE}
-switchCost.se <- behavData %>%
-filter(Procedure.Trial. == "TaskC") %>%
-filter(switchRate > minSwitchRate,CompSearch.RT < compCutoff | LearnSearch.RT < learnCutoff) %>%
-mutate(respTime = ifelse(!is.na(CompSearch.RT),CompSearch.RT,LearnSearch.RT), SwitchCount = ifelse(SwitchCount == 1, "Switch", "Rep")) %>%
-group_by(Subject, Group, SwitchCount) %>%
-summarise(RT = mean(respTime)) %>%
-group_by(Group, SwitchCount) %>%
-summarise(se = sd(RT)/sqrt(length(unique(Subject))),RT = mean(RT))
-plot1 <- behavData %>%
-filter(Procedure.Trial. == "TaskC") %>%
-filter(switchRate > minSwitchRate,CompSearch.RT < compCutoff | LearnSearch.RT < learnCutoff) %>%
-mutate(respTime = ifelse(!is.na(CompSearch.RT),CompSearch.RT,LearnSearch.RT), SwitchCount = ifelse(SwitchCount == 1, "Switch", "Rep")) %>%
-group_by(Subject, Group, SwitchCount) %>%
-summarise(RT = mean(respTime)) %>%
-ggplot(aes(x=SwitchCount, y=RT, fill = Group)) +
-geom_point(aes(colour = Group), size = 2, alpha = 0.3) +
-geom_line(aes(colour = Group, group = Subject), alpha = 0.3) +
-geom_point(data = switchCost.se, aes(colour = Group),size = 5) +
-geom_line(data = switchCost.se, aes(group = Group, colour = Group), size=2) +
-facet_grid(.~Group) +
-scale_colour_manual(values=c("green4", "gray42")) +
-scale_fill_manual(values=c("green4", "gray42")) +
-scale_y_continuous(limits = c(250,1100), expand = c(0, 0)) +
-scale_x_discrete(limits = c("Switch", "Rep"), labels = c("Switch", "Rep")) +
-labs(y = "Response time (ms)", x = "Search Task") +
-theme(panel.grid.major = element_blank(),
-panel.grid.minor = element_blank(),
-panel.background = element_blank(),
-axis.line = element_line(colour = "black"),
-#axis.title.x = element_text("Search Task"),
-axis.ticks = element_blank(),
-text= element_text(size=18),
-strip.background = element_blank(),
-legend.position = "none"
-)
-switchCost.se <- behavData %>%
-filter(Procedure.Trial. == "TaskL") %>%
-filter(switchRate > minSwitchRate,CompSearch.RT < compCutoff | LearnSearch.RT < learnCutoff) %>%
-mutate(respTime = ifelse(!is.na(CompSearch.RT),CompSearch.RT,LearnSearch.RT), SwitchCount = ifelse(SwitchCount == 1, "Switch", "Rep")) %>%
-group_by(Subject, Group, SwitchCount) %>%
-summarise(RT = mean(respTime)) %>%
-group_by(Group, SwitchCount) %>%
-summarise(se = sd(RT)/sqrt(length(unique(Subject))),RT = mean(RT))
-plot2 <- behavData %>%
-filter(Procedure.Trial. == "TaskL") %>%
-filter(switchRate > minSwitchRate,CompSearch.RT < compCutoff | LearnSearch.RT < learnCutoff) %>%
-mutate(respTime = ifelse(!is.na(CompSearch.RT),CompSearch.RT,LearnSearch.RT), SwitchCount = ifelse(SwitchCount == 1, "Switch", "Rep")) %>%
-group_by(Subject, Group, SwitchCount) %>%
-summarise(RT = mean(respTime)) %>%
-ggplot(aes(x=SwitchCount, y=RT, fill = Group)) +
-geom_point(aes(colour = Group), size = 2, alpha = 0.3) +
-geom_line(aes(colour = Group, group = Subject), alpha = 0.3) +
-geom_point(data = switchCost.se, aes(colour = Group),size = 5) +
-geom_line(data = switchCost.se, aes(group = Group, colour = Group), size=2) +
-facet_grid(.~Group) +
-scale_colour_manual(values=c("green4", "gray42")) +
-scale_fill_manual(values=c("green4", "gray42")) +
-scale_y_continuous(limits = c(250,1100), expand = c(0, 0)) +
-scale_x_discrete(limits = c("Switch","Rep"), labels = c("Switch", "Rep")) +
-labs(y = "Response time (ms)", x = "Categorisation task") +
-theme(panel.grid.major = element_blank(),
-panel.grid.minor = element_blank(),
-panel.background = element_blank(),
-axis.line = element_line(colour = "black"),
-axis.title.y = element_text(colour = "white"),
-axis.ticks = element_blank(),
-text= element_text(size=18),
-strip.background = element_blank(),
-legend.position = "none"
-)
-pg <- grid.arrange(plot1,plot2, ncol = 2, nrow = 1)
-ggsave("Figures/switchcost.jpg", pg, width = 16, height = 8, units = "cm")
-```
-
-```{r switchCostPlot, fig.cap= "(ref:SCPlot)"}
-include_graphics("Figures/switchcost.jpg", auto_pdf = TRUE)
 ```
 
 ## Comparison between voluntary and cued task switching

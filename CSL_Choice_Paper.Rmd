@@ -29,7 +29,7 @@ affiliation:
     institution   : "Philipps-University of Marburg, Germany"
 
 author_note: |
-  Dion Henare and Anna Schuboe, Cognitive Neuroscience of Perception and Action, Department of Psychology, Philipps-University Marburg, Germany. \newline This research was supported by the Deutsche Forschungsgemeinschaft (DFG, German Research Foundation) – SFB/TRR 135, project number 222641018, TP B3.
+  Dion Henare and Anna Schuboe, Cognitive Neuroscience of Perception and Action, Department of Psychology, Philipps-University Marburg, Germany. We would like to acknowledge the contributino of Sophia Schach who was involved in the planning and collection of our data. \newline This research was supported by the Deutsche Forschungsgemeinschaft (DFG, German Research Foundation) – SFB/TRR 135, project number 222641018, TP B3.
 
 abstract: |
   The human visual system can only process a fraction of the information present in a typical visual scene, and selection is historically framed as the outcome of bottom-up and top-down control processes. In this study we evaluated how a third factor, an individual’s selection history, interacts with top-down control mechanisms during visual search. Participants in our task were assigned to one of two groups in which they developed a history of either shape or colour selection in one task, while searching for a shape singleton in a second task. A voluntary task selection procedure allowed participants to choose which task they would perform on each trial thereby maximising their top- down preparation. We recorded EEG throughout and extracted lateralised ERP components that index target selection (N$_{\text{T}}$)) and distractor suppression (P$_{\text{D}}$)). Our results showed that selection history continued to guide attention during visual search, even when top-down control mechanisms were maximised with voluntary task selection. For participants with a history of colour selection, the N$_{\text{T}}$) component elicited by a shape target was attenuated when accompanied by a colour distractor, and the distractor itself elicited a larger P$_{\text{D}}$) component. Additionally, task switching results revealed that participants in the colour group had larger, asymmetric switch costs implying increased competition between task sets. Our results support the notion that selection history is a significant factor in attention guidance, orienting the visual system reflexively to objects that contradict an individual’s current goals - even when these goals are intrinsically selected and prepared ahead of time.
@@ -40,7 +40,7 @@ figsintext        : no
 figurelist        : no
 tablelist         : no
 footnotelist      : no
-lineno            : no
+lineno            : yes
 mask              : no
 
 numbersection     : no
@@ -226,7 +226,7 @@ An open question remains as to whether increased top-down control can be used to
 
 However, recent work in the task switching literature has suggested that cued task switching may be insufficient for allowing participants to optimally engage top-down control before the trial begins [@kiesel2010control]. The primary measure of interest in task switching paradigms is switch cost, that is, the slowed response times following a task switch relative to a task repetition. While switch costs do appear to be reduced in cued task switching [@sohn_task_2001;@ruthruff_switching_2001], it has also been known for some time that they are still affected by bottom-up factors like residual activation of prior task sets [@allport_shifting_1994] and priming of previous task sets [@waszak_task-switching_2003;@koch_cue-based_2006]. A novel approach to increasing top-down attentional control in dual tasks is the voluntary task-switching paradigm developed by @arrington2004cost. In this version of the task, participants are not cued as to what trial type will be performed next, but rather they are given the choice of which trial type they would like to perform next. Evidence suggests that the voluntary task switching paradigm allows for stronger proactive control over performance of each task [@arrington2005voluntary;@kang2014electrophysiological].
 
-Evidence that voluntary task switching procedures enable greater top-down control comes from a range of behavioural and electrophysiological findings. Comparisons to cued task switching procedures showed reduced switch costs in the voluntary version as well as a lack of any consistent influence by bottom-up factors [arrington2005voluntary;@chen_at_2015;@gollan_whats_2014]. @chen_at_2015 also extended these effects to show that voluntary task switching allows for participants to adopt different preparatory strategies when stimulus-repsonse mappings were manipulated, an ability which was not observed for those doing cued task switching. A prominent signature of the different control processes engaged during cued and voluntary task switching procedures comes from EEG activity recorded during the preparatory period before task onset. While cued task switching has typically been associated with a P3-like posterior positivty (see @karayanidis_advance_2010 for a review), recordings from participants engaged in voluntary switching are dominated by a fronto-central negativity [@vandamme2010voluntary;@chen_at_2015;@poljac_dissociable_2014]. This component, typically referred to as the CNV, has been associated with preparatory task-response mapping and has been used to demonstrate the increased top-down control that is engaged during voluntry task switching. @kang2014electrophysiological directly compared preparatory EEG activity between cued and voluntary task switching tasks within the same participants, and confirmed that while cues elicited posterior positivity, voluntary choices were associated with a large CNV.
+Evidence that voluntary task switching procedures enable greater top-down control comes from a range of behavioural and electrophysiological findings. Comparisons to cued task switching procedures showed reduced switch costs in the voluntary version as well as a lack of any consistent influence by bottom-up factors [@arrington2005voluntary;@chen_at_2015;@gollan_whats_2014]. @chen_at_2015 also extended these effects to show that voluntary task switching allows for participants to adopt different preparatory strategies when stimulus-repsonse mappings were manipulated, an ability which was not observed for those doing cued task switching. A prominent signature of the different control processes engaged during cued and voluntary task switching procedures comes from EEG activity recorded during the preparatory period before task onset. While cued task switching has typically been associated with a P3-like posterior positivty (see @karayanidis_advance_2010 for a review), recordings from participants engaged in voluntary switching are dominated by a fronto-central negativity [@vandamme2010voluntary;@chen_at_2015;@poljac_dissociable_2014]. This component, typically referred to as the CNV, has been associated with preparatory task-response mapping and has been used to demonstrate the increased top-down control that is engaged during voluntry task switching. @kang2014electrophysiological directly compared preparatory EEG activity between cued and voluntary task switching tasks within the same participants, and confirmed that while cues elicited posterior positivity, voluntary choices were associated with a large CNV.
 
 Another advantage of voluntary task selection procedures is that they allow us to measure choice processes and could therefore provide insight into how choice is affected by selection history. In previous use of voluntary task selection, research has shown systematic patterns in task selection when participants are instructed to perform the two tasks in a random order. Participants typically show a repetition bias in their task choices [@arrington2004cost] which is exacerbated by shorter intertrial intervals [@arrington2005voluntary;@vandierendonck2010task], and typically involves a preference for performing the difficult task more frequently [@millington2013between;@yeung2010bottom]. A number of previous studies have also shown that the availability of a stimulus to the cognitive system can impact task choice [@mayr2006unpredictable;@yeung2010bottom;@arrington2010stimulus]. For example, when participants choose to perform either size or animacy judgements about words, they were more likely to choose the size judgement if they had performed a size judgement on that word previously and more likely to choose the animacy judgement if they had performed an animacy judgement on that word previously [@arrington2010stimulus]. Similarly, there are consistent biases in judgement choice across participants. Particular words, for instance "asprin", are more likely to elicit a size judgement, whereas other words are more likely to elicit an animacy judgement [@arrington2010stimulus]. In other voluntary selection tasks, repetition of a target's location has increased the likelihood of a participant repeating their previous choice [@mayr2006unpredictable;@yeung2010bottom], and individual switch rates correlated strongly with the cost of a task switch [@mayr2006unpredictable]. These findings suggest that previous history influences the ease with which a particular task is performed and therefore in turn, impacts task choice in a voluntary selection paradigm. 
 
@@ -238,11 +238,11 @@ In the present study, we adapted the design of @feldmann2015you to a voluntary t
 
 27 participants with normal or corrected-to-normal vision (tested using an Oculus Binoptometer 3) participated in the task for either payment or course credit. All participants gave written and informed consent prior to the start of the experiment. Participants were randomly assigned to either the shape group (ages ranging from 21 to 31, mean = 24.5, SD = 2.8) or the colour group (ages ranging from 19 to 25, mean = 22.5, SD = 1.7). Each group had one left handed participant and all other participants were right handed. One participant did not reach suitable performance during the practice session and was therefore excluded from the experiment.
 
-## Experimental procedure
+## Experimental Procedure
 
 Participants came in for two separate sessions (performed on consecutive days) and performed two different tasks within each session, a categorisation task and a search task (described in detail below). Session one was a practice session in which participants were familiarised with the two tasks by performing them in separate block, the order of these blocks was counterbalanced across participants. This was designed to train participants on both tasks but was separated from the testing session to avoid fatigue intefering with the EEG session.  In session two, EEG was recorded and the full task began where participants chose at the start of each trial whether they would perform a categorisation or search trial. Participants were seated in a comfortable chair in a dimly lit room with their eyes 100cm away from the screen (LCD-TN Samsung Syncmaster 2233). An Erogodex DX1 response pad was placed on their lap with 6 keys arranged so that participants could use the index and middle finger of each hand to respond to the task, while the thumb on each hand could be used to perform task selection between trials. Stimulus presentation and response collection was controlled by E-Prime 2.0 and audio feedback was presented by two stereo speakers (Logitech Z120 2.0) placed behind the screen.
 
-### Stimuli
+### Stimuli.
 
 Each stimulus presented during the categorisation and search trials was presented on a dark grey background (RGB: 60,60,60) and subtended 2.3$^\circ$ of visual angle. A fixation cross (0.6$^\circ$) was located in the centre of the screen throughout the experiment in order to help participants maintain central fixation. The physical luminance of the grey (RGB: 110,110,110), green (RGB: 48,171,48), blue (RGB: 48,48,171), and red (RGB: 171,48,48) stimulus colours was balanced using a luminance meter (Konica Minolta LS-100).
 
@@ -252,15 +252,15 @@ Each stimulus presented during the categorisation and search trials was presente
 include_graphics("Figures/CSL-Choice trial displays.jpg", auto_pdf = TRUE)
 ```
 
-### Categorisation trials
+### Categorisation trials.
 
 Categorisation trials began with a 500 ms fixation cross in the center of the screen. Eight stimuli were then presented simultaneously in a circular arrangement with a radius of 6.3$^\circ$ of visual angle for 200 ms (see Figure\ \@ref(fig:stimDisplays)A). Six of these objects were unfilled grey circles, one was an unfilled coloured circle (either blue or green randomly selected on each trial), and one was an unfilled grey shape singleton (either pentagon or triangle selected randomly on each trial). The colour singleton and the shape singleton were constrained to appear in only four of the eight possible locations along either the vertical or horizontal midline. In half of the categorisation trials (288 trials), the shape singleton was presented on one of the vertical midline positions while the colour singleton was presented on one of the lateral positions on the horizontal midline. In the other half of categorisation trials the colour singleton was on the vertical midline while the shape singleton was lateralised (see Figure\ \@ref(fig:stimDisplays)A). Participants had two response keys for the categorisation task and after selecting one of these keys, they were given feedback informing them whether they had selected the correct response. At the beginning of the task, participants were not told the correct stimulus response pairing and instead had to learn which key was correct for a given display. For half of the participants (the colour group) the correct response was based on the colour singleton (eg. key 1 when blue was shown, key 2 when green was shown). For the other half (the shape group), the correct response was based on the shape singleton (eg. key 1 when a pentagon was shown, key 2 when a triangle was shown).The trial would end when participants made their response, up to a maximum of 2000 ms.
 
-### Search trials
+### Search trials.
 
 Search trials began with a 500 ms fixation cross in the center of the screen. Next, eight stimuli were presented in a circular arrangement with a radius of 6.3$^\circ$ of visual angle for an interval of 200 ms (see Figure\ \@ref(fig:stimDisplays)B). Six of these were always unfilled grey circles, one was the target - an unfilled grey diamond, and one was either another unfilled grey circle (in the target only condition) or an unfilled red circle (in the distractor present condition). Each of these stimuli contained a line of varying orientations and participants were required to indicate whether the line contained by the target diamond was oriented horizontally or vertically. The trial would end when particpants made their response, up to a maximum of 2000 ms. One third of the search trials (192 trials) were target only trials with 7 grey circles and one grey diamond target. The other two thirds of the search trials were distractor present trials in which one of the circles was coloured red. In half of these distractor present search trials (192 trials), the target diamond was placed on the vertical midline and the coloured distractor was lateralised to either the left or right (chosen randomly on each trial) along the horizontal midline. In the remaining trials (192 trials) the coloured distractor was placed on the vertical midline and the target diamond was lateralised to either the left or right (chosen randomly on each trial) on the horizontal midline (see Figure\ \@ref(fig:stimDisplays)B).
 
-### Task selection
+### Task selection.
 
 In session two, every trial began with a task selection screen where participants had to indicate using either their left or right thumb, whether they would like to perform a categorisation or search trial. This screen stayed on until the participant's response. Participants were asked to try to ensure that they distributed their choices evenly between the two options, and to try and make their choice random and unpredictable. Participants were required to perform 576 of each trial type and after every block of 32 trials, tey were shown a pictoral display indicating how many of each trial type was left for them to perform as well as some feedback about response times and accuracy. Examples of the full trial procedure and a between block feedback display are shown in figure\ \@ref(fig:trialProc).
 
@@ -270,15 +270,15 @@ In session two, every trial began with a task selection screen where participant
 include_graphics("Figures/CSLChoice Trial Proc and interblock feedback.jpg", auto_pdf = TRUE)
 ```
 
-## EEG recording
+## EEG Recording
 
 EEG activity was recorded continuously at 1000Hz using Brain Products 64 channel actiCAP Ag/AgCl electodes.The electrodes were arranged according to the modified combinatorial nomenclature (MCN) for the 10-10 system. The online reference was FCz and the COM sensor was located on the z axis between FCz and Cz. EEG activity was preamplified by the active electrodes and then passed to a brain products brainamp amplifier with 16 bit A/D conversion, an input impedance of 10MOhms, and an antialiasing filter with a 1000Hz low pass cut off. Impedances were kept below 5kOHms and active shielding was used throughout for attenuating common mode noise.
 
-## EEG processing
+## EEG Processing
 
 EEG data were processed using the EEGLAB toolbox in MATLAB. For the extraction of lateralised components (N$_{\text{T}}$ and P$_{\text{D}}$) data were first segmented into 700ms epochs (-200 to 500ms around each search or categorisation display) and baselined so that the average of the pre-stimulus period was set to zero for each event. For artifact rejection a HEOG channel was created by taking the voltage difference between the electrodes on the outer canthi of each eye, and a VEOG was created by taking the voltage difference between the electrodes above and below the left eye. These channels were filtered using a lowpass value of 35Hz in order to reduce false positives, and then trials containing either +/- 35mV in the HEOG channel (within 300ms post stimulus presentation) or +/- 80mV in the VEOG channel were removed. Trials containing +/- 80mv in the channels of interest (PO3, PO7, PO4, and PO8) were also removed and the data were referenced to the average of all channels. Left hemisphere channels (PO3, PO7) were averaged together, and right hemisphere channels (PO4, PO8) were averaged together so that contralateral and ipsilateral ERPs could be calculated for each condition.
 
-## Comparison between voluntary and cued task switching
+## Comparison Between Voluntary and Cued Task Switching
 
 A central premise in the logic of this study is that the voluntary task switching paradigm affords participants greater top-down control than a cued task switching procedure. As described above, evidence supporting this claim has come primarily from analysis of preparatory activity in the task switching literature. This work has shown that task cues result in a smaller frontal negativity (CNV) and a larger posterior positivity during the preparatory phase when compared to voluntary task selection. However, there are several differences in the tasks used in that literature when compared to the search tasks used here. In order to confirm that the voluntary task design is similarly effective at improving top-down control in our context, we sought to compare the preparatory activity in our task to the preparatory activity in a cued version of our task. In experiment 1 of their paper, @kadel2017selection performed exactly this task, their analyses, however, focused exclusively on post-stimulus activity. We acquired the data of @kadel2017selection and analysed the pre-stimulus activity which had been not been processed previously. We extracted the CNV and posterior positivity elicited by task cues, and compared them to the CNV and posterior positivity elicited by voluntary task choices in our experiment.
 
@@ -286,38 +286,75 @@ Details of the procedure used by @kadel2017selection can be found in their metho
 
 For the analysis of preparatory activity, we followed the EEG processing procedures used by previous investigations of cued and voluntary task switching. Data were re-referenced to the average of the mastoids and segmented into 1600ms epochs around stimulus onset. The epochs start 800ms before the task display onset, and extend 800ms post task display. The 500ms period prior to task display onset corresponds to the presentation of a fixation cross following either a cued (in the cued task) or the participant's choice (in the voluntary task). A baseline period of -700 to -500ms was used, corresponding to the 200ms preceding the cue or choice. Data were filtered using a low pass value of 35Hz, and epochs were rejected if they contained activity exceeding +/-200mv in any channel, +/-75mv in EOG channels, or improbable data (based on EEGLAB's pop_jointprob function with a 6SD threshold). Trials where participants responded incorrectly were also excluded. A fronto-central cluster of electrodes (F3, Fz, F4, FC3, FCz, FC4, C3, Cz, C4) and a posterior cluster of electrodes (CP3, CPz, CP4, P3, Pz, P4, POz, O1, O2) were then created based on the channels used by @poljac_dissociable_2014 and we extracted component amplitudes by averaging the 300ms period directly preceding stimulus onset.
 
-## Statistical analysis
+## Statistical Analysis
 
 All statistical analyses were performed in version 1.1.463 of R Studio [@rstudio_desk_2016] using R (version 3.5.2, @R-base). Data processing and visualisation was performed using the tidyverse set of packages [@pckg-tidyverse] and statistical tests were performed using the afex package [@pckg-afex]. Where necessary, calculations for comparing unequal groups were therefore performed automatically by the afex package. This manuscript was produced in R using the papaja package [@pckg-papaja].
-
-### Selection history
-
-#### Behavioural analyses
-
-For behavioural analyses we first calculated the switch rate for all participants, calculated as the percentage of trials on which a participant chose to switch tasks from the previous trial. We removed any participant whose switch rate was below 0.2 (resulting in the removal of 3 participants) on the basis that these participants were not following the instructions of randomly distributing their choices. At this point there were 12 participants remaining in the colour group and 11 participants in the shape group. For the remaining participants we removed trials with abnormally long reaction times (greater than 2.5 standard deviations above the mean, calculated separately for each participant and each task) resulting in the removal of an average of 2.32% of trials in each task. For analyses with response time as the dependent variable, we also removed trials with incorrect responses resulting in the removal of a further 4.86% of the total categorisation trials and 4.51% of total search trials. 
-
-#### ERP analyses
-
-In the categorisation task, 4 participants had to be excluded because less than 70% of the trials were left in the categorisation task (equivalent to an average of 202 trials remaining in each condition), or because their switch rate between the tasks was less than 0.2. As a result, 11 participants were remaining in each group. Our analyses focused on two components of interest, the N$_{\text{T}}$ and P$_{\text{D}}$. In order to determine the time range for the N$_{\text{T}}$, a grand average ERP of all participants was created for lateralised predictor trials (colour singleton for colour group participants and shape singleton for shape participants). The peak negativity that occurred later than 200ms post-stimulus was defined as the Nt, and a 50ms time window was centred on this timepoint producing a window from 206 to 256ms. For the P$_{\text{D}}$ component, we created a grand average ERP for lateralised non-predictor trials (the shape singleton for the colour group and the colour singleton for the shane group), identified the peak positivity that occurred later than 200ms poststimulus and centred a 50ms window on this timepoint which produced a window from 238 to 288ms.
-
-Five participants were excluded because less than 85% of trials remained in the search task after artifact rejection (equivalent to an average of 163 trials remaining in each condition), or their switch rate between the tasks was less than 0.2. As a result, 10 participants remained in the colour group, and 11 participants in the shape group. We again focused analyses on the N$_{\text{T}}$ and P$_{\text{D}}$ components. To select the N$_{\text{T}}$ time window we created a grand average of all participants for trials with a lateralised target, identified the peak negativity that occurred later than 200ms poststimulus and centred a 50ms window on this time point. This produced a time range of 227 to 277ms post-stimulus onset. For the P$_{\text{D}}$ component, we created a grand average ERP for trials with a lateralised distractor, identified the peak positivity that occurred later than 200ms poststimulus and centred a 50ms window on this timepoint which produced a window from 264 to 314ms.
 
 ### Voluntary task selection
 
 To evaluate the choice processes in our task we used both switch rates and switch costs. For all of these analyses we applied the same rejection criteria as we used in the behavioural analyses presented above. Switch rate was calculated simply as the percentage of trials in which a participant chose to switch between the two tasks. Switch costs were calculated as the average response time difference between switch trials and repetition trials.
 
+### Selection history.
 
-### Comparison between voluntary and cued task switching
+#### Behavioural analyses.
+
+For behavioural analyses we first calculated the switch rate for all participants, calculated as the percentage of trials on which a participant chose to switch tasks from the previous trial. We removed any participant whose switch rate was below 0.2 (resulting in the removal of 3 participants) on the basis that these participants were not following the instructions of randomly distributing their choices. At this point there were 12 participants remaining in the colour group and 11 participants in the shape group. For the remaining participants we removed trials with abnormally long reaction times (greater than 2.5 standard deviations above the mean, calculated separately for each participant and each task) resulting in the removal of an average of 2.32% of trials in each task. For analyses with response time as the dependent variable, we also removed trials with incorrect responses resulting in the removal of a further 4.86% of the total categorisation trials and 4.51% of total search trials. 
+
+#### ERP analyses.
+
+In the categorisation task, 4 participants had to be excluded because less than 70% of the trials were left in the categorisation task (equivalent to an average of 202 trials remaining in each condition), or because their switch rate between the tasks was less than 0.2. As a result, 11 participants were remaining in each group. Our analyses focused on two components of interest, the N$_{\text{T}}$ and P$_{\text{D}}$. In order to determine the time range for the N$_{\text{T}}$, a grand average ERP of all participants was created for lateralised predictor trials (colour singleton for colour group participants and shape singleton for shape participants). The peak negativity that occurred later than 200ms post-stimulus was defined as the Nt, and a 50ms time window was centred on this timepoint producing a window from 206 to 256ms. For the P$_{\text{D}}$ component, we created a grand average ERP for lateralised non-predictor trials (the shape singleton for the colour group and the colour singleton for the shane group), identified the peak positivity that occurred later than 200ms poststimulus and centred a 50ms window on this timepoint which produced a window from 238 to 288ms.
+
+Five participants were excluded because less than 85% of trials remained in the search task after artifact rejection (equivalent to an average of 163 trials remaining in each condition), or their switch rate between the tasks was less than 0.2. As a result, 10 participants remained in the colour group, and 11 participants in the shape group. We again focused analyses on the N$_{\text{T}}$ and P$_{\text{D}}$ components. To select the N$_{\text{T}}$ time window we created a grand average of all participants for trials with a lateralised target, identified the peak negativity that occurred later than 200ms poststimulus and centred a 50ms window on this time point. This produced a time range of 227 to 277ms post-stimulus onset. For the P$_{\text{D}}$ component, we created a grand average ERP for trials with a lateralised distractor, identified the peak positivity that occurred later than 200ms poststimulus and centred a 50ms window on this timepoint which produced a window from 264 to 314ms.
+
+### Comparison between voluntary and cued task switching.
 
 Independent samples t tests were used to compare the preparatory activity between the present data and the data from @kadel2017selection. One test compared CNV amplitude taken from the frontal electrode cluster, and a second compared amplitudes taken from the posterior electrode cluster.
 
 # Results
 ```{r exclusion criteria}
-minSwitchRate = 0.05
+minSwitchRate = 0.2
 ```
+
+```{r loadBehavData}
+groupInfo = read.csv(file="BehaviouralData.csv")
+#Load all data
+behavData = read.csv(file="Behaviour/CSL_Choice_behav.csv")
+behavData <- select(behavData,-c(ExperimentName, Session, Clock.Information, DataFile.Basename, Display.RefreshRate, ExperimentVersion, RandomSeed, RuntimeCapabilities, RuntimeVersion, RuntimeVersionExpected, SessionDate, SessionStartDateTimeUtc, SessionTime, StudioVersion,BlockAccC, BlockAccL, BlockRTC, BlockRTL, Group, pos1, pos2, pos3, pos4, pos5, pos6, pos7, pos8, Response.DurationError, Response.OnsetDelay, Response.OnsetTime, Response2.DurationError, Response2.OnsetDelay, Response2.OnsetTime)
+)
+```
+
+```{r , include=FALSE}
+
+for (sub in unique(behavData$Subject)) {
+  behavData$Group[behavData$Subject==sub] = groupInfo$Group[groupInfo$Subject==sub]
+  behavData$switchRate[behavData$Subject==sub] = groupInfo$SwitchRate[groupInfo$Subject==sub]
+  behavData$compSD[behavData$Subject==sub] = sd(filter(behavData,Subject ==sub, Procedure.Trial. == "TaskC")$CompSearch.RT)
+  behavData$compMean[behavData$Subject==sub] = mean(filter(behavData,Subject ==sub, Procedure.Trial. == "TaskC")$CompSearch.RT)
+  behavData$learnSD[behavData$Subject==sub] = sd(filter(behavData,Subject ==sub, Procedure.Trial. == "TaskL")$LearnSearch.RT)
+  behavData$learnMean[behavData$Subject==sub] = mean(filter(behavData,Subject ==sub, Procedure.Trial. == "TaskL")$LearnSearch.RT)
+}
+behavData$compCutoff <- behavData$compMean + (behavData$compSD * 2.5)
+behavData$learnCutoff <- behavData$learnMean + (behavData$learnSD * 2.5)
+behavData <- behavData %>% 
+  mutate(SwitchCount = ifelse(repswitch=="switch",1,0))
+behavData$Trial <- behavData$Block
+behavData$Block <- trunc(unique(behavData$Block)/32-0.00001)+1
+
+#Subject group table
+behavData %>% 
+  group_by(Subject) %>%
+  summarise(Group = mean(Group))
+behavData = behavData %>% mutate(Group = ifelse(Group==1,"Colour","Shape"))
+behavData$Group = as.factor(behavData$Group)
+
+#Save switch rates for ERP
+switchRates <- behavData %>% group_by(Subject) %>%summarise(SR = mean(switchRate))
+ParticipantsRejected <- unique(behavData %>% filter(switchRate < minSwitchRate) %>% group_by(Subject) %>% summarise(new = mean(Subject)))$new
+```
+
 ## Voluntary Task Selection
 
-### Task Choice
+### Task choice.
 
 ```{r taskChoiceStats}
 bias.dat <- behavData %>%
@@ -414,7 +451,7 @@ choiceRT.fup <- apa_print.emmGrid(pairs(emmeans(choiceRT.stat, ~repswitch|Group)
 
 In addition, a 2x2 ANOVA was performed in order to evaluate the effect of task transition (repeat vs switch) and group (colour vs shape) on the time taken to make a task choice. The results (depicted in Figure\ \@ref(fig:choseSearch)B) showed no significant main effects of Group (`r choiceRT.res$full_result$Group`) and task transition (`r choiceRT.res$full_result$repswitch`), as well as no significant interaction between group and task transition (`r choiceRT.res$full_result$Group_repswitch`). 
 
-### Switch Rates
+### Switch rates.
 
 ```{r switchRateStats}
 switch <- behavData %>%
@@ -467,7 +504,7 @@ ggsave('Figures/SRviolin.jpg',width=5, height=4, units="in", dpi = 300)
 include_graphics("Figures/SRviolin.jpg", auto_pdf = TRUE)
 ```
 
-### Switch Costs
+### Switch costs.
 
 ```{r switchCostStats, include = FALSE}
 searchSC.dat <- behavData %>%
@@ -672,44 +709,7 @@ include_graphics("Figures/switchcost.jpg", auto_pdf = TRUE)
 
 ## Selection History
 
-### Behavioral performance
-
-```{r loadBehavData}
-groupInfo = read.csv(file="BehaviouralData.csv")
-#Load all data
-behavData = read.csv(file="Behaviour/CSL_Choice_behav.csv")
-behavData <- select(behavData,-c(ExperimentName, Session, Clock.Information, DataFile.Basename, Display.RefreshRate, ExperimentVersion, RandomSeed, RuntimeCapabilities, RuntimeVersion, RuntimeVersionExpected, SessionDate, SessionStartDateTimeUtc, SessionTime, StudioVersion,BlockAccC, BlockAccL, BlockRTC, BlockRTL, Group, pos1, pos2, pos3, pos4, pos5, pos6, pos7, pos8, Response.DurationError, Response.OnsetDelay, Response.OnsetTime, Response2.DurationError, Response2.OnsetDelay, Response2.OnsetTime)
-)
-```
-
-```{r , include=FALSE}
-
-for (sub in unique(behavData$Subject)) {
-  behavData$Group[behavData$Subject==sub] = groupInfo$Group[groupInfo$Subject==sub]
-  behavData$switchRate[behavData$Subject==sub] = groupInfo$SwitchRate[groupInfo$Subject==sub]
-  behavData$compSD[behavData$Subject==sub] = sd(filter(behavData,Subject ==sub, Procedure.Trial. == "TaskC")$CompSearch.RT)
-  behavData$compMean[behavData$Subject==sub] = mean(filter(behavData,Subject ==sub, Procedure.Trial. == "TaskC")$CompSearch.RT)
-  behavData$learnSD[behavData$Subject==sub] = sd(filter(behavData,Subject ==sub, Procedure.Trial. == "TaskL")$LearnSearch.RT)
-  behavData$learnMean[behavData$Subject==sub] = mean(filter(behavData,Subject ==sub, Procedure.Trial. == "TaskL")$LearnSearch.RT)
-}
-behavData$compCutoff <- behavData$compMean + (behavData$compSD * 2.5)
-behavData$learnCutoff <- behavData$learnMean + (behavData$learnSD * 2.5)
-behavData <- behavData %>% 
-  mutate(SwitchCount = ifelse(repswitch=="switch",1,0))
-behavData$Trial <- behavData$Block
-behavData$Block <- trunc(unique(behavData$Block)/32-0.00001)+1
-
-#Subject group table
-behavData %>% 
-  group_by(Subject) %>%
-  summarise(Group = mean(Group))
-behavData = behavData %>% mutate(Group = ifelse(Group==1,"Colour","Shape"))
-behavData$Group = as.factor(behavData$Group)
-
-#Save switch rates for ERP
-switchRates <- behavData %>% group_by(Subject) %>%summarise(SR = mean(switchRate))
-ParticipantsRejected <- unique(behavData %>% filter(switchRate < minSwitchRate) %>% group_by(Subject) %>% summarise(new = mean(Subject)))$new
-```
+### Behavioral performance.
 
 ```{r perfByTaskStats, include = FALSE}
 #documenting trial rejection
@@ -779,7 +779,7 @@ A 2x2 ANOVA was carried out in order to evaluate whether there were effects of g
 
 A 2x2 ANOVA carried out on participant accuracy showed neither a significant difference in accuracy between the shape group ($M$ = `r as.character(round(group.acc$mean[2],2))`%, $SE$ = `r as.character(round(group.acc$se[2],2))`) and the colour group (`r paste("$M$ = ", as.character(round(group.acc$mean[1],2)), "%, $SE$ = ", as.character(round(group.acc$se[1],2)), ", " ,acc.res$full_result$Group, sep = "")`), nor any significant difference on the categorisation task ($M$ = `r as.character(round(task.acc$mean[1],2))`%, $SE$ = `r as.character(round(task.acc$se[1],2))`) and the search task (`r paste("$M$ = ", as.character(round(task.acc$mean[2],2)), "%, $SE$ = ", as.character(round(task.acc$se[2],2)), ", " ,acc.res$full_result$Procedure_Trial_, sep = "")`). There was also no significant interaction between group and task on accuracy (`r acc.res$full_result$Group_Procedure_Trial_`).
 
-#### Search task distraction
+#### Search task distraction.
 
 ```{r, SearchStats}
 searchAcc <- behavData %>%
@@ -893,7 +893,7 @@ rm( groupInfo,intEffectTTest, acc, acc.res, acc.stat, autoCor, Cor, distCost, rt
 gc()
 ```
 
-### ERP results
+### ERP results.
 
 ```{r organiseData, echo = FALSE, include = FALSE}
 dPath = 'CSL_Visuals/'
@@ -1003,7 +1003,7 @@ for (i in unique(allData$Subject)) {
 }
 ```
 
-#### Categorization task
+#### Categorization task.
 
 ```{r, findCatCompWindows}
 grandTarget <- allData %>%
@@ -1151,13 +1151,13 @@ learn.PdCol.results <- apa_print(learn.PdCol.aov)
 
 In the categorisation task, our ERP analyses focused on the lateralised response to each object (either the shape singleton or the colour singleton). For each ERP there were two time windows of interest, the Nt time window (`r sprintf("%i to %ims", NtStart, NtEnd)`) and the P$_{\text{D}}$ time window (`r sprintf("%i to %ims", PdStart, PdEnd)`) as depicted in Figure\ \@ref(fig:makeLearnPlots). We performed a set of mixed 2x2 ANOVAS with electrode laterality (contralateral vs. ipsilateral) as the within-subject factor and group (colour vs. shape) as the between-subject factor, performed for both components (N$_{\text{T}}$ and P$_{\text{D}}$) elicited by each of the lateralised stimuli (colour and shape singletons).
 
-##### Lateral colour singleton, midline shape
+##### Lateral colour singleton, midline shape.
 
 In displays with the colour singleton= lateralised and the shape singleton on the midline, voltages in the N$_{\text{T}}$ time window did not differ between participants in the colour group (`r group.colnt$text[1]`) and participants in the shape group (`r group.colnt$text[2]`, `r learn.NtCol.results$full$Group` ), nor was there any difference between the contralateral electrode site (`r elecLat.colnt$text[1]`) and ipsilateral electrode site (`r elecLat.colnt$text[2]`, `r gsub("= .000\\$", "< .001\\$",gsub("= 0.00\\$","< 0.01\\$",learn.NtCol.results$full$Contra))`). We did, however, observe a signicifcant interaction between group and electrode laterality (`r learn.NtCol.results$full$Group_Contra`). For participants performing colour categorisation, a lateralised colour singleton elicited a more negative voltage at contralateral electrode sites (`r intr.colnt$text[1]`) than ipsilateral electrode sites (`r intr.colnt$text[3]`, `r learn.NtCol.fup$statistic$Contralateral_Ipsilateral_Colour`), whereas for participants performing shape lateralisation, a lateralised colour singleton elicited a more positive voltage at contralateral electrode sites (`r intr.colnt$text[2]`) than ipsilateral electrode sites (`r intr.colnt$text[4]`, `r learn.NtCol.fup$statistic$Contralateral_Ipsilateral_Shape`).
 
 When evaluating the P$_{\text{D}}$ time range, we observed no main effects of group (`r learn.PdCol.results$full$Group`) nor electrode laterality (`r learn.PdCol.results$full$Contra`), and no interaction between group and electrode laterality (`r learn.PdCol.results$full$Group_Contra`).
 
-##### Lateral shape singleton, midline colour
+##### Lateral shape singleton, midline colour.
 
 In displays with the shape singleton lateralised and the colour singleton on the midline, voltages in the N$_{\text{T}}$ time window did not differ between participants in the colour group (`r group.shpnt$text[1]`) and participants in the shape group (`r group.shpnt$text[2]`, `r learn.NtShape.results$full$Group` ), nor was there any difference between the contralateral electrode site (`r elecLat.shpnt$text[1]`) and ipsilateral electrode site (`r elecLat.shpnt$text[2]`, `r gsub("= .000\\$", "< .001\\$",gsub("= 0.00\\$","< 0.01\\$",learn.NtShape.results$full$Contra))`). We did, however, observed a signicifcant interaction between group and electrode laterality (`r learn.NtShape.results$full$Group_Contra`). For participants performing shape categorisation, a lateralised shape singleton elicited a more negative voltage at contralateral electrode sites (`r intr.shpnt$text[1]`) than ipsilateral electrode sites (`r intr.shpnt$text[3]`, `r learn.NtShape.fup$statistic$Contralateral_Ipsilateral_Colour`), whereas for participants performing colour lateralisation, a lateralised shape singleton elicited a more positive voltage at contralateral electrode sites (`r intr.shpnt$text[2]`) than ipsilateral electrode sites (`r intr.shpnt$text[4]`, `r learn.NtShape.fup$statistic$Contralateral_Ipsilateral_Shape`).
 
@@ -1226,7 +1226,7 @@ ggsave("Figures/LearnSubtracted.jpg", pg, dpi = 300, width = 5, height = 4, unit
 include_graphics("Figures/LearnSubtracted.jpg", auto_pdf = TRUE)
 ```
 
-#### Search task
+#### Search task.
 
 ```{r findSearchCompWindows}
 grandTarget <- allData %>%
@@ -1377,17 +1377,17 @@ intr.dtpd.se <- searchPdDT %>%
 Next we focused on the lateralised response to targets and distractors in the search displays as a function of group assignment. Evidence for the effect of selection history would come from the interaction between group and lateralised ERP activity. We performed a set of mixed 2x2 ANOVAs with electrode laterality (contralateral vs. ipsilateral) as the within-subject factor and group (colour vs. shape) as the between-subject factor. This was performed for mean amplitudes in the N$_{\text{T}}$ time window elicited by each of the display types (target lateralised - distractor absent, target lateralised - distractor on the midline, and distractor lateralised - target on the midline), as well as the P$_{\text{D}}$ time window in the case of a lateralised distractor (see Figure\ \@ref(fig:makeSearchPlots)).
 `r #the Nt time window (r sprintf("%i to %ims", NtStart, NtEnd)) and the Pd time window (r sprintf("%i to %ims", PdStart, PdEnd))`
 
-##### Target response - Distractor absent trials
+##### Target response - distractor absent trials.
 
 In the target only displays the contralateral response (`r laterality.NTO$text[1]`) was more negative than the ipsilateral response (`r paste(laterality.NTO$text[2], ", ", search.NtTO.results$full$Contra, sep="")`). Neither the main effect of group (`r search.NtTO.results$full$Group`), nor the interaction between group and hemisphere reached significance (`r search.NtTO.results$full$Group_Contra`). 
 
-##### Target response - Distractor present trials
+##### Target response - distractor present trials.
 
 When the target was lateralised in the presence of a midline distractor, we observed no significant main effect of group (`r search.NtTD.results$full$Group`), however there was a significant main effect of electrode laterality (`r search.NtTD.results$full$Contra`), indicating the presence of an N$_{\text{T}}$ (`r main.TDnt`). This main effect was superceeded by an interaction between group and electrode laterality which showed that the voltage difference between contralateral and ipsilateral electrode sites was significantly larger for participants in the shape group (`r intr.tdnt.se$text[2]`) than those in the colour group (`r paste(intr.tdnt.se$text[1], ", ", search.NtTD.results$full$Group_Contra, sep = "")`). 
 
 `r #Follow-up comparisons reveal that while a significant N$_{\text{T}}$ was elicited for participants in both the colour (r search.NtTD.fup$full_result$Contralateral_Ipsilateral_Colour) and shape group (r search.NtTD.fup$full_result$Contralateral_Ipsilateral_Shape). When N$_{\text{T}}$ amplitude is compared directly with an independent samples t test, the results show that the N$_{\text{T}}$ is significantly larger for the shape group than the colour group (r NtTDdiff$full_result).`
 
-##### Distractor response - Distractor present trials
+##### Distractor response - distractor present trials.
 
 For the lateralised distractor response, results of the N$_{\text{T}}$ time range showed neither an effect of group (`r search.NtDT.results$full$Group`), nor of electrode laterality (`r search.NtDT.results$full$Contra`), nor an interaction between group and electrode laterality (`r search.NtDT.results$full$Group_Contra`).
 
@@ -1476,7 +1476,7 @@ rm(allData, diffDirect, NtTDdiff, PdDTdiff)
 gc()
 ```
 
-## Comparison between voluntary and cued task switching
+## Comparison Between Voluntary and Cued Task Switching
 
 ```{r prepComparisonMain, warnings = FALSE, echo = FALSE}
 load('CNV/plotData_readyforplotsandstats.RData')
@@ -1609,12 +1609,12 @@ ggsave("Figures/CNVbycondition.jpg",cnvint, width = 16, height = 9, units = "cm"
 include_graphics("Figures/CNVbycondition.jpg", auto_pdf = TRUE)
 ```
 
-### Version 1 – everything in one analysis
+### Version 1 – everything in one analysis.
 Additionally, we decided to perform a 2x2x2 ANOVA to investigate the effect of task (categorisation vs search), transition (switch vs repetition), and experiment (cued vs voluntary task switching) on preparatory activity at both frontal and posterior electrode clusters. When performed with CNV amplitude (taken from frontal electrodes) as the dependent variable, we observed significant main effects of task (`r v1.frontal.aov$full_result$TaskChoice`) and experiment (`r v1.frontal.aov$full_result$Exp`), but not transition (`r v1.frontal.aov$full_result$RepSwitch`). We saw a significant interaction between task and experiment (`r v1.frontal.aov$full_result$Exp_TaskChoice`), and follow-up contrasts revealed that the CNV was larger during voluntary task switching than cued task switching when preparing for the search task (`r v1.frontalCNV.fup1$full_result$Cued_Voluntary_Search`), but not so much for the categorisation task (`r v1.frontalCNV.fup1$full_result$Cued_Voluntary_Learn`). Follow-up contrasts also showed that for participants in the cued task switching experiment, the CNV was larger during preparation for the search task than for the categorisation task (`r v1.frontalCNV.fup2$full_result$Learn_Search_Cued`), whereas no significant difference between tasks was observed for participants in the voluntary task switching experiment (`r v1.frontalCNV.fup2$full_result$Learn_Search_Voluntary`). While the main effect of transition noted above was not significant, we did observe a significant interaction between task and transition (`r v1.frontal.aov$full_result$RepSwitch_TaskChoice`). Follow-up comparisons revealed that for the categorisation task, the CNV was significantly larger in repetition trials than in switch trials (`r v1.frontalCNV.fup3$full_result$Repetition_Switch_Learn`), whereas no significant difference was observed in the search task (`r v1.frontalCNV.fup3$full_result$Repetition_Switch_Search`). Additionally, we saw that the CNV was larger for categorisation trials than for search trials in preparation for both a switch (`r v1.frontalCNV.fup4$full_result$Learn_Search_Switch`) and a repetition (`r v1.frontalCNV.fup4$full_result$Learn_Search_Repetition`). The 3-way interaction between task, transition, and experiment was not significant (`r v1.frontal.aov$full_result$Exp_RepSwitch_TaskChoice`).
 
 When this analysis was repeated using posterior positive amplitude as the dependent variable, we saw a significantly larger positivity for switch trials than repetition trials (`r v1.post.aov$full_result$RepSwitch`), and this effect did not interact with experiment (`r v1.post.aov$full_result$Exp_RepSwitch`) or task (`r v1.post.aov$full_result$RepSwitch_TaskChoice`). We also saw significant main effects of task (`r v1.post.aov$full_result$TaskChoice`) and experiment (`r v1.post.aov$full_result$Exp`), as well as a significant interaction between task and experiment (`r v1.post.aov$full_result$Exp_TaskChoice`). Follow-up contrasts on this interaction showed that for categorisation trials, there was a significantly larger positivity in cued task switching compared to voluntary (`r v1.postCNV.fup1$full_result$Cued_Voluntary_Learn`), and this effect was more pronounced in the search trials (`r v1.postCNV.fup1$full_result$Cued_Voluntary_Search`). In the cued task switching experiment we also saw a significant difference in component amplitude between categorisation and search trials (`r v1.postCNV.fup2$full_result$Learn_Search_Cued`), however in the voluntary selection paradigm we saw no such difference between categorisation and search (`r v1.postCNV.fup2$full_result$Learn_Search_Cued`). We did not observe a significant 3-way interaction between task, transition, and experiment (`r v1.post.aov$full_result$Exp_RepSwitch_TaskChoice`).
 
-### Versions 2 – separate analysis for each experiment
+### Version 2 – separate analysis for each experiment.
 
 Additionally, for each experiment we decided to perform a 2x2 ANOVA to investigate the effect of task (categorisation vs search) and transition (switch vs repetition) on preparatory activity at both frontal and posterior electrode clusters. In the cued task switching experiment, CNV amplitude at frontal electrodes showed a significant main effect of task (`r v2cued.frontal.aov$full_result$TaskChoice`), no significant main effect of transition (`r v2cued.frontal.aov$full_result$RepSwitch`), and a significant interaction between task and transition (`r v2cued.frontal.aov$full_result$RepSwitch_TaskChoice`). Follow-up contrasts showed that the CNV is larger for categorisation trials than search trials preceding a switch (`r v2cued.frontalCNV.fup2$full_result$Learn_Search_Switch`), and that this effect is even more pronounced for a repetition (`r v2cued.frontalCNV.fup2$full_result$Learn_Search_Repetition`). We did not see any difference between switch and repetition in categorisation trials (`r v2cued.frontalCNV.fup1$full_result$Repetition_Switch_Learn`), nor any difference between switch and repetition in search trials (`r v2cued.frontalCNV.fup1$full_result$Repetition_Switch_Search`). When we perform this analysis using data from the posterior cluster of electrodes in the cued task switching experiment, we see a significant main effect of transition where switch trials have a significantly larger posterior positivity than repetition trials (`r v2cued.post.aov$full_result$RepSwitch`). We also see a main effect of task in which the posterior positivity is larger for the search task than the categorisation task (`r v2cued.post.aov$full_result$TaskChoice`). There is no significant interaction between transition and task (`r v2cued.post.aov$full_result$RepSwitch_TaskChoice`).
 

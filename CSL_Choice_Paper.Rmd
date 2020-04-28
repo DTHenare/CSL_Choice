@@ -29,7 +29,7 @@ affiliation:
     institution   : "Philipps-University of Marburg, Germany"
 
 author_note: |
-  Dion Henare and Anna Schuboe, Cognitive Neuroscience of Perception and Action, Department of Psychology, Philipps-University Marburg, Germany. We would like to acknowledge the contribution of Sophia Schach who was involved in the planning and collection of our data. \newline This research was supported by the Deutsche Forschungsgemeinschaft (DFG, German Research Foundation) – SFB/TRR 135, project number 222641018, TP B3.
+  Dion Henare and Anna Schuboe, Cognitive Neuroscience of Perception and Action, Department of Psychology, Philipps-University Marburg, Germany. We would like to acknowledge the contribution of Sophia Schach who was involved in collection of our data as well as some initial analyses. \newline This research was supported by the Deutsche Forschungsgemeinschaft (DFG, German Research Foundation) – SFB/TRR 135, project number 222641018, TP B3.
 
 abstract: |
   The human visual system can only process a fraction of the information present in a typical visual scene, and selection is historically framed as the outcome of bottom-up and top-down control processes. In this study we evaluated how a third factor, an individual’s selection history, interacts with top-down control mechanisms during visual search. Participants in our task were assigned to one of two groups in which they developed a history of either shape or colour selection in one task, while searching for a shape singleton in a second task. A voluntary task selection procedure allowed participants to choose which task they would perform on each trial thereby maximising their top- down preparation. We recorded EEG throughout and extracted lateralised ERP components that index target selection (N$_{\text{T}}$)) and distractor suppression (P$_{\text{D}}$)). Our results showed that selection history continued to guide attention during visual search, even when top-down control mechanisms were maximised with voluntary task selection. For participants with a history of colour selection, the N$_{\text{T}}$) component elicited by a shape target was attenuated when accompanied by a colour distractor, and the distractor itself elicited a larger P$_{\text{D}}$) component. Additionally, task switching results revealed that participants in the colour group had larger, asymmetric switch costs implying increased competition between task sets. Our results support the notion that selection history is a significant factor in attention guidance, orienting the visual system reflexively to objects that contradict an individual’s current goals - even when these goals are intrinsically selected and prepared ahead of time.
@@ -249,7 +249,7 @@ Each stimulus presented during the categorisation and search trials was presente
 (ref:stimDispFig) Example task displays for the categorisation (A) and search tasks (B). In each display, one singleton is lateralised and the other is on the midline in order to allow for the calculation of EEG activity elicited by the lateral stimulus. Participants performed 1152 trials in total, 50% of these were required to be categorisation trials (half of each display type) and 50% were required to be search trials (one third of each display type).
 
 ```{r stimDisplays, fig.cap = "(ref:stimDispFig)"}
-include_graphics("Figures/CSL-Choice trial displays.jpg", auto_pdf = TRUE)
+include_graphics("Figures/CSL-Choice trial displays.tiff", auto_pdf = TRUE)
 ```
 
 ### Categorisation trials.
@@ -267,7 +267,7 @@ In session two, every trial began with a task selection screen where participant
 (ref:trialProcFig) Trial procedure (A). Participants started each trial by selecting which of two tasks they would perform next. After a 500ms delay, their chosen task display was presented. In the case of a categorisation display, they would categorise either the shape or colour singleton (depending on group assignment) whereas in the search task all participants would respond to the orientation of the line within the shape singleton. An example of the feedback display (B) shown to participants between blocks which provides information about the percentage of trials left for each task, as well as the number of blocks completed, average accuracy for each task, and average response time for each task.
 
 ```{r trialProc, fig.cap = "(ref:trialProcFig)"}
-include_graphics("Figures/CSLChoice Trial Proc and interblock feedback.jpg", auto_pdf = TRUE)
+include_graphics("Figures/CSLChoice Trial Proc and interblock feedback.tiff", auto_pdf = TRUE)
 ```
 
 ## EEG Recording
@@ -425,11 +425,11 @@ choiceRTPlot <- behavData %>%
         #text= element_text(size=18)
         )
 final <- grid.arrange(choicePercent,choiceRTPlot, ncol = 2, nrow = 1,  widths = c(1,1), layout_matrix = rbind(c(1,2)))
-ggsave("Figures/taskChoice.jpg", plot = final, dpi = 600, width = 16, height = 8, units = "cm")
+ggsave("Figures/taskChoice.tiff", plot = final, dpi = 600, width = 16, height = 8, units = "cm")
 ```
 
 ```{r choseSearch, fig.cap = "(ref:choseSearchPlot)"}
-include_graphics("Figures/taskChoice.jpg", auto_pdf = TRUE)
+include_graphics("Figures/taskChoice.tiff", auto_pdf = TRUE)
 ```
 
 ```{r choiceRT}
@@ -497,11 +497,11 @@ behavData %>%
         axis.ticks = element_blank(),
         text= element_text(size=18)
         )
-ggsave('Figures/SRviolin.jpg',width=5, height=4, units="in", dpi = 300)
+ggsave('Figures/SRviolin.tiff',width=5, height=4, units="in", dpi = 300)
 ```
 
 ```{r SwitchRateViolin, fig.cap = "(ref:SRPlot)"}
-include_graphics("Figures/SRviolin.jpg", auto_pdf = TRUE)
+include_graphics("Figures/SRviolin.tiff", auto_pdf = TRUE)
 ```
 
 ### Switch costs.
@@ -700,11 +700,11 @@ strip.background = element_blank(),
 legend.position = "none"
 )
 pg <- grid.arrange(plot1,plot2, ncol = 2, nrow = 1)
-ggsave("Figures/switchcost.jpg", pg, width = 16, height = 8, units = "cm")
+ggsave("Figures/switchcost.tiff", pg, width = 16, height = 8, units = "cm")
 ```
 
 ```{r switchCostPlot, fig.cap= "(ref:SCPlot)"}
-include_graphics("Figures/switchcost.jpg", auto_pdf = TRUE)
+include_graphics("Figures/switchcost.tiff", auto_pdf = TRUE)
 ```
 
 ## Selection History
@@ -878,13 +878,13 @@ behavData %>%
         axis.ticks = element_blank(),
         text= element_text(size=18)
         )
-ggsave('Figures/DistIntViolin.jpg',width=5, height=4, units="in", dpi = 300)
+ggsave('Figures/DistIntViolin.tiff',width=5, height=4, units="in", dpi = 300)
 ```
 
 (ref:behavDistInt) Response time cost (response time in distractor present trials minus RT in distractor absent trials) caused by the presence of a coloured distractor in the search task. Participants assigned to respond to colour in the categorisation task (shown in green) had significantly higher costs during the search task than participants assigned to repsond to shape in the categorisation task (shown in grey). Individual response time costs are depicted as dots alongside a boxplot and violin plot to visualise the range and distribution of costs for each group.
 
 ```{r DistIntViolin, fig.cap = "(ref:behavDistInt)"}
-include_graphics("Figures/DistIntViolin.jpg", auto_pdf = TRUE)
+include_graphics("Figures/DistIntViolin.tiff", auto_pdf = TRUE)
 ```
 
 
@@ -1219,11 +1219,11 @@ for(i in which(grepl("strip-r", pg$layout$name))){
 }
 
 grid::grid.draw(pg)
-ggsave("Figures/LearnSubtracted.jpg", pg, dpi = 300, width = 5, height = 4, units = "in")
+ggsave("Figures/LearnSubtracted.tiff", pg, dpi = 300, width = 5, height = 4, units = "in")
 ```
 
 ```{r makeLearnPlots, fig.cap="(ref:learnERPCap)"}
-include_graphics("Figures/LearnSubtracted.jpg", auto_pdf = TRUE)
+include_graphics("Figures/LearnSubtracted.tiff", auto_pdf = TRUE)
 ```
 
 #### Search task.
@@ -1459,11 +1459,11 @@ for(i in which(grepl("strip-r", pg$layout$name))){
 }
 
 grid::grid.draw(pg)
-ggsave("Figures/SearchSubtracted.jpg", pg, dpi = 300, width = 5, height = 5.3, units = c("in"))
+ggsave("Figures/SearchSubtracted.tiff", pg, dpi = 300, width = 5, height = 5.3, units = c("in"))
 ```
 
 ```{r makeSearchPlots, fig.cap="(ref:searchERPCap)"}
-include_graphics("Figures/SearchSubtracted.jpg", auto_pdf = TRUE)
+include_graphics("Figures/SearchSubtracted.tiff", auto_pdf = TRUE)
 ```
 
 
@@ -1496,7 +1496,7 @@ source('CreateTopography.R')
 (ref:ExpCompPlot) Preparatory activity in the voluntary task selection procedure used in the present experiment, compared to the preparatory activity in a cued version of our task carried out by @kadel2017selection. A) ERP activity centred on the task display onset taken from a cluster of fronto-central electrodes to measure the CNV, and a cluster of posterior electrodes to measure the posterior positivity. The solid vertical line indicates the onset of the fixation cross preceding the task display on each trial. In the cued task this fixation indicated which task participants would be presented with, in the voluntary task this fixation started after participants had selected the task they would like to perform in the upcoming trial. The vertical dotted line shows the onset of the task display, and the component window used to measure preparatory activity is highlighted in yellow. B) Scalp distribution of ERP activity within the time window of interest, plotted separately for the two experiments. We observe a larger fronto-central negativity typical of voluntary task switching paradigms and indicative of enhanced top-down control relative to the cued task paradigm.
 
 ```{r expCompPrepPlot, fig.cap= "(ref:ExpCompPlot)"}
-include_graphics("Figures/comp.jpg", auto_pdf = TRUE)
+include_graphics("Figures/comp.tiff", auto_pdf = TRUE)
 ```
 
 Comparison of the preparatory activity in the present experiment to the preparatory activity recorded by @kadel2017selection is shown in Figure\ \@ref(fig:expCompPrepPlot). We saw a significantly larger CNV at frono-central electrodes in our voluntary task switching procedure (`r front.stats$full_result`). We also saw a significantly larger positivity at posterior electrods in the cued task switching procedure used by @kadel2017selection (`r post.stats$full_result`).
@@ -1577,6 +1577,8 @@ x = c(-800,-500)
 y=c(0,0)
 lineData = data.frame(x=x,y=y)
 cnvint <- plotData %>%
+  ungroup() %>%
+  mutate(TaskChoice = ifelse(TaskChoice == "Learn","Categorisation","Search")) %>%
   group_by(sample, Chan, Exp, RepSwitch, TaskChoice) %>%
   summarise(mean = mean(mean)) %>%
   ggplot() +
@@ -1600,13 +1602,13 @@ cnvint <- plotData %>%
         plot.margin = unit(c(0,0,0,0),"cm")
         #,plot.title = element_text(family = "sans", size = 18, margin=margin(0,0,0,0))
   )
-ggsave("Figures/CNVbycondition.jpg",cnvint, width = 16, height = 9, units = "cm", dpi = 300)
+ggsave("Figures/CNVbycondition.tiff",cnvint, width = 16, height = 9, units = "cm", dpi = 300)
 ```
 
 (ref:ExpCompbyCondPlot) Preparatory activity in the cued tasking switching experiment (left), and the voluntary task switching experiment (right) separated by the task performed (categorisation vs search), and task transition (switch vs repetition) from the previous trial. The solid vertical line indicates the onset of the fixation cross preceding the task display on each trial. In the cued task this fixation indicated which task participants would be presented with, in the voluntary task this fixation started after participants had selected the task they would like to perform. The vertical dotted line shows the onset of the task display, the component window used to measure preparatory activity is highlighted in yellow.
 
 ```{r expCompPrepbyTaskPlot, fig.cap= "(ref:ExpCompbyCondPlot)"}
-include_graphics("Figures/CNVbycondition.jpg", auto_pdf = TRUE)
+include_graphics("Figures/CNVbycondition.tiff", auto_pdf = TRUE)
 ```
 
 ### Version 1 – everything in one analysis.
